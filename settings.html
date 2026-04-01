@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - HRN Gaming Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #05070a;
+            --accent: #89b4fa;
+            --glass: rgba(255,255,255,0.035);
+            --glass-border: rgba(255,255,255,0.09);
+            --text-main: #f0f4ff;
+            --text-dim: rgba(255,255,255,0.65);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 40px 30px;
+            overflow-y: auto;
+        }
+
+        .settings-container {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(20px);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 1.02rem;
+            font-weight: 500;
+        }
+
+        .setting-desc {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle.active {
+            background: var(--accent);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle.active::after {
+            transform: translateX(24px);
+        }
+
+        .btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 14px 28px;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: rgba(137,180,250,0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .danger {
+            color: #ff8080;
+        }
+        .danger:hover {
+            background: rgba(255,80,80,0.15);
+            border-color: #ff8080;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="header">
+            <i data-lucide="settings" style="width:42px;height:42px;color:var(--accent)"></i>
+            <h1>Settings</h1>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <i data-lucide="user"></i>
+                <span>Account</span>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <div class="setting-label">Username</div>
+                    <div class="setting-desc">hrn_player_420</div>
+                </div>
+                <button class="btn">Change</button>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <div class="setting-label">Discord Linked</div>
+                    <div class="setting-desc">@jouwusername</div>
+                </div>
+                <button class="btn">Unlink</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <i data-lucide="monitor"></i>
+                <span>Appearance</span>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <div class="setting-label">Dark Mode</div>
+                    <div class="setting-desc">Always on for the real ones</div>
+                </div>
+                <div class="toggle active" id="dark-toggle"></div>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <div class="setting-label">Particles Intensity</div>
+                    <div class="setting-desc">How much chaos you want</div>
+                </div>
+                <select style="background:var(--glass);border:1px solid var(--glass-border);color:white;padding:8px 12px;border-radius:12px;">
+                    <option>Low</option>
+                    <option selected>Medium</option>
+                    <option>High</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <i data-lucide="volume-2"></i>
+                <span>Audio</span>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Background Music</div>
+                <div class="toggle active"></div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Sound Effects</div>
+                <div class="toggle active"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <i data-lucide="shield"></i>
+                <span>Privacy &amp; Safety</span>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <div class="setting-label">Show online status</div>
+                </div>
+                <div class="toggle active"></div>
+            </div>
+        </div>
+
+        <div style="margin-top:40px;display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn" onclick="hideIframe()">Hide Settings</button>
+            <button class="btn danger" onclick="closeIframe()">Close Window</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Toggle switches
+        document.querySelectorAll('.toggle').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                toggle.classList.toggle('active');
+            });
+        });
+
+        // PostMessage functions
+        function hideIframe() {
+            window.parent.postMessage('HIDE_IFRAME', '*');
+        }
+
+        function closeIframe() {
+            window.parent.postMessage('CLOSE_IFRAME', '*');
+        }
+
+        // Extra: je kunt ook via toetsenbord sluiten
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                hideIframe();
+            }
+        });
+    </script>
+</body>
+</html>
