@@ -50,13 +50,12 @@
         .logo:hover{opacity:.56}
         .tagline{font-size:1.02rem;font-weight:400;letter-spacing:.15em;color:var(--text-dim);margin-top:-4px;min-height:1.3em;opacity:0;transform:translateY(10px);transition:all .6s cubic-bezier(.23,1,.32,1);}
         .tagline.show{opacity:1;transform:translateY(0);}
-        #iframe-container{position:fixed;inset:0;z-index:100;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .4s cubic-bezier(.23,1,.32,1);}
-        #iframe-container.active{opacity:1;visibility:visible;}
+        #iframe-container{position:fixed;inset:0;z-index:100;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .4s cubic-bezier(.23,1,.32,1);pointer-events:none;}
+        #iframe-container.active{opacity:1;visibility:visible;pointer-events:auto;}
         #content-iframe{width:100%;height:100%;border:none;background:var(--bg);}
         .iframe-loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--text-dim);z-index:110;}
         .spinner{width:42px;height:42px;border:3px solid rgba(137,180,250,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite;}
         @keyframes spin{to{transform:rotate(360deg)}}
-        .loading-text{font-size:.85rem;letter-spacing:.08em;font-weight:500;}
         @media(max-width:768px){
             .wrapper{padding:20px 16px}
             .main{flex-direction:column;justify-content:center;gap:28px}
@@ -108,7 +107,6 @@
     <div id="iframe-container">
         <div class="iframe-loading" id="iframe-loading">
             <div class="spinner"></div>
-            <div class="loading-text">Loading...</div>
         </div>
         <iframe id="content-iframe" src="" allowfullscreen></iframe>
     </div>
@@ -207,18 +205,33 @@
 
         function openPage(page) {
             syncSettings();
-            if (currentPage === page) {
-                if (isHidden) showIframe(); else hideIframe();
+            
+            if (currentPage === page && isHidden) {
+                showIframe();
                 return;
             }
+            
+            if (currentPage === page && !isHidden) {
+                hideIframe();
+                return;
+            }
+
             currentPage = page;
             isHidden = false;
-            document.querySelectorAll('.side-link').forEach(link => link.classList.toggle('active', link.dataset.page === page));
+
+            document.querySelectorAll('.side-link').forEach(link => {
+                link.classList.toggle('active', link.dataset.page === page);
+            });
+
             history.pushState({page: page}, '', '#' + page);
+            iframeContainer.style.visibility = 'visible';
             iframeContainer.classList.add('active');
+            iframeContainer.style.opacity = '1';
+            
             loading.style.display = 'flex';
             contentIframe.style.opacity = '0';
             contentIframe.src = page + '.html';
+
             contentIframe.onload = () => {
                 loading.style.display = 'none';
                 contentIframe.style.opacity = '1';
@@ -227,10 +240,16 @@
 
         function hideIframe() {
             isHidden = true;
+            iframeContainer.classList.remove('active');
             iframeContainer.style.opacity = '0';
-            setTimeout(() => { if (isHidden) iframeContainer.style.visibility = 'hidden'; }, 400);
-            currentPage = null;
-            document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+            
+            setTimeout(() => {
+                if (isHidden) {
+                    iframeContainer.style.visibility = 'hidden';
+                    document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+                }
+            }, 400);
+
             history.pushState(null, '', window.location.pathname);
         }
 
@@ -238,7 +257,15 @@
             syncSettings();
             isHidden = false;
             iframeContainer.style.visibility = 'visible';
+            iframeContainer.classList.add('active');
             iframeContainer.style.opacity = '1';
+            
+            if (currentPage) {
+                document.querySelectorAll('.side-link').forEach(link => {
+                    link.classList.toggle('active', link.dataset.page === currentPage);
+                });
+                history.pushState({page: currentPage}, '', '#' + currentPage);
+            }
         }
 
         window.addEventListener('message', (e) => {
