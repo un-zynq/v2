@@ -7,25 +7,300 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root{--bg:#05070a;--accent:#89b4fa;--text-main:#fff;--text-dim:rgba(255,255,255,.45);--glass:rgba(255,255,255,.03);--glass-border:rgba(255,255,255,.08);--discord-gray:#121417;--transition:all .4s cubic-bezier(.2,1,.3,1)}*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{display:none;width:0;height:0}html,body{height:100vh;height:100dvh;width:100%;font-family:'Inter',sans-serif;background-color:var(--bg);color:var(--text-main);overflow:hidden;user-select:none;-webkit-user-select:none;cursor:url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor-32.png'),auto}a,button,.side-link,.discord-pill{cursor:url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor-32.png'),pointer}.ambient-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at 50% 50%,#121720 0%,#05070a 100%);z-index:0}.ambient-bg::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background-image:url('https://wallpapers.com/images/hd/dark-gaming-3475-x-1679-wallpaper-wjdfq8rsvh4lz1dt.jpg');background-size:cover;background-position:center;opacity:0.15;pointer-events:none}.glow{position:fixed;width:40vw;height:40vw;background:radial-gradient(circle,rgba(137,180,250,.08) 0%,transparent 70%);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;display:none;will-change:left,top;z-index:0}@media(hover:hover){.glow{display:block}}.wrapper{display:flex;flex-direction:column;justify-content:space-between;height:100dvh;padding:40px;max-width:1600px;margin:0 auto;position:relative}.header{display:flex;justify-content:center;z-index:100}#clock{background:var(--glass);padding:10px 24px;border-radius:20px;border:1px solid var(--glass-border);backdrop-filter:blur(10px);font-size:.75rem;letter-spacing:.15em;color:var(--text-dim);font-variant-numeric:tabular-nums;text-transform:uppercase}.main{display:flex;justify-content:space-between;align-items:center;flex-grow:1;width:100%;position:relative}.side-nav{display:flex;flex-direction:column;gap:20px;z-index:300;width:60px;position:relative}.side-link{width:56px;height:56px;display:flex;align-items:center;justify-content:center;color:var(--text-main);background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;transition:var(--transition);text-decoration:none}.side-link:hover{background:rgba(137,180,250,.1);border-color:var(--accent);transform:translateY(-3px);color:var(--accent)}.side-link svg{width:24px;height:24px;stroke-width:1.5px}.center-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:fit-content;z-index:10}.logo{font-size:clamp(5rem,20vw,13rem);font-weight:900;letter-spacing:-.05em;line-height:.75;background:linear-gradient(180deg,#ccc 30%,rgba(137,180,250,.4) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:25px;filter:drop-shadow(0 0 50px rgba(0,0,0,.5))}.discord-pill{display:inline-flex;align-items:center;gap:12px;padding:14px 32px;border-radius:50px;border:1px solid rgba(255,255,255,.15);font-size:.8rem;font-weight:800;background:rgba(255,255,255,.03);transition:var(--transition);backdrop-filter:blur(10px);text-decoration:none;color:#fff}.discord-pill:hover{background:rgba(255,255,255,.1);border-color:#fff;transform:scale(1.05)}.discord-pill svg{width:20px;height:20px;fill:currentColor}.footer{display:flex;justify-content:center;align-items:center;z-index:100;position:relative}.meta-info{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.7rem;color:var(--text-dim)}.status-indicator{display:flex;align-items:center;gap:8px;background:var(--glass);padding:4px 12px;border-radius:12px;border:1px solid var(--glass-border)}.dot{width:6px;height:6px;background:#50fa7b;border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.2)}}.desktop-only{display:flex}.mobile-only{display:none}@media(max-width:640px){.wrapper{padding:15px}.main{flex-direction:column;justify-content:center;gap:0}.center-brand{position:static;transform:none;order:1;width:100%;margin-bottom:10px}.logo{margin-bottom:5px}.discord-pill{position:fixed;bottom:25px;right:20px;width:46px;height:46px;padding:0;justify-content:center;border-radius:16px;z-index:400;background:var(--discord-gray);border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.3);box-shadow:0 8px 32px rgba(0,0,0,.4)}.discord-pill span{display:none}.discord-pill svg{width:1.1rem;height:1.1rem}.side-nav{order:2;flex-direction:row;width:100%;justify-content:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding-left:50%;scroll-behavior:smooth;padding:20px 50vw;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%);mask-image:linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%)}.side-link{flex:0 0 54px;height:54px;border-radius:14px;scroll-snap-align:start}.desktop-only{display:none!important}.mobile-only{display:flex!important}}
+        :root {
+            --bg: #05070a;
+            --accent: #89b4fa;
+            --accent-glow: rgba(137, 180, 250, 0.15);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.45);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --discord-gray: #121417;
+            --transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            scrollbar-width: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        html, body {
+            height: 100dvh;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor-32.png'), auto;
+        }
+
+        a, button, .side-link, .discord-pill {
+            cursor: url('https://cdn.jsdelivr.net/gh/un-zynq/new-ui/cursor-32.png'), pointer;
+        }
+
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, #121720 0%, #05070a 100%);
+            z-index: 0;
+        }
+
+        .ambient-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('https://wallpapers.com/images/hd/dark-gaming-3475-x-1679-wallpaper-wjdfq8rsvh4lz1dt.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            pointer-events: none;
+            display: none;
+        }
+
+        body.show-bg .ambient-bg::after {
+            display: block;
+        }
+
+        .glow {
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(137, 180, 250, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            will-change: transform;
+            transform: translate3d(-50%, -50%, 0);
+            display: none;
+        }
+
+        @media(hover: hover) {
+            .glow { display: block; }
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100dvh;
+            padding: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #status-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--glass);
+            padding: 10px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            font-size: .75rem;
+            letter-spacing: .15em;
+            color: var(--text-dim);
+            font-variant-numeric: tabular-nums;
+            text-transform: uppercase;
+        }
+
+        .pill-sep {
+            width: 1px;
+            height: 12px;
+            background: var(--glass-border);
+        }
+
+        .main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-grow: 1;
+            width: 100%;
+            position: relative;
+        }
+
+        .side-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 300;
+            width: 60px;
+            position: relative;
+        }
+
+        .side-link {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .side-link:hover {
+            background: rgba(137, 180, 250, 0.1);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            color: var(--accent);
+        }
+
+        .side-link svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 1.5px;
+        }
+
+        .center-brand {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: fit-content;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: clamp(5rem, 20vw, 13rem);
+            font-weight: 900;
+            letter-spacing: -.05em;
+            line-height: .75;
+            background: linear-gradient(180deg, #ccc 30%, rgba(137,180,250,0.4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 50px rgba(0,0,0,0.5));
+        }
+
+        .discord-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 32px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.15);
+            font-size: .8rem;
+            font-weight: 800;
+            background: rgba(255,255,255,0.03);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .discord-pill:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #fff;
+            transform: scale(1.05);
+        }
+
+        .discord-pill svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            position: relative;
+        }
+
+        .meta-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: .7rem;
+            color: var(--text-dim);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--glass);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #50fa7b;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.2); }
+        }
+
+        .desktop-only { display: flex; }
+        .mobile-only { display: none; }
+
+        @media(max-width: 640px) {
+            .wrapper { padding: 15px; }
+            .main { flex-direction: column; justify-content: center; }
+            .center-brand { position: static; transform: none; order: 1; width: 100%; margin-bottom: 10px; }
+            .logo { margin-bottom: 5px; }
+            .discord-pill { position: fixed; bottom: 25px; right: 20px; width: 46px; height: 46px; padding: 0; justify-content: center; border-radius: 16px; z-index: 400; background: var(--discord-gray); border: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+            .discord-pill span { display: none; }
+            .side-nav { order: 2; flex-direction: row; width: 100%; justify-content: flex-start; gap: 12px; overflow-x: auto; padding: 20px 50vw; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%, black 65%, transparent 100%); }
+            .side-link { flex: 0 0 54px; height: 54px; border-radius: 14px; }
+            .desktop-only { display: none !important; }
+            .mobile-only { display: flex !important; }
+        }
     </style>
 </head>
 <body>
     <div class="ambient-bg"></div>
     <div class="glow" id="mouse-glow"></div>
+
     <div class="wrapper">
         <header class="header">
-            <div id="clock">LOADING...</div>
+            <div id="status-pill">
+                <span id="date"></span>
+                <div class="pill-sep"></div>
+                <span id="clock"></span>
+            </div>
         </header>
+
         <main class="main">
             <nav class="side-nav" id="mobileNav">
                 <a href="#" class="side-link"><i data-lucide="play"></i></a>
                 <a href="#" class="side-link"><i data-lucide="users"></i></a>
                 <a href="#" class="side-link"><i data-lucide="trophy"></i></a>
                 <a href="#" class="side-link mobile-only"><i data-lucide="shopping-cart"></i></a>
-                <a href="#" class="side-link mobile-only"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link mobile-only"><i data-lucide="settings" onclick="toggleBG()"></i></a>
                 <a href="#" class="side-link mobile-only"><i data-lucide="user"></i></a>
             </nav>
+
             <div class="center-brand">
                 <h1 class="logo">HRN</h1>
                 <a href="https://discord.gg/JAmeRKQzX" target="_blank" class="discord-pill">
@@ -33,12 +308,14 @@
                     <span>JOIN DISCORD</span>
                 </a>
             </div>
+
             <nav class="side-nav desktop-only">
                 <a href="#" class="side-link"><i data-lucide="shopping-cart"></i></a>
-                <a href="#" class="side-link"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link"><i data-lucide="settings" onclick="toggleBG()"></i></a>
                 <a href="#" class="side-link"><i data-lucide="user"></i></a>
             </nav>
         </main>
+
         <footer class="footer">
             <div class="meta-info">
                 <div class="status-indicator">
@@ -49,28 +326,57 @@
             </div>
         </footer>
     </div>
+
     <script>
         lucide.createIcons();
-        function updateTime() {
+
+        function toggleBG() {
+            const isVisible = localStorage.getItem('bg-visible') === 'true';
+            localStorage.setItem('bg-visible', !isVisible);
+            applyBG();
+        }
+
+        function applyBG() {
+            const isVisible = localStorage.getItem('bg-visible') !== 'false';
+            if (isVisible) {
+                document.body.classList.add('show-bg');
+            } else {
+                document.body.classList.remove('show-bg');
+            }
+        }
+        applyBG();
+
+        function updateDateTime() {
             const now = new Date();
             let hours = now.getHours() % 12 || 12;
             let min = now.getMinutes().toString().padStart(2, '0');
-            let sec = now.getSeconds().toString().padStart(2, '0');
             let ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-            const clockEl = document.getElementById('clock');
-            if(clockEl) clockEl.textContent = `${hours}:${min}:${sec} ${ampm}`;
+            const options = { day: '2-digit', month: 'short' };
+            const dateStr = now.toLocaleDateString('en-US', options);
+            document.getElementById('clock').textContent = `${hours}:${min} ${ampm}`;
+            document.getElementById('date').textContent = dateStr;
         }
-        setInterval(updateTime, 1000); 
-        updateTime();
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
         const glow = document.getElementById('mouse-glow');
         let mX = 0, mY = 0, gX = 0, gY = 0;
-        document.addEventListener('mousemove', (e) => { mX = e.clientX; mY = e.clientY; }, { passive: true });
+
+        document.addEventListener('mousemove', (e) => {
+            mX = e.clientX;
+            mY = e.clientY;
+        }, { passive: true });
+
         function lerp() {
-            gX += (mX - gX) * 0.08; gY += (mY - gY) * 0.08;
-            if (glow) { glow.style.left = gX + 'px'; glow.style.top = gY + 'px'; }
+            gX += (mX - gX) * 0.08;
+            gY += (mY - gY) * 0.08;
+            if (glow) {
+                glow.style.transform = `translate3d(${gX}px, ${gY}px, 0) translate(-50%, -50%)`;
+            }
             requestAnimationFrame(lerp);
         }
         lerp();
+
         const nav = document.getElementById('mobileNav');
         function centerNav() {
             if (window.innerWidth <= 640 && nav) {
@@ -80,8 +386,6 @@
         }
         window.addEventListener('load', centerNav);
         window.addEventListener('resize', centerNav);
-        const resizeObserver = new ResizeObserver(centerNav);
-        if(nav) resizeObserver.observe(nav);
     </script>
 </body>
 </html>
