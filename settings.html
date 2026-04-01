@@ -17,7 +17,6 @@
             --success-green: #16a34a;
         }
 
-        /* SaaS Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: var(--bg-black); }
         ::-webkit-scrollbar-thumb { background: var(--border-gray); border-radius: 10px; }
@@ -95,7 +94,6 @@
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
 
-        /* Slider Switch */
         .switch-row {
             display: flex;
             justify-content: space-between;
@@ -218,12 +216,12 @@
         </div>
 
         <div class="footer">
-            <button onclick="saveSettings()">Apply Changes</button>
+            <button onclick="saveAndClose()">Apply & Close</button>
         </div>
     </div>
 
     <script>
-        function saveSettings() {
+        function saveAndClose() {
             const bgUrl = document.getElementById('bgUrl').value.trim();
             const tabTitle = document.getElementById('tabTitle').value.trim() || "HRN | Gaming Hub";
             const favicon = document.getElementById('faviconUrl').value.trim();
@@ -241,21 +239,19 @@
                     tabTitle: tabTitle,
                     favicon: favicon || null
                 }, '*');
+
+                setTimeout(() => {
+                    window.parent.postMessage({ type: 'closeIframe' }, '*');
+                }, 150);
             }
 
             const btn = document.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = 'Saved';
+            btn.innerText = 'Applied';
             btn.style.background = 'var(--success-green)';
-            
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.style.background = 'var(--accent-blue)';
-            }, 2000);
         }
 
         window.onload = () => {
-            document.getElementById('tabTitle').value = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
+            document.getElementById('tabTitle').value = localStorage.getItem('hrn_tab_title') || "";
             document.getElementById('bgUrl').value = localStorage.getItem('hrn_bg_url') || "";
             document.getElementById('faviconUrl').value = localStorage.getItem('hrn_favicon_url') || "";
             document.getElementById('particlesToggle').checked = localStorage.getItem('hrn_particles') !== 'false';
