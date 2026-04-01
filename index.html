@@ -60,7 +60,6 @@
         .tagline{font-size:1.02rem;font-weight:400;letter-spacing:.15em;color:var(--text-dim);margin-top:-4px;min-height:1.3em;opacity:0;transform:translateY(10px);transition:all .6s cubic-bezier(.23,1,.32,1);}
         .tagline.show{opacity:1;transform:translateY(0);}
         
-        /* === IFRAME FIXES === */
         #iframe-container{
             position:fixed;
             inset:0;
@@ -83,18 +82,10 @@
         }
         
         .iframe-loading{
-            position:absolute;
-            top:50%; left:50%; transform:translate(-50%,-50%);
-            display:flex; flex-direction:column; align-items:center; gap:16px;
-            color:var(--text-dim); z-index:110;
+            position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+            display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--text-dim);z-index:110;
         }
-        .spinner{
-            width:42px; height:42px;
-            border:3px solid rgba(137,180,250,.15);
-            border-top-color:var(--accent);
-            border-radius:50%;
-            animation:spin .9s linear infinite;
-        }
+        .spinner{width:42px;height:42px;border:3px solid rgba(137,180,250,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite;}
         @keyframes spin{to{transform:rotate(360deg)}}
         .loading-text{font-size:.85rem;letter-spacing:.08em;font-weight:500;}
         
@@ -146,7 +137,7 @@
         </main>
     </div>
 
-    <!-- Iframe Container -->
+    <!-- Iframe -->
     <div id="iframe-container">
         <div class="iframe-loading" id="iframe-loading">
             <div class="spinner"></div>
@@ -164,17 +155,44 @@
             return taglines[Math.floor(Math.random() * taglines.length)];
         }
 
-        // Particles (verkort voor overzicht)
+        // Particles
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         let particles = [], w, h;
 
-        class Particle { /* ...zelfde als vorige versie... */ 
+        class Particle {
             constructor() { this.reset(); }
-            reset() { /* ... */ }
-            update() { /* ... */ }
-            getOpacity() { /* ... */ }
-            draw() { /* ... */ }
+            reset() {
+                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.size = Math.random() * 1.7 + 0.5;
+                this.speedX = Math.random() * 0.22 - 0.11;
+                this.speedY = Math.random() * 0.22 - 0.16;
+                this.hue = 212 + Math.random() * 28;
+                this.life = Math.random() * 8000 + 6000;
+                this.age = Math.random() * this.life;
+                this.baseOpacity = Math.random() * 0.28 + 0.12;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY; this.age += 16;
+                if (this.x < 0) this.x = w; if (this.x > w) this.x = 0;
+                if (this.y < 0) this.y = h; if (this.y > h) this.y = 0;
+                if (this.age > this.life) this.reset();
+            }
+            getOpacity() {
+                const p = this.age / this.life;
+                return p < 0.15 ? this.baseOpacity * (p / 0.15) : p > 0.80 ? this.baseOpacity * ((1 - p) / 0.20) : this.baseOpacity;
+            }
+            draw() {
+                const o = this.getOpacity();
+                if (o <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = o;
+                ctx.fillStyle = `hsl(${this.hue},75%,94%)`;
+                ctx.shadowBlur = 9;
+                ctx.shadowColor = `hsl(${this.hue},90%,78%)`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
         }
 
         function resize() {
@@ -194,7 +212,7 @@
             requestAnimationFrame(animateParticles);
         }
 
-        // ==================== IFRAME LOGIC (GEFIXT) ====================
+        // ==================== IFRAME + BROWSER HISTORY FIX ====================
         const iframeContainer = document.getElementById('iframe-container');
         const loading = document.getElementById('iframe-loading');
         let contentIframe = document.getElementById('content-iframe');
@@ -208,32 +226,29 @@
         }
 
         function openPage(page) {
-            // Als dezelfde pagina al open is → toggle hide/show
             if (currentPage === page) {
-                if (isHidden) {
-                    showIframe();
-                } else {
-                    hideIframe();
-                }
+                if (isHidden) showIframe();
+                else hideIframe();
                 return;
             }
 
             currentPage = page;
             isHidden = false;
 
-            // Activeer juiste nav link
+            // Activeer nav link
             document.querySelectorAll('.side-link').forEach(link => {
                 link.classList.toggle('active', link.dataset.page === page);
             });
 
-            // Zorg dat container zichtbaar is
+            // Voeg history entry toe (zodat back/forward werkt, maar wij controleren het)
+            history.pushState({page: page}, '', '#iframe-' + page.replace(/[^a-zA-Z0-9]/g, ''));
+
             iframeContainer.style.visibility = 'visible';
             iframeContainer.style.opacity = '1';
             iframeContainer.classList.add('active');
 
             loading.style.display = 'flex';
 
-            // Reset en laad nieuwe pagina
             resetIframe();
             contentIframe.src = page;
 
@@ -270,15 +285,22 @@
             setTimeout(() => {
                 resetIframe();
                 iframeContainer.style.visibility = 'hidden';
+                // Optioneel: history terugzetten naar root
+                history.pushState(null, '', window.location.pathname);
             }, 450);
         }
 
-        // PostMessage support
-        window.addEventListener('message', (event) => {
-            const data = event.data;
-            if (data === 'HIDE_IFRAME' || data?.action === 'hide') hideIframe();
-            else if (data === 'CLOSE_IFRAME' || data?.action === 'close') closeIframe();
-            else if (data === 'SHOW_IFRAME' || data?.action === 'show') showIframe();
+        // === BELANGRIJK: Blokkeer browser back/forward effect op iframe ===
+        window.addEventListener('popstate', (event) => {
+            // Doe NIETS als de gebruiker back/forward doet
+            // Dit voorkomt dat de iframe onverwacht laadt of verdwijnt
+
+            if (currentPage) {
+                // Je kunt kiezen wat er gebeurt:
+                // Optie 1: Iframe gewoon laten staan (aanbevolen)
+                // Optie 2: Iframe sluiten bij back/forward
+                // closeIframe();   // uncomment als je wilt dat back/forward de iframe sluit
+            }
         });
 
         // Nav clicks
@@ -298,7 +320,15 @@
             if (e.key === "Escape" && iframeContainer.classList.contains('active')) hideIframe();
         });
 
-        // Tagline, DateTime, Glow
+        // PostMessage
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (data === 'HIDE_IFRAME' || data?.action === 'hide') hideIframe();
+            else if (data === 'CLOSE_IFRAME' || data?.action === 'close') closeIframe();
+            else if (data === 'SHOW_IFRAME' || data?.action === 'show') showIframe();
+        });
+
+        // Rest van de init (tagline, tijd, glow, particles)
         function loadRandomTagline() {
             const taglineEl = document.getElementById('tagline');
             taglineEl.textContent = getRandomTagline();
@@ -325,7 +355,6 @@
             requestAnimationFrame(animateGlow);
         }
 
-        // Init
         window.addEventListener('load', () => {
             resize();
             initParticles();
