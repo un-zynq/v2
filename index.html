@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HRN | Gaming Hub</title>
+    <title id="dynamic-title">HRN | Gaming Hub</title>
+    <link rel="icon" id="dynamic-favicon" href="favicon.ico" type="image/x-icon">
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e7ca3a68f0c04656baf422e837d316d4"}'></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <style>
         :root{
             --bg:#05070a;
@@ -20,75 +19,45 @@
             --glass-border:rgba(255,255,255,.09);
             --transition:all .35s cubic-bezier(.23,1,.32,1);
         }
-        
         *{margin:0;padding:0;box-sizing:border-box;scrollbar-width:none}
         *::-webkit-scrollbar{display:none}
-        
         html,body{
             height:100dvh; width:100%; font-family:'Inter',system-ui,sans-serif;
             background:var(--bg); color:var(--text-main); overflow:hidden; user-select:none;
         }
-        
-        .ambient-bg{position:fixed;inset:0;z-index:1;background:radial-gradient(circle at 40% 30%,rgba(137,180,250,.05) 0%,transparent 60%),#05070a;}
-        .ambient-bg::before{content:'';position:absolute;inset:0;background:url('https://wallpapers.com/images/hd/dark-gaming-3475-x-1679-wallpaper-wjdfq8rsvh4lz1dt.jpg') center/cover no-repeat;opacity:.2;pointer-events:none;}
-        
+        .ambient-bg{
+            position:fixed; inset:0; z-index:1;
+            background:radial-gradient(circle at 40% 30%,rgba(137,180,250,.05) 0%,transparent 60%), #05070a;
+            background-size: cover;
+            background-position: center;
+            transition: opacity .6s ease;
+        }
         .glow{position:fixed;width:460px;height:460px;background:radial-gradient(circle,var(--accent-glow) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:2;opacity:.38;filter:blur(55px);mix-blend-mode:screen;display:none;}
         @media(hover:hover){.glow{display:block}}
-        
         #particles{position:fixed;inset:0;z-index:3;pointer-events:none}
-        
         .wrapper{display:flex;flex-direction:column;height:100dvh;padding:28px 36px;max-width:1680px;margin:0 auto;position:relative;z-index:10;}
         .header{display:flex;justify-content:center;z-index:50;opacity:0;transition:opacity .6s ease;}
         .header.show{opacity:1}
-        
         #status-pill{display:flex;align-items:center;gap:14px;background:var(--glass);padding:9px 24px;border-radius:9999px;border:1px solid var(--glass-border);backdrop-filter:blur(20px);font-size:.75rem;font-weight:500;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;box-shadow:0 4px 15px rgba(0,0,0,.15);}
-        
         .main{display:flex;justify-content:space-between;align-items:center;flex-grow:1;position:relative;z-index:20;}
-        
         .side-nav.desktop-only{display:flex;flex-direction:column;gap:16px;z-index:30;width:62px;}
         .side-nav.mobile-nav{display:none;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;margin:0 auto;z-index:30;}
-        
         .side-link{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:var(--text-main);background:var(--glass);border:1px solid var(--glass-border);border-radius:15px;transition:var(--transition);text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.1);}
         .side-link:hover{background:rgba(137,180,250,.13);border-color:var(--accent);transform:translateY(-4px) scale(1.05);color:var(--accent);}
         .side-link svg{width:22px;height:22px;stroke-width:2.1px;}
         .side-link.active{background:rgba(137,180,250,.18);border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(137,180,250,.3);}
-        
         .center-brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;z-index:40;}
         .logo{font-size:clamp(4.2rem,14vw,10.5rem);font-weight:900;letter-spacing:-.07em;line-height:.82;background:linear-gradient(180deg,#f0f4ff 28%,#a8c4ff 72%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 20px 45px rgba(137,180,250,.35));opacity:.5;transition:opacity .6s ease;}
         .logo:hover{opacity:.56}
-        
         .tagline{font-size:1.02rem;font-weight:400;letter-spacing:.15em;color:var(--text-dim);margin-top:-4px;min-height:1.3em;opacity:0;transform:translateY(10px);transition:all .6s cubic-bezier(.23,1,.32,1);}
         .tagline.show{opacity:1;transform:translateY(0);}
-        
-        #iframe-container{
-            position:fixed;
-            inset:0;
-            z-index:100;
-            background:var(--bg);
-            opacity:0;
-            visibility:hidden;
-            transition:opacity .4s cubic-bezier(.23,1,.32,1);
-        }
-        #iframe-container.active{
-            opacity:1;
-            visibility:visible;
-        }
-        
-        #content-iframe{
-            width:100%;
-            height:100%;
-            border:none;
-            background:var(--bg);
-        }
-        
-        .iframe-loading{
-            position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-            display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--text-dim);z-index:110;
-        }
+        #iframe-container{position:fixed;inset:0;z-index:100;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .4s cubic-bezier(.23,1,.32,1);}
+        #iframe-container.active{opacity:1;visibility:visible;}
+        #content-iframe{width:100%;height:100%;border:none;background:var(--bg);}
+        .iframe-loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--text-dim);z-index:110;}
         .spinner{width:42px;height:42px;border:3px solid rgba(137,180,250,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite;}
         @keyframes spin{to{transform:rotate(360deg)}}
         .loading-text{font-size:.85rem;letter-spacing:.08em;font-weight:500;}
-        
         @media(max-width:768px){
             .wrapper{padding:20px 16px}
             .main{flex-direction:column;justify-content:center;gap:28px}
@@ -100,10 +69,10 @@
     </style>
 </head>
 <body>
-    <div class="ambient-bg"></div>
+    <div class="ambient-bg" id="ambient-bg"></div>
     <div class="glow" id="mouse-glow"></div>
     <canvas id="particles"></canvas>
-    
+
     <div class="wrapper">
         <header class="header" id="header">
             <div id="status-pill">
@@ -112,32 +81,32 @@
                 <span id="clock"></span>
             </div>
         </header>
-        
+
         <main class="main">
             <nav class="side-nav desktop-only" aria-label="Main navigation">
-                <a href="#" class="side-link" data-page="./settings"><i data-lucide="settings"></i></a>
-                <a href="#" class="side-link" data-page="./games"><i data-lucide="gamepad-2"></i></a>
-                <a href="#" class="side-link" data-page="./bookmarklets"><i data-lucide="bookmark"></i></a>
-                <a href="#" class="side-link" data-page="./about"><i data-lucide="info"></i></a>
-                <a href="#" class="side-link" data-page="./add"><i data-lucide="plus"></i></a>
+                <a href="#" class="side-link" data-page="settings"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link" data-page="games"><i data-lucide="gamepad-2"></i></a>
+                <a href="#" class="side-link" data-page="bookmarklets"><i data-lucide="bookmark"></i></a>
+                <a href="#" class="side-link" data-page="about"><i data-lucide="info"></i></a>
+                <a href="#" class="side-link" data-page="add"><i data-lucide="plus"></i></a>
             </nav>
-            
+
             <div class="center-brand">
                 <h1 class="logo">HRN</h1>
                 <p class="tagline" id="tagline"></p>
             </div>
-            
+
             <nav class="side-nav mobile-nav" aria-label="Main navigation">
-                <a href="#" class="side-link" data-page="./settings"><i data-lucide="settings"></i></a>
-                <a href="#" class="side-link" data-page="./games"><i data-lucide="gamepad-2"></i></a>
-                <a href="#" class="side-link" data-page="./bookmarklets"><i data-lucide="bookmark"></i></a>
-                <a href="#" class="side-link" data-page="./about"><i data-lucide="info"></i></a>
-                <a href="#" class="side-link" data-page="./add"><i data-lucide="plus"></i></a>
+                <a href="#" class="side-link" data-page="settings"><i data-lucide="settings"></i></a>
+                <a href="#" class="side-link" data-page="games"><i data-lucide="gamepad-2"></i></a>
+                <a href="#" class="side-link" data-page="bookmarklets"><i data-lucide="bookmark"></i></a>
+                <a href="#" class="side-link" data-page="about"><i data-lucide="info"></i></a>
+                <a href="#" class="side-link" data-page="add"><i data-lucide="plus"></i></a>
             </nav>
         </main>
     </div>
 
-    <!-- Iframe -->
+    <!-- Iframe Container -->
     <div id="iframe-container">
         <div class="iframe-loading" id="iframe-loading">
             <div class="spinner"></div>
@@ -149,21 +118,56 @@
     <script>
         lucide.createIcons();
 
-        const taglines = ["ELITE GAMING COMMUNITY","528 GAMES. ONE PLATFORM.","PLAY ANYTHING. MASTER EVERYTHING.","WHERE LEGENDS ARE BORN","NO SKILL, NO ENTRY","LEVEL UP OR LOG OUT","FOR THE REAL ONES","HIGH RISK. HIGH REWARD.","CLUTCH OR KICK","BUILT DIFFERENT"];
+        const taglines = [
+            "ELITE GAMING COMMUNITY","528 GAMES. ONE PLATFORM.","PLAY ANYTHING. MASTER EVERYTHING.",
+            "WHERE LEGENDS ARE BORN","NO SKILL, NO ENTRY","LEVEL UP OR LOG OUT",
+            "FOR THE REAL ONES","HIGH RISK. HIGH REWARD.","CLUTCH OR KICK","BUILT DIFFERENT"
+        ];
 
-        function getRandomTagline() {
-            return taglines[Math.floor(Math.random() * taglines.length)];
+        // ================ GLOBAL SETTINGS ================
+        function loadGlobalSettings() {
+            // Background
+            const bgUrl = localStorage.getItem('hrn_bg_url');
+            const ambient = document.getElementById('ambient-bg');
+            if (bgUrl) {
+                ambient.style.backgroundImage = `url('${bgUrl}')`;
+                ambient.style.opacity = '0.25';
+            }
+
+            // Tab Title
+            const savedTitle = localStorage.getItem('hrn_tab_title');
+            if (savedTitle) document.getElementById('dynamic-title').textContent = savedTitle;
+
+            // Favicon
+            const savedFavicon = localStorage.getItem('hrn_favicon_url');
+            if (savedFavicon) changeFavicon(savedFavicon);
+
+            // Particles
+            const particlesEnabled = localStorage.getItem('hrn_particles') !== 'false';
+            if (!particlesEnabled) document.getElementById('particles').style.display = 'none';
         }
 
-        // Particles
+        function changeFavicon(url) {
+            let link = document.getElementById('dynamic-favicon');
+            if (!link) {
+                link = document.createElement('link');
+                link.id = 'dynamic-favicon';
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.href = url;
+        }
+
+        // ================ PARTICLES ================
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
-        let particles = [], w, h;
+        let particlesArray = [], w, h;
 
         class Particle {
             constructor() { this.reset(); }
             reset() {
-                this.x = Math.random() * w; this.y = Math.random() * h;
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
                 this.size = Math.random() * 1.7 + 0.5;
                 this.speedX = Math.random() * 0.22 - 0.11;
                 this.speedY = Math.random() * 0.22 - 0.16;
@@ -190,7 +194,9 @@
                 ctx.fillStyle = `hsl(${this.hue},75%,94%)`;
                 ctx.shadowBlur = 9;
                 ctx.shadowColor = `hsl(${this.hue},90%,78%)`;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.restore();
             }
         }
@@ -201,56 +207,42 @@
         }
 
         function initParticles() {
-            particles = [];
+            particlesArray = [];
             const count = Math.floor(Math.min(w * h / 13500, 85));
-            for (let i = 0; i < count; i++) particles.push(new Particle());
+            for (let i = 0; i < count; i++) particlesArray.push(new Particle());
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, w, h);
-            for (let p of particles) { p.update(); p.draw(); }
+            for (let p of particlesArray) { p.update(); p.draw(); }
             requestAnimationFrame(animateParticles);
         }
 
-        // ==================== IFRAME + BROWSER HISTORY FIX ====================
+        // ================ IFRAME & NAVIGATION ================
         const iframeContainer = document.getElementById('iframe-container');
         const loading = document.getElementById('iframe-loading');
-        let contentIframe = document.getElementById('content-iframe');
+        const contentIframe = document.getElementById('content-iframe');
         let currentPage = null;
         let isHidden = false;
 
-        function resetIframe() {
-            contentIframe.src = 'about:blank';
-            contentIframe.style.opacity = '0';
-            loading.style.display = 'none';
-        }
-
         function openPage(page) {
             if (currentPage === page) {
-                if (isHidden) showIframe();
-                else hideIframe();
+                if (isHidden) showIframe(); else hideIframe();
                 return;
             }
-
             currentPage = page;
             isHidden = false;
 
-            // Activeer nav link
             document.querySelectorAll('.side-link').forEach(link => {
                 link.classList.toggle('active', link.dataset.page === page);
             });
 
-            // Voeg history entry toe (zodat back/forward werkt, maar wij controleren het)
-            history.pushState({page: page}, '', '#iframe-' + page.replace(/[^a-zA-Z0-9]/g, ''));
+            history.pushState({page: page}, '', '#' + page);
 
-            iframeContainer.style.visibility = 'visible';
-            iframeContainer.style.opacity = '1';
             iframeContainer.classList.add('active');
-
             loading.style.display = 'flex';
-
-            resetIframe();
-            contentIframe.src = page;
+            contentIframe.style.opacity = '0';
+            contentIframe.src = page + '.html';
 
             contentIframe.onload = () => {
                 loading.style.display = 'none';
@@ -262,9 +254,7 @@
         function hideIframe() {
             isHidden = true;
             iframeContainer.style.opacity = '0';
-            setTimeout(() => {
-                if (isHidden) iframeContainer.style.visibility = 'hidden';
-            }, 420);
+            setTimeout(() => { if (isHidden) iframeContainer.style.visibility = 'hidden'; }, 420);
         }
 
         function showIframe() {
@@ -273,42 +263,17 @@
             iframeContainer.style.opacity = '1';
         }
 
-        function closeIframe() {
-            currentPage = null;
-            isHidden = false;
-
-            document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
-
-            iframeContainer.classList.remove('active');
-            iframeContainer.style.opacity = '0';
-
-            setTimeout(() => {
-                resetIframe();
-                iframeContainer.style.visibility = 'hidden';
-                // Optioneel: history terugzetten naar root
-                history.pushState(null, '', window.location.pathname);
-            }, 450);
+        function handleHash() {
+            const hash = window.location.hash.slice(1);
+            const valid = ['settings','games','bookmarklets','about','add'];
+            if (hash && valid.includes(hash)) openPage(hash);
         }
 
-        // === BELANGRIJK: Blokkeer browser back/forward effect op iframe ===
-        window.addEventListener('popstate', (event) => {
-            // Doe NIETS als de gebruiker back/forward doet
-            // Dit voorkomt dat de iframe onverwacht laadt of verdwijnt
-
-            if (currentPage) {
-                // Je kunt kiezen wat er gebeurt:
-                // Optie 1: Iframe gewoon laten staan (aanbevolen)
-                // Optie 2: Iframe sluiten bij back/forward
-                // closeIframe();   // uncomment als je wilt dat back/forward de iframe sluit
-            }
-        });
-
-        // Nav clicks
+        // ================ EVENT LISTENERS ================
         document.querySelectorAll('.side-link').forEach(link => {
             link.addEventListener('click', e => {
                 e.preventDefault();
-                const page = link.dataset.page;
-                if (page) openPage(page);
+                openPage(link.dataset.page);
             });
         });
 
@@ -320,19 +285,30 @@
             if (e.key === "Escape" && iframeContainer.classList.contains('active')) hideIframe();
         });
 
-        // PostMessage
+        window.addEventListener('popstate', handleHash);
+
+        // PostMessage van settings.html
         window.addEventListener('message', (event) => {
-            const data = event.data;
-            if (data === 'HIDE_IFRAME' || data?.action === 'hide') hideIframe();
-            else if (data === 'CLOSE_IFRAME' || data?.action === 'close') closeIframe();
-            else if (data === 'SHOW_IFRAME' || data?.action === 'show') showIframe();
+            if (event.data?.type === 'updateSettings') {
+                if (event.data.bgUrl) {
+                    const ambient = document.getElementById('ambient-bg');
+                    ambient.style.backgroundImage = `url('${event.data.bgUrl}')`;
+                    ambient.style.opacity = '0.25';
+                }
+                if (event.data.tabTitle) {
+                    document.getElementById('dynamic-title').textContent = event.data.tabTitle;
+                }
+                if (event.data.favicon) {
+                    changeFavicon(event.data.favicon);
+                }
+            }
         });
 
-        // Rest van de init (tagline, tijd, glow, particles)
+        // ================ INIT ================
         function loadRandomTagline() {
-            const taglineEl = document.getElementById('tagline');
-            taglineEl.textContent = getRandomTagline();
-            setTimeout(() => taglineEl.classList.add('show'), 300);
+            const el = document.getElementById('tagline');
+            el.textContent = taglines[Math.floor(Math.random() * taglines.length)];
+            setTimeout(() => el.classList.add('show'), 300);
         }
 
         function updateDateTime() {
@@ -341,12 +317,15 @@
             const min = now.getMinutes().toString().padStart(2, '0');
             const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
             document.getElementById('clock').textContent = `${hours}:${min} ${ampm}`;
-            document.getElementById('date').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}).toUpperCase();
         }
 
         const glow = document.getElementById('mouse-glow');
         let tx = 0, ty = 0, cx = 0, cy = 0;
-        document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; }, {passive:true});
+
+        document.addEventListener('mousemove', e => {
+            tx = e.clientX; ty = e.clientY;
+        }, {passive: true});
 
         function animateGlow() {
             cx += (tx - cx) * 0.09;
@@ -359,11 +338,13 @@
             resize();
             initParticles();
             animateParticles();
+            loadGlobalSettings();
             updateDateTime();
             setInterval(updateDateTime, 1000);
             document.getElementById('header').classList.toggle('show', window.innerHeight > 620);
             loadRandomTagline();
             animateGlow();
+            handleHash();                    // Check hash bij openen
         });
 
         window.addEventListener('resize', resize);
