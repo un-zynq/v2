@@ -193,17 +193,37 @@
             $('dynamic-title').textContent = localStorage.getItem('hrn_title') || "HRN | CORE";
             if (localStorage.getItem('hrn_fav')) $('app-favicon').href = localStorage.getItem('hrn_fav');
 
-            particles = [];
-            pAmount = newpAmount;
-            for (let i = 0; i < pAmount; i++) {
-                particles.push({
-                    x: Math.random() * window.innerWidth,
-                    y: Math.random() * window.innerHeight,
-                    s: Math.random() * 4 + 2.5,
-                    vx: (Math.random() - 0.5) * 0.4,
-                    vy: (Math.random() - 0.5) * 0.4,
-                    o: o * (Math.random() * 0.5 + 0.5)
-                });
+            // Alleen aantal particles updaten als het significant verandert
+            if (pAmount !== newpAmount) {
+                const oldParticles = particles;
+                particles = [];
+                pAmount = newpAmount;
+
+                for (let i = 0; i < pAmount; i++) {
+                    if (i < oldParticles.length) {
+                        // Hergebruik bestaande particles (positie blijft behouden)
+                        particles.push(oldParticles[i]);
+                    } else {
+                        // Nieuwe particles alleen toevoegen
+                        particles.push({
+                            x: Math.random() * window.innerWidth,
+                            y: Math.random() * window.innerHeight,
+                            s: Math.random() * 4 + 2.5,
+                            vx: (Math.random() - 0.5) * 0.4,
+                            vy: (Math.random() - 0.5) * 0.4,
+                            o: o * (Math.random() * 0.5 + 0.5)
+                        });
+                    }
+                }
+                // Verwijder overtollige particles als density lager is
+                if (particles.length > pAmount) particles.length = pAmount;
+            }
+
+            // Update opacity van bestaande particles
+            if (particles.length > 0) {
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].o = o * (Math.random() * 0.5 + 0.5);
+                }
             }
 
             const bgValue = await loadBackground();
