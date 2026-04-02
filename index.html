@@ -93,13 +93,14 @@
         let currentPage = null;
 
         async function prefetchPages() {
-            ['settings', 'games', 'about', 'add', 'bookmarklets'].forEach(async p => {
+            const pages = ['settings', 'games', 'about', 'add', 'bookmarklets'];
+            for (const p of pages) {
                 try {
                     const res = await fetch(p + '.html');
                     if(res.ok) pageCache[p] = await res.text();
-                    checkHash();
                 } catch(e) {}
-            });
+            }
+            checkHash(); // Check hash pas NA het laden van cache
         }
 
         function syncSettings() {
@@ -115,11 +116,12 @@
             const ambient = document.getElementById('ambient-bg');
             ambient.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : "none";
             ambient.style.opacity = bgUrl ? "0.4" : "0";
+            
             initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
         }
 
         function openPage(page) {
-            if (currentPage === page && container.classList.contains('active')) return;
+            if (!page) return;
             currentPage = page;
             if (window.location.hash !== '#' + page) history.pushState(null, null, '#' + page);
             
@@ -142,8 +144,8 @@
 
         function checkHash() {
             const hash = window.location.hash.substring(1);
-            if (hash && hash !== currentPage) openPage(hash);
-            else if (!hash && currentPage) closeIframe();
+            if (hash) openPage(hash);
+            else if (currentPage) closeIframe();
         }
 
         class Particle {
@@ -151,10 +153,10 @@
             reset() { 
                 this.x = Math.random() * w; 
                 this.y = Math.random() * h; 
-                this.size = Math.random() * 2 + 1; // Groter voor betere zichtbaarheid
-                this.speedX = Math.random() * 0.4 - 0.2; 
-                this.speedY = Math.random() * 0.4 - 0.2; 
-                this.opacity = Math.random() * 0.6 + 0.3; // Hogere basis opacity
+                this.size = Math.random() * 2 + 0.8; 
+                this.speedX = Math.random() * 0.3 - 0.15; 
+                this.speedY = Math.random() * 0.3 - 0.15; 
+                this.opacity = Math.random() * 0.5 + 0.4; // Feller
             }
             update() { 
                 this.x += this.speedX; this.y += this.speedY; 
@@ -166,21 +168,22 @@
                 ctx.beginPath(); 
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
                 ctx.fill(); 
-                // Optionele subtiele glow per deeltje
-                ctx.shadowBlur = 4;
-                ctx.shadowColor = ctx.fillStyle;
             }
         }
 
         function initParticles(mode) {
-            const counts = { off: 0, low: 40, mid: 100, high: 250 };
-            const target = counts[mode] || 100;
+            ctx.clearRect(0, 0, w, h);
+            if (mode === 'off') {
+                particlesArray = [];
+                return;
+            }
+            const counts = { low: 35, mid: 90, high: 220 };
+            const target = counts[mode] || 90;
             particlesArray = Array.from({ length: target }, () => new Particle());
         }
 
         function animate() { 
             ctx.clearRect(0, 0, w, h); 
-            ctx.shadowBlur = 0; // Reset shadow voor prestaties
             particlesArray.forEach(p => { p.update(); p.draw(); }); 
             requestAnimationFrame(animate); 
         }
