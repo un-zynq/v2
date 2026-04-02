@@ -14,13 +14,19 @@
         :root {
             --bg: #030508;
             --accent: #89b4fa;
+            --accent-rgb: 137, 180, 250;
             --text: #f0f4ff;
-            --dim: rgba(255, 255, 255, 0.4);
-            --border: rgba(255, 255, 255, 0.08);
-            --logo-opacity: 0.5;
-            --glow-intensity: 20px;
-            --shine-opacity: 0.15;
+            /* Basis zichtbaarheid verhoogd */
+            --dim: rgba(255, 255, 255, 0.7); 
+            --border: rgba(255, 255, 255, 0.15);
+            --logo-opacity: 0.8;
+            
+            /* DESKTOP HOVER (High Visibility) */
+            --glow-opacity: 0.6;
+            --border-opacity: 1; 
+            --icon-opacity: 1;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; text-transform: uppercase; }
 
@@ -30,74 +36,69 @@
             display: flex; align-items: center; justify-content: center;
             transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .load-line { width: 140px; height: 1px; background: rgba(255,255,255,0.05); position: relative; }
+        .load-line { width: 140px; height: 1px; background: rgba(255,255,255,0.1); position: relative; }
         #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s; box-shadow: 0 0 15px var(--accent); }
 
-        /* BACKGROUND & FX */
-        .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; filter: brightness(0.3); transition: opacity 1.5s; }
+        /* BACKGROUND */
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; filter: brightness(0.4); transition: opacity 1.5s; }
         canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
-        #mouse-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; pointer-events: none; z-index: 3; background: radial-gradient(circle, rgba(137, 180, 250, 0.08) 0%, transparent 70%); transform: translate(-50%, -50%); filter: blur(50px); }
+        #mouse-glow { position: fixed; width: 600px; height: 600px; border-radius: 50%; pointer-events: none; z-index: 3; background: radial-gradient(circle, rgba(var(--accent-rgb), 0.12) 0%, transparent 70%); transform: translate(-50%, -50%); filter: blur(60px); }
 
-        /* UI WRAPPER */
+        /* UI */
         .wrapper { position: relative; display: flex; flex-direction: column; height: 100dvh; width: 100%; z-index: 10; opacity: 0; transition: opacity 0.8s ease; }
         .wrapper.active { opacity: 1; }
 
         .header { position: absolute; top: 40px; width: 100%; display: flex; justify-content: center; }
-        .status-pill { background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(12px); font-size: 9px; font-weight: 900; letter-spacing: 2px; color: var(--dim); display: flex; gap: 20px; }
+        .status-pill { background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 12px 28px; border-radius: 100px; backdrop-filter: blur(15px); font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--text); display: flex; gap: 20px; }
 
-        /* BRAND */
-        .brand { 
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-            text-align: center; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%;
-        }
+        .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; }
         .logo { 
             font-size: clamp(5rem, 22vw, 13rem); font-weight: 900; letter-spacing: -0.07em; line-height: 0.8;
-            background: linear-gradient(180deg, #fff 40%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            opacity: var(--logo-opacity); transition: 0.4s;
+            background: linear-gradient(180deg, #fff 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: var(--logo-opacity); transition: 0.4s; filter: drop-shadow(0 0 30px rgba(var(--accent-rgb), 0.2));
         }
-        .tagline { font-size: 10px; letter-spacing: 10px; color: var(--dim); margin-top: 25px; opacity: 0; transform: translateY(15px); transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s; font-weight: 400; }
-        .tagline.show { opacity: 1; transform: translateY(0); }
+        .tagline { font-size: 11px; letter-spacing: 12px; color: var(--text); margin-top: 30px; opacity: 0; transform: translateY(15px); transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s; font-weight: 600; }
+        .tagline.show { opacity: 0.7; transform: translateY(0); }
 
-        /* NAVIGATION */
-        .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; padding: 0 50px; z-index: 20; transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s; }
+        /* NAV */
+        .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 30px; padding: 0 60px; z-index: 20; transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s; }
         .nav-left { left: -100px; opacity: 0; }
         .nav-right { right: -100px; opacity: 0; }
         .wrapper.active .nav-left { left: 0; opacity: 1; }
         .wrapper.active .nav-right { right: 0; opacity: 1; }
 
-        .mobile-nav { display: none; gap: 20px; margin-top: 40px; pointer-events: all; }
+        .mobile-nav { display: none; gap: 25px; margin-top: 50px; pointer-events: all; }
         
-        /* THE BUTTONS - WITH SHINE & BORDERS */
+        /* THE BUTTONS - Meer basis zichtbaarheid */
         .btn { 
-            width: 62px; height: 62px; border-radius: 22px; 
-            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            width: 65px; height: 65px; border-radius: 24px; 
+            background: rgba(255,255,255,0.03);
             border: 1px solid var(--border);
-            border-top: 1px solid rgba(255,255,255, var(--shine-opacity)); /* THE TOP SHINE */
             color: var(--dim); display: flex; align-items: center; 
             justify-content: center; cursor: pointer; 
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: all;
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.05); /* INNER DEPTH */
+            backdrop-filter: blur(5px);
         }
 
         .btn:hover, .btn.active { 
-            color: var(--accent); 
-            border-color: var(--accent); 
-            background: rgba(255,255,255,0.06); 
-            transform: scale(1.1) translateY(-2px); 
-            box-shadow: 0 0 var(--glow-intensity) -5px var(--accent), 
-                        inset 0 0 10px rgba(137, 180, 250, 0.1);
+            color: rgba(var(--accent-rgb), var(--icon-opacity)); 
+            border: 1px solid rgba(var(--accent-rgb), var(--border-opacity)); 
+            background: rgba(var(--accent-rgb), 0.08); 
+            transform: scale(1.12) translateY(-3px); 
+            box-shadow: 0 15px 40px -10px rgba(var(--accent-rgb), var(--glow-opacity));
         }
 
-        /* MOBILE OVERRIDES - HALF INTENSITY HOVER */
+        /* MOBILE FIX: Duidelijkere 10%/20% (Visually tuned) */
         @media (max-width: 900px) {
             :root {
-                --glow-intensity: 10px; /* 50% Less glow */
-                --shine-opacity: 0.08; /* Half shine */
+                --glow-opacity: 0.2;   /* Iets meer dan 10% omdat 10% onzichtbaar was */
+                --border-opacity: 0.3; /* Duidelijkere lijn op mobiel */
+                --icon-opacity: 0.5;   /* Icoon is nu echt zichtbaar bij hover */
             }
             .side-nav { display: none !important; }
             .mobile-nav { display: flex; }
-            .logo { font-size: clamp(6rem, 28vw, 10rem); }
-            .btn:hover { transform: scale(1.05); } /* Less dramatic scale */
+            .logo { font-size: clamp(6.5rem, 30vw, 11rem); }
+            .btn:hover { transform: scale(1.08); } 
         }
 
         /* MODAL */
@@ -145,7 +146,7 @@
         lucide.createIcons();
         const $ = id => document.getElementById(id);
         const cache = {};
-        const TAGLINES = ["INTERFACE ONLINE", "SYSTEM CORE", "NEURAL LINK STABLE", "BUILT DIFFERENT", "ELITE HUB", "DATA STREAM ACTIVE"];
+        const TAGLINES = ["INTERFACE ONLINE", "SYSTEM CORE", "NEURAL LINK STABLE", "BUILT DIFFERENT", "ELITE HUB"];
 
         const canvas = $('particles');
         const ctx = canvas.getContext('2d');
@@ -159,9 +160,9 @@
             constructor() { this.init(); }
             init() {
                 this.x = Math.random() * w; this.y = Math.random() * h;
-                this.s = Math.random() * 1.5;
-                this.vx = Math.random() * 0.3 - 0.15; this.vy = Math.random() * 0.3 - 0.15;
-                this.o = Math.random() * 0.4;
+                this.s = Math.random() * 2; // Iets grotere particles
+                this.vx = Math.random() * 0.4 - 0.2; this.vy = Math.random() * 0.4 - 0.2;
+                this.o = Math.random() * 0.6; // Meer zichtbare particles
             }
             draw() {
                 ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
@@ -172,13 +173,18 @@
             }
         }
 
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : "137, 180, 250";
+        }
+
         async function loadPage(name) {
             try {
                 const r = await fetch(name + '.html');
                 if (!r.ok) throw new Error();
                 cache[name] = await r.text();
             } catch(e) { 
-                cache[name] = `<body style="background:#030508; margin:0; display:flex; align-items:center; justify-content:center; height:100vh;"><button onclick="window.parent.postMessage('close','*')" style="background:none; border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.3); padding:15px 30px; border-radius:8px; cursor:pointer; font-family:sans-serif; font-size:10px; letter-spacing:4px; font-weight:900; text-transform:uppercase;">EXIT</button></body>`; 
+                cache[name] = `<body style="background:#030508; margin:0; display:flex; align-items:center; justify-content:center; height:100vh;"><button onclick="window.parent.postMessage('close','*')" style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; padding:15px 30px; border-radius:8px; cursor:pointer; font-family:sans-serif; font-size:10px; letter-spacing:4px; font-weight:900; text-transform:uppercase;">EXIT</button></body>`; 
             }
         }
 
@@ -189,7 +195,7 @@
                 await loadPage(pages[i]);
                 $('progress').style.width = ((i+1) / pages.length * 100) + '%';
             }
-            for(let i=0; i<45; i++) particles.push(new P());
+            for(let i=0; i<55; i++) particles.push(new P()); // Meer particles
             loop();
             setTimeout(() => {
                 $('loader').style.opacity = '0';
@@ -205,15 +211,16 @@
 
         function sync() {
             const c = localStorage.getItem('hrn_clr') || "#89b4fa";
-            const o = localStorage.getItem('hrn_op') || "0.5";
+            const o = localStorage.getItem('hrn_op') || "0.8"; // Default nu 0.8
             const b = localStorage.getItem('hrn_bg');
             const t = localStorage.getItem('hrn_title') || "HRN | CORE";
             
             document.documentElement.style.setProperty('--accent', c);
+            document.documentElement.style.setProperty('--accent-rgb', hexToRgb(c));
             document.documentElement.style.setProperty('--logo-opacity', o);
             $('dynamic-title').textContent = t;
             
-            if(b) { $('bg').style.backgroundImage = `url(${b})`; $('bg').style.opacity = 0.5; }
+            if(b) { $('bg').style.backgroundImage = `url(${b})`; $('bg').style.opacity = 0.6; }
         }
 
         function setHash(name) { window.location.hash = name; }
