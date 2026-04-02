@@ -15,10 +15,9 @@
             --bg: #030508;
             --accent: #89b4fa;
             --accent-rgb: 137, 180, 250;
-            /* Iets witter zilver voor meer presence */
             --ui-silver: rgba(240, 245, 255, 0.75); 
             --ui-border: rgba(255, 255, 255, 0.12);
-            --logo-opacity: 0.7; /* Titel iets minder */
+            --logo-opacity: 0.7;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -39,10 +38,21 @@
         .status-pill { background: rgba(255,255,255,0.02); border: 1px solid var(--ui-border); padding: 11px 28px; border-radius: 100px; backdrop-filter: blur(20px); font-size: 9.5px; font-weight: 900; letter-spacing: 2.8px; display: flex; gap: 28px; transition: 0.6s ease; color: var(--ui-silver); }
 
         .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; width: 100%; }
-        /* Titel minder dominant gemaakt (clamp verlaagd) */
         .logo { font-size: clamp(5.5rem, 22vw, 12rem); font-weight: 900; letter-spacing: -0.06em; line-height: 0.75; background: linear-gradient(180deg, #fff 60%, var(--accent) 140%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: var(--logo-opacity); transition: 0.8s; }
-        .tagline { font-size: 10px; letter-spacing: 12px; color: var(--ui-silver); margin-top: 32px; opacity: 0; transform: translateY(20px); transition: 2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s; }
-        .tagline.show { opacity: 0.5; transform: translateY(0); }
+        
+        /* TAGLINE: Meer zichtbaarheid */
+        .tagline { 
+            font-size: 11px; 
+            font-weight: 600;
+            letter-spacing: 10px; 
+            color: #fff; 
+            margin-top: 35px; 
+            opacity: 0; 
+            transform: translateY(15px); 
+            transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.8s; 
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        .tagline.show { opacity: 0.85; transform: translateY(0); }
 
         .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; padding: 0 55px; z-index: 20; transition: 1.2s; }
         .nav-left { left: -150px; opacity: 0; }
@@ -55,7 +65,7 @@
         .btn { 
             width: 64px; height: 64px; border-radius: 22px; 
             background: rgba(255,255,255,0.03); border: 1px solid var(--ui-border); 
-            color: var(--ui-silver); opacity: 0.85; /* De rest wat meer */
+            color: var(--ui-silver); opacity: 0.85;
             display: flex; align-items: center; justify-content: center; 
             cursor: pointer; transition: 0.45s cubic-bezier(0.16, 1, 0.3, 1); 
             pointer-events: all; backdrop-filter: blur(15px); 
@@ -92,7 +102,7 @@
         </div>
         <div class="brand">
             <h1 class="logo">HRN</h1>
-            <p class="tagline" id="tagline">CORE INTERFACE</p>
+            <p class="tagline" id="tagline">CORE INTERFACE ACTIVE</p>
             <div class="mobile-nav">
                 <div class="btn" onclick="setHash('settings')"><i data-lucide="settings"></i></div>
                 <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
