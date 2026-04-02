@@ -113,10 +113,7 @@
             document.getElementById('bg').value = "";
         }
 
-        function resetAll() {
-            localStorage.clear();
-            location.reload();
-        }
+        const resetAll = () => (fields.forEach(f => (localStorage.removeItem('hrn_'+f), document.getElementById(f).value = defaults[f])), localStorage.removeItem('hrn_part'), localStorage.removeItem('hrn_bg'), document.getElementById('part').checked = true, document.getElementById('bg').value = "", updateBg(defaultBg), sync());
 
         document.getElementById('bg-file').onchange = (e) => {
             const file = e.target.files[0];
