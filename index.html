@@ -10,32 +10,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root{--bg:#030508;--accent:#89b4fa;--ui-silver:rgba(235,240,255,0.85);--ui-border:rgba(255,255,255,0.1)}
-        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        body,html{height:100%;width:100%;background:var(--bg);color:var(--ui-silver);font-family:Inter,sans-serif;overflow:hidden;text-transform:uppercase}
-        #webgl-canvas{position:fixed;inset:0;z-index:2;pointer-events:none}
-        .ambient-bg{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;opacity:0;filter:brightness(0.6);transition:2s ease-in-out}
-        .ambient-bg.loaded{opacity:1}
-        .overlay-dim{position:fixed;inset:0;z-index:3;background:radial-gradient(circle at center, transparent, rgba(0,0,0,0.4));pointer-events:none}
-        #loader{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .8s ease}
-        .load-line{width:200px;height:2px;background:rgba(255,255,255,.05);position:relative;overflow:hidden}
-        #progress{position:absolute;height:100%;width:0%;background:var(--accent);transition:width 0.4s ease;box-shadow:0 0 15px var(--accent)}
-        .wrapper{position:relative;display:flex;flex-direction:column;height:100dvh;width:100%;z-index:10;opacity:0;transition:1.5s ease}
-        .wrapper.active{opacity:1}
-        .header{position:absolute;top:30px;width:100%;display:flex;justify-content:center;z-index:100}
-        .status-pill{background:rgba(0,0,0,0.5);border:1px solid var(--ui-border);padding:10px 25px;border-radius:100px;backdrop-filter:blur(10px);font-size:9px;font-weight:900;letter-spacing:2px;display:flex;gap:20px}
-        .brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:100%}
-        .logo{font-size:clamp(5rem, 20vw, 10rem);font-weight:900;letter-spacing:-.05em;background:linear-gradient(180deg,#fff, var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0.8}
-        .tagline{font-size:10px;font-weight:600;letter-spacing:8px;color:#fff;margin-top:20px;opacity:0;transform:translateY(10px);transition:1s ease 0.5s}
-        .tagline.show{opacity:0.7;transform:translateY(0)}
-        .side-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;padding:0 40px;z-index:20}
-        .nav-left{left:0}.nav-right{right:0}
-        .btn{width:60px;height:60px;border-radius:20px;background:rgba(0,0,0,0.4);border:1px solid var(--ui-border);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.3s;backdrop-filter:blur(10px)}
-        .btn:hover{transform:scale(1.1);border-color:var(--accent);background:rgba(255,255,255,0.05)}
-        #container{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.5);display:none;opacity:0;transition:0.4s ease}
-        #container.active{display:block;opacity:1}
-        iframe{width:100%;height:100%;border:none}
-        @media (max-width:900px){ .side-nav{display:none} }
+        :root { --bg: #030508; --accent: #89b4fa; --accent-rgb: 137,180,250; --ui-silver: rgba(235,240,255,0.85); --ui-border: rgba(255,255,255,0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { height: 100%; width: 100%; background: var(--bg); color: var(--ui-silver); font-family: Inter, sans-serif; overflow: hidden; text-transform: uppercase; }
+        #webgl-canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; filter: brightness(0.7); transition: 2.5s cubic-bezier(.4,0,.2,1); }
+        .ambient-bg.loaded { opacity: 1; }
+        .overlay-dim { position: fixed; inset: 0; z-index: 1; background: rgba(0,0,0,0.3); pointer-events: none; }
+        #loader { position: fixed; inset: 0; z-index: 10000; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity .8s ease; }
+        .load-line { width: 220px; height: 2px; background: rgba(255,255,255,.05); position: relative; overflow: hidden; border-radius: 10px; }
+        #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.6s ease; box-shadow: 0 0 15px var(--accent); }
+        .wrapper { position: relative; display: flex; flex-direction: column; height: 100dvh; width: 100%; z-index: 10; opacity: 0; transform: scale(1.02); transition: 1.5s cubic-bezier(.16,1,.3,1); }
+        .wrapper.active { opacity: 1; transform: scale(1); }
+        .header { position: absolute; top: 38px; width: 100%; display: flex; justify-content: center; z-index: 100; }
+        .status-pill { background: rgba(0,0,0,0.4); border: 1px solid var(--ui-border); padding: 11px 28px; border-radius: 100px; backdrop-filter: blur(12px); font-size: 9px; font-weight: 900; letter-spacing: 2.5px; display: flex; gap: 28px; transition: .6s ease; color: var(--ui-silver); }
+        .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); text-align: center; pointer-events: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 35px; }
+        .logo { font-size: clamp(5.5rem, 22vw, 11.5rem); font-weight: 900; letter-spacing: -.06em; line-height: .7; background: linear-gradient(180deg, #fff 50%, var(--accent) 150%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: .7; transition: .8s; }
+        .tagline { font-size: 10px; font-weight: 600; letter-spacing: 9px; color: #fff; margin-top: 0; opacity: 0; transform: translateY(15px); transition: 1.5s ease 0.5s; text-shadow: 0 2px 15px rgba(0,0,0,0.8); line-height: 1.2; display: inline-block; max-width: 75%; word-wrap: break-word; }
+        .tagline.show { opacity: .9; transform: translateY(0); }
+        .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; padding: 0 55px; z-index: 20; transition: 1.2s cubic-bezier(.16,1,.3,1); }
+        .nav-left { left: -150px; opacity: 0; }
+        .nav-right { right: -150px; opacity: 0; }
+        .wrapper.active .nav-left { left: 0; opacity: 1; }
+        .wrapper.active .nav-right { right: 0; opacity: 1; }
+        .mobile-nav { display: none; gap: 15px; margin-top: 5px; pointer-events: all; justify-content: center; }
+        .btn { width: 58px; height: 58px; border-radius: 18px; background: rgba(0,0,0,0.4); border: 1px solid var(--ui-border); color: var(--ui-silver); opacity: .85; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: .4s cubic-bezier(.16,1,.3,1); pointer-events: all; backdrop-filter: blur(12px); }
+        .btn:active { transform: scale(0.96); }
+        .btn svg { width: 22px; height: 22px; stroke-width: 1.8px; }
+        .btn.active, .btn:hover { opacity: 1; color: #fff; border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.1); transform: scale(1.08) translateY(-2px); box-shadow: 0 12px 25px -10px rgba(0,0,0,0.5); }
+        @media (min-width: 901px) { .brand { gap: 0; } .tagline { margin-top: 32px; } .side-nav { gap: 25px; } .btn { width: 62px; height: 62px; } }
+        @media (max-width: 900px) { .side-nav { display: none !important; } .mobile-nav { display: flex; } }
+        #container { position: fixed; inset: 0; z-index: 1000; background: transparent; display: none; opacity: 0; transition: opacity .5s ease; }
+        #container.active { display: block; opacity: 1; }
+        iframe { width: 100%; height: 100%; border: none; background: transparent; }
     </style>
 </head>
 <body>
@@ -46,7 +53,7 @@
     
     <div class="wrapper" id="ui">
         <div class="header">
-            <div class="status-pill">
+            <div class="status-pill" id="status-pill">
                 <span id="date">SYNCING</span>
                 <span id="clock">00:00:00</span>
             </div>
@@ -56,8 +63,13 @@
             <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
         </div>
         <div class="brand">
-            <h1 class="logo">HRN</h1>
+            <h1 class="logo" id="main-logo">HRN</h1>
             <p class="tagline" id="tagline"></p>
+            <div class="mobile-nav">
+                <div class="btn" onclick="setHash('settings')"><i data-lucide="settings"></i></div>
+                <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
+                <div class="btn" onclick="setHash('about')"><i data-lucide="info"></i></div>
+            </div>
         </div>
         <div class="side-nav nav-right">
             <div class="btn" onclick="setHash('about')"><i data-lucide="info"></i></div>
@@ -75,9 +87,11 @@
         uniform float u_time;
         varying float v_op;
         void main() {
-            vec2 clipSpace = (a_pos / u_res * 2.0) - 1.0;
+            vec2 zeroToOne = a_pos / u_res;
+            vec2 clipSpace = (zeroToOne * 2.0) - 1.0;
             gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-            gl_PointSize = a_size * (0.8 + sin(u_time + a_op) * 0.2);
+            float pulse = 0.85 + (sin(u_time * 1.5 + a_op * 10.0) * 0.15);
+            gl_PointSize = a_size * 1.5 * pulse;
             v_op = a_op;
         }
     </script>
@@ -87,9 +101,9 @@
         uniform vec3 u_color;
         varying float v_op;
         void main() {
-            float d = distance(gl_PointCoord, vec2(0.5));
-            if (d > 0.5) discard;
-            gl_FragColor = vec4(u_color, v_op * (1.0 - d * 2.0));
+            float dist = distance(gl_PointCoord, vec2(0.5));
+            if (dist > 0.5) discard;
+            gl_FragColor = vec4(u_color, (v_op * 1.3) * (1.0 - dist * 2.0));
         }
     </script>
 
@@ -97,145 +111,181 @@
         lucide.createIcons();
         const $ = id => document.getElementById(id);
         const canvas = $('webgl-canvas');
-        const gl = canvas.getContext('webgl');
-        let particles = [], pAmount = 0, pEnabled = true, program;
-        let posBuffer, sizeBuffer, opBuffer, posAttr, sizeAttr, opAttr, resUni, colUni, timeUni;
-        const defaultImg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
+        const gl = canvas.getContext('webgl', { antialias: true, alpha: true });
+        let particles = [], pAmount = 0, pEnabled = true, program, posAttr, sizeAttr, opAttr, resUni, colUni, timeUni, posBuffer, sizeBuffer, opBuffer, cache = {}, startTime = Date.now();
+        const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
 
-        const taglines = ["YOU ARE THE AURA", "LEGEND IN MAKING", "POWER WITHIN YOU", "OWN THE GAME", "RISE ABOVE ALL"];
+        const taglines = [ "YOU ARE THE AURA", "LEGEND IN MAKING", "POWER WITHIN YOU", "OWN THE GAME", "FEARLESS AND STRONG" ];
+
+        function createShader(gl, type, source) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, source);
+            gl.compileShader(s);
+            return s;
+        }
 
         function initGL() {
-            const createS = (t, s) => {
-                const sh = gl.createShader(t);
-                gl.shaderSource(sh, s);
-                gl.compileShader(sh);
-                return sh;
-            };
-            const v = createS(gl.VERTEX_SHADER, $('vs').text);
-            const f = createS(gl.FRAGMENT_SHADER, $('fs').text);
+            const vS = createShader(gl, gl.VERTEX_SHADER, $('vs').text);
+            const fS = createShader(gl, gl.FRAGMENT_SHADER, $('fs').text);
             program = gl.createProgram();
-            gl.attachShader(program, v); gl.attachShader(program, f);
-            gl.linkProgram(program); gl.useProgram(program);
-
+            gl.attachShader(program, vS);
+            gl.attachShader(program, fS);
+            gl.linkProgram(program);
+            gl.useProgram(program);
             posAttr = gl.getAttribLocation(program, "a_pos");
             sizeAttr = gl.getAttribLocation(program, "a_size");
             opAttr = gl.getAttribLocation(program, "a_op");
             resUni = gl.getUniformLocation(program, "u_res");
             colUni = gl.getUniformLocation(program, "u_color");
             timeUni = gl.getUniformLocation(program, "u_time");
-
             posBuffer = gl.createBuffer();
             sizeBuffer = gl.createBuffer();
             opBuffer = gl.createBuffer();
-
             gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
+
+        function updateBg(val) {
+            const bgLayer = $('bg');
+            const url = val && val.trim() !== "" ? val : defaultBg;
+            const img = new Image();
+            img.onload = () => {
+                bgLayer.style.backgroundImage = `url(${url})`;
+                bgLayer.classList.add('loaded');
+            };
+            img.src = url;
         }
 
         function sync() {
-            const clr = localStorage.getItem('hrn_clr') || "#89b4fa";
-            const dens = parseFloat(localStorage.getItem('hrn_int')) || 1.1;
-            const op = parseFloat(localStorage.getItem('hrn_op')) || 0.8;
+            const c = localStorage.getItem('hrn_clr') || "#89b4fa";
+            const o = parseFloat(localStorage.getItem('hrn_op')) || 0.8;
+            const density = parseFloat(localStorage.getItem('hrn_int')) || 1.1;
+            const area = (window.innerWidth * window.innerHeight) / 10000;
+            const newpAmount = Math.floor(area * density);
+            
             pEnabled = localStorage.getItem('hrn_part') !== 'false';
+            const r = parseInt(c.slice(1, 3), 16) / 255;
+            const g = parseInt(c.slice(3, 5), 16) / 255;
+            const b = parseInt(c.slice(5, 7), 16) / 255;
             
-            document.documentElement.style.setProperty('--accent', clr);
+            if (program) {
+                gl.useProgram(program);
+                gl.uniform3f(colUni, r, g, b);
+            }
+            document.documentElement.style.setProperty('--accent', c);
             $('dynamic-title').textContent = localStorage.getItem('hrn_title') || "HRN | CORE";
-            
-            const bgUrl = localStorage.getItem('hrn_bg') || defaultImg;
-            $('bg').style.backgroundImage = `url(${bgUrl})`;
-            $('bg').classList.add('loaded');
 
-            if (pEnabled) {
-                pAmount = Math.floor(((window.innerWidth * window.innerHeight) / 10000) * dens);
+            if (particles.length === 0 || Math.abs(particles.length - newpAmount) > 20) {
                 particles = [];
-                for(let i=0; i<pAmount; i++) {
+                pAmount = newpAmount;
+                for (let i = 0; i < pAmount; i++) {
                     particles.push({
                         x: Math.random() * window.innerWidth,
                         y: Math.random() * window.innerHeight,
-                        s: Math.random() * 3 + 2,
-                        vx: (Math.random()-0.5)*0.5,
-                        vy: (Math.random()-0.5)*0.5,
-                        o: Math.random() * op
+                        s: Math.random() * 4 + 2.5,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        o: o * (Math.random() * 0.5 + 0.5)
                     });
                 }
             }
-
-            const r = parseInt(clr.slice(1,3), 16)/255, g = parseInt(clr.slice(3,5), 16)/255, b = parseInt(clr.slice(5,7), 16)/255;
-            gl.uniform3f(colUni, r, g, b);
+            updateBg(localStorage.getItem('hrn_bg'));
+            if (localStorage.getItem('hrn_fav')) $('app-favicon').href = localStorage.getItem('hrn_fav');
         }
 
-        function render(t) {
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            if (!pEnabled) { requestAnimationFrame(render); return; }
+        function render() {
+            if (!pEnabled || pAmount === 0) {
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                requestAnimationFrame(render);
+                return;
+            }
+            const elapsed = (Date.now() - startTime) / 1000;
+            const posData = new Float32Array(pAmount * 2), sizeData = new Float32Array(pAmount), opData = new Float32Array(pAmount);
 
-            const posData = new Float32Array(pAmount * 2);
-            const sizeData = new Float32Array(pAmount);
-            const opData = new Float32Array(pAmount);
-
-            for(let i=0; i<pAmount; i++) {
+            for (let i = 0; i < pAmount; i++) {
                 let p = particles[i];
-                p.x = (p.x + p.vx + window.innerWidth) % window.innerWidth;
-                p.y = (p.y + p.vy + window.innerHeight) % window.innerHeight;
-                posData[i*2] = p.x; posData[i*2+1] = p.y;
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x = window.innerWidth;
+                if (p.x > window.innerWidth) p.x = 0;
+                if (p.y < 0) p.y = window.innerHeight;
+                if (p.y > window.innerHeight) p.y = 0;
+                posData[i * 2] = p.x; posData[i * 2 + 1] = p.y;
                 sizeData[i] = p.s; opData[i] = p.o;
             }
-
-            gl.uniform2f(resUni, canvas.width, canvas.height);
-            gl.uniform1f(timeUni, t/1000);
-
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.useProgram(program);
+            gl.uniform2f(resUni, window.innerWidth, window.innerHeight);
+            gl.uniform1f(timeUni, elapsed);
             gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, posData, gl.DYNAMIC_DRAW);
-            gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(posAttr);
-
+            gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
             gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, sizeData, gl.DYNAMIC_DRAW);
-            gl.vertexAttribPointer(sizeAttr, 1, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(sizeAttr);
-
+            gl.vertexAttribPointer(sizeAttr, 1, gl.FLOAT, false, 0, 0);
             gl.bindBuffer(gl.ARRAY_BUFFER, opBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, opData, gl.DYNAMIC_DRAW);
-            gl.vertexAttribPointer(opAttr, 1, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(opAttr);
-
+            gl.vertexAttribPointer(opAttr, 1, gl.FLOAT, false, 0, 0);
             gl.drawArrays(gl.POINTS, 0, pAmount);
             requestAnimationFrame(render);
         }
 
-        window.setHash = n => window.location.hash = n;
-        
-        window.addEventListener('hashchange', () => {
-            const h = window.location.hash.slice(1);
-            if(h === 'settings') {
-                $('frame').src = 'settings.html';
-                $('container').classList.add('active');
-            } else if (!h) {
-                $('container').classList.remove('active');
+        async function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            $('tagline').textContent = taglines[Math.floor(Math.random() * taglines.length)];
+            initGL();
+            sync();
+            render();
+            const pages = ['settings', 'games', 'about', 'add'];
+            let loadedCount = 0;
+            for (const p of pages) {
+                try {
+                    const r = await fetch(p + '.html');
+                    cache[p] = await r.text();
+                } catch (e) { cache[p] = '<h1>Not Found</h1>'; }
+                loadedCount++;
+                $('progress').style.width = (loadedCount / pages.length * 100) + '%';
             }
-        });
-
-        window.addEventListener('message', e => {
-            if(e.data === 'sync') sync();
-            if(e.data === 'close') setHash('');
-        });
-
-        window.onload = () => {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            $('tagline').textContent = taglines[Math.floor(Math.random()*taglines.length)];
-            initGL(); sync(); render(0);
             setTimeout(() => {
-                $('loader').style.opacity = 0;
-                $('ui').classList.add('active');
-                $('tagline').classList.add('show');
-                setTimeout(() => $('loader').style.display='none', 800);
-            }, 1000);
-        };
+                $('loader').style.opacity = '0';
+                setTimeout(() => {
+                    $('loader').style.display = 'none';
+                    $('ui').classList.add('active');
+                    $('tagline').classList.add('show');
+                    checkHash();
+                }, 800);
+            }, 600);
+        }
 
+        function setHash(n) { window.location.hash = n; }
+        function checkHash() {
+            const h = window.location.hash.slice(1), container = $('container'), frame = $('frame');
+            if (h && cache[h]) {
+                frame.srcdoc = cache[h];
+                container.style.display = 'block';
+                setTimeout(() => container.classList.add('active'), 10);
+            } else {
+                container.classList.remove('active');
+                setTimeout(() => { if (!window.location.hash) container.style.display = 'none'; }, 500);
+            }
+        }
+
+        window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; sync(); };
+        window.addEventListener('hashchange', checkHash);
+        window.addEventListener('message', e => {
+            if (e.data === 'sync') sync();
+            if (e.data === 'close') setHash('');
+        });
         setInterval(() => {
             const n = new Date();
             $('clock').textContent = n.toTimeString().split(' ')[0];
-            $('date').textContent = n.toLocaleDateString('en-US', {weekday:'short', day:'numeric'}).toUpperCase();
+            $('date').textContent = n.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' }).toUpperCase();
         }, 1000);
+        window.onload = init;
     </script>
 </body>
 </html>
