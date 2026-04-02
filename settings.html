@@ -65,39 +65,12 @@
             overflow-y: auto;
         }
         .core-pane::-webkit-scrollbar { display: none; }
-
-        .nav { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .nav h2 { 
-            font-size: 10px; 
-            font-weight: 900; 
-            color: var(--accent); 
-            letter-spacing: 3px; 
-        }
-        .close-btn { 
-            cursor: pointer; 
-            font-size: 18px; 
-            opacity: 0.4; 
-            padding: 4px; 
-            transition: 0.2s; 
-        }
-        .close-btn:hover { 
-            opacity: 1; 
-            transform: scale(1.1); 
-        }
-
+        .nav { display: flex; justify-content: space-between; align-items: center; }
+        .nav h2 { font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 3px; }
+        .close-btn { cursor: pointer; font-size: 18px; opacity: 0.4; padding: 4px; transition: 0.2s; }
+        .close-btn:hover { opacity: 1; transform: scale(1.1); }
         .row { width: 100%; }
-        label { 
-            font-size: 8px; 
-            font-weight: 800; 
-            opacity: 0.4; 
-            display: block; 
-            margin-bottom: 6px; 
-            letter-spacing: 1px; 
-        }
+        label { font-size: 8px; font-weight: 800; opacity: 0.4; display: block; margin-bottom: 6px; letter-spacing: 1px; }
         input[type="text"] {
             width: 100%;
             background: var(--glass);
@@ -122,26 +95,10 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .btn-action:hover { 
-            background: rgba(255, 255, 255, 0.1); 
-            border-color: var(--accent); 
-        }
-
-        .flex-group { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-        }
-        .btn-reset { 
-            background: rgba(243, 139, 168, 0.05); 
-            border-color: rgba(243, 139, 168, 0.2); 
-            color: #f38ba8; 
-        }
-        .btn-reset:hover { 
-            background: rgba(243, 139, 168, 0.15); 
-            border-color: #f38ba8; 
-        }
-
+        .btn-action:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent); }
+        .flex-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-reset { background: rgba(243, 139, 168, 0.05); border-color: rgba(243, 139, 168, 0.2); color: #f38ba8; }
+        .btn-reset:hover { background: rgba(243, 139, 168, 0.15); border-color: #f38ba8; }
         input[type="color"] {
             -webkit-appearance: none;
             border: 1px solid var(--border);
@@ -152,11 +109,7 @@
             cursor: pointer;
             padding: 0;
         }
-        input[type="color"]::-webkit-color-swatch { 
-            border: none; 
-            border-radius: 4px; 
-        }
-
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
         .slider-wrap {
             width: 100%;
             height: 38px;
@@ -170,20 +123,8 @@
             touch-action: none;
             cursor: ew-resize;
         }
-        .slider-track { 
-            width: 100%; 
-            height: 2px; 
-            background: rgba(255, 255, 255, 0.1); 
-            position: relative; 
-            pointer-events: none; 
-        }
-        .slider-fill { 
-            position: absolute; 
-            height: 100%; 
-            background: var(--accent); 
-            width: 0%; 
-            pointer-events: none; 
-        }
+        .slider-track { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.1); position: relative; pointer-events: none; }
+        .slider-fill { position: absolute; height: 100%; background: var(--accent); width: 0%; pointer-events: none; }
         .slider-knob {
             position: absolute;
             width: 14px;
@@ -196,7 +137,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             pointer-events: none;
         }
-
         .toggle-box {
             display: flex;
             align-items: center;
@@ -209,25 +149,9 @@
             transition: 0.2s;
         }
         .toggle-box:hover { border-color: var(--accent); }
-        .dot { 
-            width: 8px; 
-            height: 8px; 
-            border-radius: 50%; 
-            background: #222; 
-            transition: 0.3s; 
-        }
-        .active .dot { 
-            background: var(--accent); 
-            box-shadow: 0 0 10px var(--accent); 
-        }
-
-        .chips { 
-            display: flex; 
-            gap: 6px; 
-            overflow-x: auto; 
-            padding-bottom: 4px; 
-            scrollbar-width: none; 
-        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #222; transition: 0.3s; }
+        .active .dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
         .chips::-webkit-scrollbar { display: none; }
         .chip {
             padding: 8px 12px;
@@ -240,23 +164,18 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .chip:hover { 
-            border-color: var(--accent); 
-            color: var(--accent); 
-        }
+        .chip:hover { border-color: var(--accent); color: var(--accent); }
         .hidden-file { display: none; }
     </style>
 </head>
 <body>
     <div class="ambient-bg" id="bg-layer"></div>
     <div class="overlay-dim"></div>
-    
     <div class="core-pane">
         <div class="nav">
             <h2>SETTINGS</h2>
             <div class="close-btn" onclick="window.parent.postMessage('close', '*')">×</div>
         </div>
-
         <div class="row flex-group">
             <div>
                 <label>ACCENT</label>
@@ -268,24 +187,20 @@
                 <input type="file" id="bg-file" class="hidden-file" accept="image/*">
             </div>
         </div>
-
         <div class="row">
             <label>REMOTE URL</label>
             <input type="text" id="bg" placeholder="PASTE LINK...">
         </div>
-
         <div class="row flex-group">
             <button class="btn-action btn-reset" onclick="resetBg()">RESET BG</button>
             <button class="btn-action btn-reset" onclick="resetAll()">PURGE ALL</button>
         </div>
-
         <div class="row">
             <div class="toggle-box" id="part-toggle">
                 <label style="margin:0; opacity:1; cursor:pointer">PARTICLES</label>
                 <div class="dot"></div>
             </div>
         </div>
-
         <div class="row flex-group">
             <div>
                 <label>DENSITY</label>
@@ -306,12 +221,10 @@
                 </div>
             </div>
         </div>
-
         <div class="row">
             <label>PRESETS</label>
             <div class="chips" id="p-list"></div>
         </div>
-
         <div class="row flex-group">
             <div><label>TITLE</label><input type="text" id="title"></div>
             <div><label>FAVICON</label><input type="text" id="fav"></div>
@@ -321,26 +234,70 @@
     <script>
         const sync = () => window.parent.postMessage('sync', '*');
         const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
-        const defaults = { 
-            title: 'HRN | CORE', 
-            clr: '#89b4fa', 
-            op: 0.8, 
-            int: 1.1, 
-            fav: '', 
-            part: true 
-        };
-
+        const defaults = { title: 'HRN | CORE', clr: '#89b4fa', op: 0.8, int: 1.1, fav: '', part: true };
         const presets = [
             { n: "DEFAULT", t: "HRN | CORE", f: "/logo.svg" },
             { n: "GOOGLE", t: "Google", f: "https://google.com/favicon.ico" },
-            { n: "DRIVE", t: "My Drive", f: "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" },
+            { n: "DRIVE", t: "My Drive", f: "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" }
         ];
 
-        function updateBg(val) {
+        let db;
+        const DB_NAME = "hrn_db";
+        const DB_VERSION = 1;
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = e => {
+                    db = e.target.result;
+                    if (!db.objectStoreNames.contains('background')) {
+                        db.createObjectStore('background', { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = e => { db = e.target.result; resolve(); };
+                request.onerror = e => reject(e);
+            });
+        }
+
+        async function saveBackground(value) {
+            if (!db) await initDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('background', 'readwrite');
+                const store = tx.objectStore('background');
+                const data = { id: 'current_bg', value: value, timestamp: Date.now() };
+                const req = store.put(data);
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function loadBackground() {
+            if (!db) await initDB();
+            return new Promise((resolve) => {
+                const tx = db.transaction('background', 'readonly');
+                const store = tx.objectStore('background');
+                const req = store.get('current_bg');
+                req.onsuccess = () => resolve(req.result ? req.result.value : defaultBg);
+                req.onerror = () => resolve(defaultBg);
+            });
+        }
+
+        async function updateBg(val) {
             const bgLayer = document.getElementById('bg-layer');
-            const finalVal = val || defaultBg;
+            let finalVal = val || defaultBg;
+            if (val && val.startsWith('data:')) {
+                const res = await fetch(val);
+                const blob = await res.blob();
+                await saveBackground(blob);
+                finalVal = URL.createObjectURL(blob);
+            } else if (typeof val === 'string' && val.length > 0) {
+                await saveBackground(val);
+                finalVal = val;
+            } else {
+                await saveBackground(defaultBg);
+                finalVal = defaultBg;
+            }
             bgLayer.style.backgroundImage = `url('${finalVal}')`;
-            localStorage.setItem('hrn_bg', finalVal);
             sync();
         }
 
@@ -359,7 +316,6 @@
             const max = parseFloat(wrap.dataset.max);
             const step = parseFloat(wrap.dataset.step);
             let isDragging = false;
-
             const update = (e) => {
                 const rect = wrap.getBoundingClientRect();
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -367,33 +323,26 @@
                 pos = Math.max(0, Math.min(1, pos));
                 let val = min + (pos * (max - min));
                 val = Math.round(val / step) * step;
-
                 setSliderUI(id, val);
                 localStorage.setItem('hrn_' + key, val.toFixed(2));
                 sync();
             };
-
             wrap.addEventListener('mousedown', (e) => { isDragging = true; update(e); });
             window.addEventListener('mousemove', (e) => { if (isDragging) update(e); });
             window.addEventListener('mouseup', () => isDragging = false);
-
             wrap.addEventListener('touchstart', (e) => { isDragging = true; update(e); });
             window.addEventListener('touchmove', (e) => { if (isDragging) update(e); });
             window.addEventListener('touchend', () => isDragging = false);
-
             const saved = localStorage.getItem('hrn_' + key) || defaults[key];
             setSliderUI(id, parseFloat(saved));
         }
 
-        // Initialize sliders
         initSlider('slider-int', 'int');
         initSlider('slider-op', 'op');
 
-        // Text + Color inputs
         ['title', 'clr', 'fav', 'bg'].forEach(id => {
             const el = document.getElementById(id);
             el.value = localStorage.getItem('hrn_' + id) || (id === 'bg' ? '' : defaults[id]);
-
             el.oninput = () => {
                 localStorage.setItem('hrn_' + id, el.value);
                 if (id === 'clr') document.documentElement.style.setProperty('--accent', el.value);
@@ -402,11 +351,9 @@
             };
         });
 
-        // Particles toggle
         const partBtn = document.getElementById('part-toggle');
         let partActive = localStorage.getItem('hrn_part') !== 'false';
         if (partActive) partBtn.classList.add('active');
-
         partBtn.onclick = () => {
             partActive = !partActive;
             partBtn.classList.toggle('active', partActive);
@@ -414,43 +361,41 @@
             sync();
         };
 
-        // Reset functions
-        window.resetBg = () => {
+        window.resetBg = async () => {
             document.getElementById('bg').value = "";
+            await saveBackground(defaultBg);
             updateBg(defaultBg);
         };
 
-        window.resetAll = () => {
+        window.resetAll = async () => {
             localStorage.clear();
+            if (db) {
+                const tx = db.transaction('background', 'readwrite');
+                tx.objectStore('background').delete('current_bg');
+            }
             document.getElementById('title').value = defaults.title;
             document.getElementById('fav').value = defaults.fav;
             document.getElementById('clr').value = defaults.clr;
             document.getElementById('bg').value = "";
             document.documentElement.style.setProperty('--accent', defaults.clr);
-
             setSliderUI('slider-int', defaults.int);
             setSliderUI('slider-op', defaults.op);
-
             partActive = true;
             partBtn.classList.add('active');
-
-            updateBg(defaultBg);
+            await updateBg(defaultBg);
             sync();
         };
 
-        // File upload
-        document.getElementById('bg-file').onchange = (e) => {
-            if (e.target.files[0]) {
-                const fr = new FileReader();
-                fr.onload = () => {
-                    updateBg(fr.result);
-                    document.getElementById('bg').value = "Local File Uploaded";
-                };
-                fr.readAsDataURL(e.target.files[0]);
-            }
+        document.getElementById('bg-file').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            await saveBackground(file);
+            const objectUrl = URL.createObjectURL(file);
+            document.getElementById('bg-layer').style.backgroundImage = `url('${objectUrl}')`;
+            document.getElementById('bg').value = "Local File Uploaded";
+            sync();
         };
 
-        // Presets
         const list = document.getElementById('p-list');
         presets.forEach(p => {
             const c = document.createElement('div');
@@ -466,9 +411,13 @@
             list.appendChild(c);
         });
 
-        // Startup
-        updateBg(localStorage.getItem('hrn_bg'));
-        document.documentElement.style.setProperty('--accent', localStorage.getItem('hrn_clr') || defaults.clr);
+        async function startup() {
+            await initDB();
+            const bg = await loadBackground();
+            updateBg(bg);
+            document.documentElement.style.setProperty('--accent', localStorage.getItem('hrn_clr') || defaults.clr);
+        }
+        startup();
     </script>
 </body>
 </html>
