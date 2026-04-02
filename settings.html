@@ -1,101 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>SETTINGS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #030508; --accent: #89b4fa; --text: #f0f4ff; --panel: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 30px 20px; text-transform: uppercase; }
-        .container { max-width: 450px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        h1 { font-size: 10px; letter-spacing: 4px; color: var(--accent); }
-        .group { background: var(--panel); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 15px; }
-        .label { font-size: 8px; color: rgba(255,255,255,0.4); margin-bottom: 12px; display: block; letter-spacing: 2px; }
-        input[type="text"] { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: white; font-size: 10px; outline: none; margin-bottom: 10px; }
-        .flex { display: flex; gap: 15px; align-items: center; justify-content: space-between; }
-        
-        .switch { position: relative; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background: var(--accent); }
-        input:checked + .slider:before { transform: translateX(20px); }
-        input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; }
-
-        .btn-save { width: 100%; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; font-size: 10px; cursor: pointer; transition: 0.2s; }
+        body { margin: 0; background: transparent; color: #fff; font-family: 'Inter', sans-serif; text-transform: uppercase; overflow-y: auto; height: 100vh; padding: 60px 40px; scrollbar-width: none; }
+        .pane { max-width: 500px; margin: 0 auto; background: rgba(10,12,18,0.7); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.08); border-radius: 32px; padding: 40px; position: relative; }
+        .close { position: absolute; top: 25px; right: 25px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        .close:hover { opacity: 1; transform: rotate(90deg); }
+        h2 { font-size: 10px; letter-spacing: 4px; margin-bottom: 40px; opacity: 0.6; font-weight: 900; }
+        .group { margin-bottom: 30px; }
+        label { display: block; font-size: 8.5px; letter-spacing: 2px; margin-bottom: 15px; opacity: 0.4; font-weight: 900; }
+        input[type="text"], input[type="color"] { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #fff; font-family: inherit; font-size: 10px; outline: none; transition: 0.3s; }
+        input[type="text"]:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.06); }
+        input[type="range"] { width: 100%; appearance: none; background: rgba(255,255,255,0.05); height: 2px; border-radius: 2px; outline: none; margin: 15px 0; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; background: #fff; border-radius: 50%; cursor: pointer; transition: 0.2s; box-shadow: 0 0 10px rgba(255,255,255,0.3); }
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 10px 0; }
+        .switch { width: 34px; height: 18px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; transition: 0.3s; }
+        .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: 0.3s; }
+        .active .switch { background: #89b4fa; }
+        .active .switch::after { left: 19px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header><h1>SYSTEM.CONFIG</h1><button style="background:none; border:none; color:white; cursor:pointer; font-weight:900;" onclick="window.parent.postMessage('close', '*')">X</button></header>
-
+    <div class="pane">
+        <div class="close" onclick="window.parent.postMessage('close', '*')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>
+        <h2>System Configuration</h2>
+        
         <div class="group">
-            <span class="label">Identity</span>
-            <input type="text" id="sys-title" placeholder="Tab Title">
-            <input type="text" id="sys-fav" placeholder="Favicon URL">
+            <label>Interface Title</label>
+            <input type="text" id="title" placeholder="HRN | CORE">
         </div>
 
         <div class="group">
-            <span class="label">Particle Engine</span>
-            <div class="flex" style="margin-bottom:15px;">
-                <span style="font-size:9px;">Active</span>
-                <label class="switch"><input type="checkbox" id="sys-part"><span class="slider"></span></label>
+            <label>Accent Color</label>
+            <input type="color" id="clr" style="height:45px; padding:5px; cursor:pointer;">
+        </div>
+
+        <div class="group">
+            <label>Core Opacity</label>
+            <input type="range" id="op" min="0.1" max="1" step="0.05">
+        </div>
+
+        <div class="group">
+            <label>Particle Intensity</label>
+            <input type="range" id="int" min="0" max="400" step="10">
+        </div>
+
+        <div class="group">
+            <div class="toggle-row" id="part-row" onclick="toggle('part')">
+                <label style="margin:0; cursor:pointer;">Engine Particles</label>
+                <div class="switch"></div>
             </div>
-            <span class="label">Particle Amount</span>
-            <div class="flex">
-                <input type="range" id="sys-int" min="0" max="250" step="10">
-                <span id="amount-val" style="font-size: 10px; width: 30px;">50</span>
-            </div>
         </div>
 
         <div class="group">
-            <span class="label">Visuals</span>
-            <div class="flex">
-                <input type="color" id="sys-color">
-                <input type="range" id="sys-opacity" min="0.1" max="1" step="0.1">
-            </div>
+            <label>Wallpaper URL</label>
+            <input type="text" id="bg" placeholder="https://image-url.com/img.jpg">
         </div>
 
         <div class="group">
-            <span class="label">Wallpaper URL</span>
-            <input type="text" id="sys-bg" placeholder="URL">
+            <label>Favicon URL</label>
+            <input type="text" id="fav" placeholder="https://site.com/icon.png">
         </div>
-
-        <button class="btn-save" onclick="save()">SAVE CHANGES</button>
     </div>
 
     <script>
-        const slider = document.getElementById('sys-int');
-        const valDisp = document.getElementById('amount-val');
-        
-        slider.oninput = () => valDisp.textContent = slider.value;
+        const fields = ['title', 'clr', 'op', 'int', 'bg', 'fav'];
+        const defaults = { title: 'HRN | CORE', clr: '#89b4fa', op: 0.8, int: 150, part: true, bg: '', fav: '' };
 
-        window.onload = () => {
-            document.getElementById('sys-title').value = localStorage.getItem('hrn_title') || "";
-            document.getElementById('sys-fav').value = localStorage.getItem('hrn_fav') || "";
-            document.getElementById('sys-color').value = localStorage.getItem('hrn_clr') || "#89b4fa";
-            document.getElementById('sys-opacity').value = localStorage.getItem('hrn_op') || "0.8";
-            document.getElementById('sys-bg').value = localStorage.getItem('hrn_bg') || "";
-            document.getElementById('sys-part').checked = localStorage.getItem('hrn_part') !== 'false';
-            
-            const amt = localStorage.getItem('hrn_int') || "50";
-            slider.value = amt;
-            valDisp.textContent = amt;
-        };
-
-        function save() {
-            localStorage.setItem('hrn_title', document.getElementById('sys-title').value);
-            localStorage.setItem('hrn_fav', document.getElementById('sys-fav').value);
-            localStorage.setItem('hrn_clr', document.getElementById('sys-color').value);
-            localStorage.setItem('hrn_op', document.getElementById('sys-opacity').value);
-            localStorage.setItem('hrn_bg', document.getElementById('sys-bg').value);
-            localStorage.setItem('hrn_part', document.getElementById('sys-part').checked);
-            localStorage.setItem('hrn_int', slider.value);
-            
-            window.parent.postMessage('sync', '*');
-            const b = document.querySelector('.btn-save'); b.textContent = "SAVED"; setTimeout(()=>b.textContent="SAVE CHANGES", 1000);
+        function load() {
+            fields.forEach(f => {
+                const val = localStorage.getItem('hrn_' + f) || defaults[f];
+                document.getElementById(f).value = val;
+                document.getElementById(f).oninput = () => {
+                    localStorage.setItem('hrn_' + f, document.getElementById(f).value);
+                    window.parent.postMessage('sync', '*');
+                };
+            });
+            const p = localStorage.getItem('hrn_part') !== 'false';
+            if(p) document.getElementById('part-row').classList.add('active');
         }
+
+        function toggle(id) {
+            const el = document.getElementById(id + '-row');
+            const val = !el.classList.contains('active');
+            el.classList.toggle('active');
+            localStorage.setItem('hrn_' + id, val);
+            window.parent.postMessage('sync', '*');
+        }
+
+        load();
     </script>
 </body>
 </html>
