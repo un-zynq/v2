@@ -4,33 +4,46 @@
     <meta charset="UTF-8">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #050608; --card: #0d1117; --border: #30363d; --text: #8b949e; --accent: #89b4fa; }
-        body { font-family: 'Inter', sans-serif; background: transparent; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { width: 90%; max-width: 380px; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); backdrop-filter: blur(20px); }
-        .group { margin-bottom: 18px; }
-        label { display: flex; justify-content: space-between; font-size: 0.65rem; text-transform: uppercase; color: var(--text); margin-bottom: 8px; font-weight: 700; letter-spacing: 1.5px; }
-        input, select { width: 100%; padding: 12px; background: #010409; border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; font-size: 0.85rem; }
-        input[type="range"] { -webkit-appearance: none; height: 6px; background: #21262d; border-radius: 5px; cursor: pointer; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
-        .color-picker-wrapper { display: flex; align-items: center; gap: 12px; background: #010409; border: 1px solid var(--border); border-radius: 10px; padding: 10px; cursor: pointer; }
-        .color-box { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        :root { --bg: #050608; --card: #0d1117; --border: #24292e; --text: #8b949e; --accent: #89b4fa; }
+        
+        /* Geen transparante body meer */
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        
+        .card { width: 90%; max-width: 380px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .group { margin-bottom: 20px; }
+        label { display: flex; justify-content: space-between; font-size: 0.65rem; text-transform: uppercase; color: var(--text); margin-bottom: 10px; font-weight: 700; letter-spacing: 1.2px; }
+        input[type="text"], input[type="url"], select { width: 100%; padding: 12px; background: #010409; border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; font-size: 0.85rem; }
+        
+        /* Clean Custom Slider Styling */
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: #21262d; border-radius: 10px; outline: none; margin: 15px 0; }
+        input[type="range"]::-webkit-slider-thumb { 
+            -webkit-appearance: none; width: 18px; height: 18px; 
+            background: #fff; border-radius: 50%; cursor: pointer; 
+            box-shadow: 0 0 10px rgba(255,255,255,0.2); 
+            border: 3px solid var(--accent); transition: transform 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+        .color-picker-wrapper { display: flex; align-items: center; gap: 12px; background: #010409; border: 1px solid var(--border); border-radius: 8px; padding: 10px; cursor: pointer; }
+        .color-box { width: 25px; height: 25px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
         #themeColor { position: absolute; opacity: 0; width: 0; height: 0; }
-        .footer { margin-top: 25px; display: flex; flex-direction: column; gap: 12px; }
-        .btn-row { display: flex; gap: 12px; }
-        button { flex: 1; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-family: inherit; font-size: 0.9rem; }
+        
+        .footer { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-row { display: flex; gap: 10px; }
+        button { flex: 1; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-family: inherit; font-size: 0.85rem; }
         .btn-apply { background: var(--accent); color: #000; }
         .btn-cancel { background: #21262d; color: #c9d1d9; }
-        .btn-reset { background: transparent; color: #f85149; font-size: 0.75rem; text-decoration: underline; border: none; }
-        button:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        .btn-reset { background: transparent; color: #f85149; font-size: 0.7rem; text-decoration: underline; border: none; padding-top: 10px; }
+        button:hover { filter: brightness(1.2); }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="group"><label>Tab Title</label><input type="text" id="tabTitle" placeholder="HRN | Hub"></div>
-        <div class="group"><label>Favicon URL</label><input type="url" id="faviconUrl" placeholder="https://..."></div>
-        <div class="group"><label>Background URL</label><input type="url" id="bgUrl" placeholder="https://..."></div>
+        <div class="group"><label>Tab Title</label><input type="text" id="tabTitle"></div>
+        <div class="group"><label>Favicon URL</label><input type="url" id="faviconUrl"></div>
+        <div class="group"><label>Background Image</label><input type="url" id="bgUrl"></div>
         <div class="group">
-            <label>Logo Opacity <span id="opacityVal">50%</span></label>
+            <label>Logo Transparency <span id="opacityVal">50%</span></label>
             <input type="range" id="logoOpacity" min="0.2" max="1" step="0.05" value="0.5">
         </div>
         <div class="group">
@@ -45,9 +58,9 @@
         <div class="footer">
             <div class="btn-row">
                 <button class="btn-cancel" onclick="window.parent.postMessage({type:'closeIframe'}, '*')">Cancel</button>
-                <button class="btn-apply" onclick="save()">Save</button>
+                <button class="btn-apply" onclick="save()">Save Settings</button>
             </div>
-            <button class="btn-reset" onclick="resetDefaults()">Reset Defaults</button>
+            <button class="btn-reset" onclick="resetDefaults()">Reset Everything</button>
         </div>
     </div>
     <script>
@@ -72,7 +85,7 @@
         }
 
         function resetDefaults() {
-            if(confirm("Clear all settings?")) {
+            if(confirm("Full reset?")) {
                 localStorage.clear();
                 window.parent.postMessage({ type: 'updateSettings' }, '*');
                 window.parent.postMessage({ type: 'closeIframe' }, '*');
