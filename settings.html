@@ -9,7 +9,8 @@
             --bg: #030508;
             --accent: #89b4fa;
             --ui-silver: rgba(235, 240, 255, 0.85); 
-            --ui-border: rgba(255, 255, 255, 0.1);
+            --ui-border: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(13, 15, 23, 0.75);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { 
@@ -24,102 +25,81 @@
         ::-webkit-scrollbar-thumb { background: var(--ui-border); border-radius: 10px; }
         
         .ambient-bg { 
-            position: fixed; 
-            inset: -50px; 
-            z-index: 1; 
-            pointer-events: none; 
-            background-size: cover; 
-            background-position: center; 
-            opacity: 0.4; 
-            filter: brightness(0.4) blur(0px);
-            display: none; 
+            position: fixed; inset: -50px; z-index: 1; 
+            pointer-events: none; background-size: cover; background-position: center; 
+            opacity: 0.4; filter: brightness(0.4); display: none; 
         }
 
         .wrapper { 
-            position: relative;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100dvh; 
-            width: 100%; 
-            padding: 40px 20px;
-            z-index: 10;
+            position: relative; display: flex; align-items: center; justify-content: center; 
+            min-height: 100dvh; width: 100%; padding: 40px 20px; z-index: 10;
         }
         .pane { 
-            width: 100%;
-            max-width: 500px; 
-            background: rgba(13, 15, 23, 0.85); 
-            backdrop-filter: blur(40px) saturate(150%); 
-            -webkit-backdrop-filter: blur(40px) saturate(150%);
-            border: 1px solid var(--ui-border); 
-            border-radius: 32px; 
-            padding: 30px; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            width: 100%; max-width: 480px; background: var(--card-bg); 
+            backdrop-filter: blur(40px) saturate(160%); -webkit-backdrop-filter: blur(40px) saturate(160%);
+            border: 1px solid var(--ui-border); border-radius: 32px; padding: 32px; 
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
         }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        h2 { font-size: 10px; font-weight: 900; letter-spacing: 3px; color: var(--accent); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        h2 { font-size: 11px; font-weight: 900; letter-spacing: 4px; color: var(--accent); opacity: 0.9; }
         .close-btn { 
-            width: 38px; height: 38px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--ui-border);
-            border-radius: 12px;
-            color: #fff;
+            width: 36px; height: 36px; background: rgba(255,255,255,0.02);
+            border: 1px solid var(--ui-border); border-radius: 10px; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.2s;
+            cursor: pointer; transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .close-btn:hover { background: rgba(255,255,255,0.08); transform: scale(1.05); }
+        .close-btn:hover { background: rgba(255,255,255,0.06); transform: rotate(90deg); }
 
-        .section { margin-bottom: 25px; }
+        .section { margin-bottom: 28px; }
         .section-label { 
-            font-size: 8px; 
-            color: var(--accent); 
-            opacity: 0.6; 
-            margin-bottom: 15px; 
-            padding-bottom: 5px; 
-            border-bottom: 1px solid var(--ui-border);
-            display: block;
+            font-size: 8px; color: var(--accent); opacity: 0.5; 
+            margin-bottom: 16px; padding-bottom: 6px; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); display: block;
         }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .full { grid-column: span 2; }
         .group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 8px; font-weight: 700; opacity: 0.4; letter-spacing: 1.5px; }
+        label { font-size: 8px; font-weight: 800; opacity: 0.3; letter-spacing: 1.5px; }
 
         input[type="text"] { 
-            width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--ui-border); 
-            padding: 12px; border-radius: 12px; color: #fff; font-size: 10px; outline: none;
-            font-family: inherit;
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--ui-border); 
+            padding: 14px; border-radius: 14px; color: #fff; font-size: 10px; outline: none;
+            transition: border 0.3s;
         }
+        input[type="text"]:focus { border-color: rgba(255,255,255,0.2); }
+
         input[type="color"] { 
             -webkit-appearance: none; border: 1px solid var(--ui-border);
-            width: 100%; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.04); cursor: pointer;
+            width: 100%; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.03); cursor: pointer;
         }
-        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 10px; }
         
         .file-input-wrapper { position: relative; }
         .file-btn { 
-            width: 100%; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid var(--ui-border);
-            border-radius: 12px; color: #fff; font-size: 10px; cursor: pointer; text-align: center;
+            width: 100%; padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--ui-border);
+            border-radius: 14px; color: #fff; font-size: 10px; cursor: pointer; text-align: center;
         }
         #bg-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin: 15px 0; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px var(--accent); }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 2px; background: rgba(255,255,255,0.08); margin: 15px 0; }
+        input[type="range"]::-webkit-slider-thumb { 
+            -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); 
+            border-radius: 50%; cursor: pointer; box-shadow: 0 0 15px var(--accent); 
+        }
 
         .checkbox-row {
-            display: flex; align-items: center; gap: 12px;
-            background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid var(--ui-border);
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.015); padding: 14px; border-radius: 14px; border: 1px solid var(--ui-border);
         }
-        input[type="checkbox"] {
-            width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;
-        }
+        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
 
-        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
         .preset-btn {
-            padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--ui-border);
-            border-radius: 10px; color: #fff; font-size: 9px; cursor: pointer; transition: 0.2s;
+            padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--ui-border);
+            border-radius: 12px; color: #fff; font-size: 9px; cursor: pointer; transition: 0.2s;
         }
-        .preset-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
+        .preset-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--accent); transform: translateY(-2px); }
 
         @media (max-width: 450px) { .grid { grid-template-columns: 1fr; } .full { grid-column: span 1; } }
     </style>
@@ -131,60 +111,63 @@
             <div class="header">
                 <h2>CORE ENGINE V3</h2>
                 <div class="close-btn" onclick="window.parent.postMessage('close', '*')">
-                    <i data-lucide="x"></i>
+                    <i data-lucide="x" style="width:18px;height:18px"></i>
                 </div>
             </div>
 
             <div class="section">
-                <span class="section-label">Interface Appearance</span>
+                <span class="section-label">Appearance & Canvas</span>
                 <div class="grid">
                     <div class="group">
-                        <label>Theme Color</label>
+                        <label>Accent Tone</label>
                         <input type="color" id="clr">
                     </div>
                     <div class="group">
-                        <label>Custom Background</label>
+                        <label>Background Source</label>
                         <div class="file-input-wrapper">
-                            <div class="file-btn" id="file-label">Upload Image</div>
+                            <div class="file-btn" id="file-label">Upload / Link</div>
                             <input type="file" id="bg-file" accept="image/*">
                         </div>
+                    </div>
+                    <div class="group full">
+                        <label>Remote Wallpaper URL</label>
+                        <input type="text" id="bg" placeholder="https://image-hosting.com/img.jpg">
                     </div>
                 </div>
             </div>
 
             <div class="section">
-                <span class="section-label">Particle Dynamics</span>
+                <span class="section-label">Neural Dynamics</span>
                 <div class="grid">
                     <div class="group full">
                         <div class="checkbox-row">
+                            <label style="opacity: 1; margin: 0; cursor: pointer; font-size: 9px;">Active Neural Particles</label>
                             <input type="checkbox" id="part">
-                            <label style="opacity: 1; margin: 0; cursor: pointer;">Enable Neural Particles</label>
                         </div>
                     </div>
                     <div class="group">
-                        <label>Density Amount</label>
+                        <label>Density</label>
                         <input type="range" id="int" min="0.1" max="5.0" step="0.1">
                     </div>
                     <div class="group">
-                        <label>Global Opacity</label>
+                        <label>Interface Alpha</label>
                         <input type="range" id="op" min="0.1" max="1" step="0.05">
                     </div>
                 </div>
             </div>
 
             <div class="section">
-                <span class="section-label">Identity & Masking</span>
+                <span class="section-label">Identity Masking</span>
                 <div class="grid">
                     <div class="group">
-                        <label>Tab Title</label>
+                        <label>Title</label>
                         <input type="text" id="title" placeholder="HRN | CORE">
                     </div>
                     <div class="group">
-                        <label>Favicon URL</label>
+                        <label>Favicon</label>
                         <input type="text" id="fav" placeholder="https://...">
                     </div>
                     <div class="group full">
-                        <label>Identity Presets</label>
                         <div class="preset-grid" id="preset-container"></div>
                     </div>
                 </div>
@@ -196,25 +179,41 @@
         lucide.createIcons();
 
         const presets = [
-            { name: "Default", title: "HRN", fav: "/logo.svg" },
+            { name: "Default", title: "HRN | CORE", fav: "favicon.png" },
             { name: "Google", title: "Google", fav: "https://www.google.com/favicon.ico" },
-            { name: "Drive", title: "My Drive - Google Drive", fav: "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" },
-            { name: "Classroom", title: "Classes", fav: "https://www.gstatic.com/classroom/favicon.png" },
+            { name: "Drive", title: "My Drive", fav: "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" },
+            { name: "Classes", title: "Classes", fav: "https://www.gstatic.com/classroom/favicon.png" },
+            { name: "Canvas", title: "Dashboard", fav: "https://du11hjcvhe07u.cloudfront.net/favicon.ico" },
             { name: "Gmail", title: "Gmail", fav: "https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico" }
         ];
 
-        const fields = ['title', 'clr', 'op', 'int', 'fav'];
-        const defaults = { title: 'HRN | CORE', clr: '#89b4fa', op: '0.8', int: '1.1', part: true, fav: '' };
+        const fields = ['title', 'clr', 'op', 'int', 'fav']; // 'bg' removed from auto-populating fields to avoid string reveal
+        const defaults = { title: 'HRN | CORE', clr: '#89b4fa', op: '0.8', int: '1.1', part: true, fav: '', bg: '' };
 
         function updatePreview(url) {
             const bgLayer = document.getElementById('bg-layer');
-            if (url && url.length > 10) {
+            if (url && url.length > 5) {
                 bgLayer.style.backgroundImage = `url(${url})`;
                 bgLayer.style.display = 'block';
-                document.getElementById('file-label').innerText = "Image Loaded";
+                document.getElementById('file-label').innerText = "Image Active";
             } else {
                 bgLayer.style.display = 'none';
                 document.getElementById('file-label').innerText = "Upload Image";
+            }
+        }
+
+        async function urlToBase64(url) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            } catch (e) {
+                return url; 
             }
         }
 
@@ -243,14 +242,17 @@
                 localStorage.setItem('hrn_bg', base64);
                 updatePreview(base64);
                 window.parent.postMessage('sync', '*');
+                document.getElementById('bg').value = ''; // Keep UI clean
             };
             reader.readAsDataURL(file);
         }
 
         function load() {
             initPresets();
-            updatePreview(localStorage.getItem('hrn_bg'));
+            const storedBg = localStorage.getItem('hrn_bg');
+            updatePreview(storedBg);
 
+            // Populate other fields
             fields.forEach(f => {
                 const stored = localStorage.getItem('hrn_' + f);
                 const val = (stored !== null) ? stored : defaults[f];
@@ -263,6 +265,19 @@
                     };
                 }
             });
+
+            // Special handling for BG input to prevent string dump
+            const bgInput = document.getElementById('bg');
+            bgInput.onchange = async () => {
+                const url = bgInput.value;
+                if(url.startsWith('http')) {
+                    const converted = await urlToBase64(url);
+                    localStorage.setItem('hrn_bg', converted);
+                    updatePreview(converted);
+                    window.parent.postMessage('sync', '*');
+                    // We DO NOT set bgInput.value to converted here.
+                }
+            };
 
             const partCheck = document.getElementById('part');
             const pState = localStorage.getItem('hrn_part') !== 'false';
