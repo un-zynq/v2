@@ -1,105 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #050608; --card: #0d1117; --border: #24292e; --text: #8b949e; --accent: #89b4fa; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { width: 90%; max-width: 380px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .group { margin-bottom: 18px; }
-        label { display: flex; justify-content: space-between; font-size: 0.65rem; text-transform: uppercase; color: var(--text); margin-bottom: 8px; font-weight: 700; letter-spacing: 1px; }
-        input[type="text"], input[type="url"], select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; font-size: 0.85rem; transition: border-color 0.2s; }
-        input:focus { border-color: var(--accent); }
+        :root { --bg: #0d1117; --border: #30363d; --accent: #89b4fa; --text: #c9d1d9; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #030508; color: white; height: 100vh; display: flex; align-items: center; justify-content: center; }
         
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: #1a1d23; border-radius: 10px; margin: 15px 0; cursor: pointer; }
-        input[type="range"]::-webkit-slider-thumb { 
-            -webkit-appearance: none; width: 18px; height: 18px; background: #fff; border-radius: 50%; 
-            border: 3px solid var(--accent); transition: 0.2s; box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        .panel { width: 340px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+        .row { margin-bottom: 16px; }
+        label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #8b949e; margin-bottom: 8px; font-weight: 700; }
+        
+        /* Optimized Inputs - No padding/margin bugs */
+        input, select {
+            width: 100%; display: block; background: #010409; border: 1px solid var(--border);
+            padding: 10px; border-radius: 8px; color: white; font-size: 13px; outline: none;
         }
-        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); background: var(--accent); }
+        input:focus { border-color: var(--accent); }
 
-        .color-wrapper { display: flex; align-items: center; gap: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 10px; cursor: pointer; }
-        .color-preview { width: 25px; height: 25px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
-        #themeColor { position: absolute; opacity: 0; pointer-events: none; }
-        
-        .footer { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
-        .btn-row { display: flex; gap: 10px; }
-        button { flex: 1; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-family: inherit; font-size: 0.85rem; }
-        .btn-save { background: var(--accent); color: #000; }
-        .btn-exit { background: #21262d; color: #c9d1d9; }
-        .btn-reset { background: transparent; color: #f85149; font-size: 0.7rem; text-decoration: underline; border: none; padding-top: 5px; }
-        button:hover { filter: brightness(1.1); }
+        /* Clean Slider */
+        input[type="range"] { -webkit-appearance: none; background: #161b22; height: 4px; padding: 0; cursor: pointer; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #fff; border-radius: 50%; border: 2px solid var(--accent); }
+
+        .flex { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .save { background: var(--accent); color: #000; }
+        .back { background: #21262d; color: white; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="group"><label>App Title</label><input type="text" id="tabTitle"></div>
-        <div class="group"><label>Favicon URL</label><input type="url" id="faviconUrl"></div>
-        <div class="group"><label>Background Image</label><input type="url" id="bgUrl"></div>
-        <div class="group">
-            <label>Logo Transparency <span id="opacityVal">50%</span></label>
-            <input type="range" id="logoOpacity" min="0.2" max="1" step="0.05">
+    <div class="panel">
+        <div class="row"><label>Title</label><input id="t" type="text"></div>
+        <div class="row"><label>Background (URL)</label><input id="b" type="text"></div>
+        <div class="row">
+            <label>Transparency: <span id="ov">50%</span></label>
+            <input id="o" type="range" min="0.2" max="1" step="0.05">
         </div>
-        <div class="group">
-            <label>System Accent</label>
-            <div class="color-wrapper" onclick="document.getElementById('themeColor').click()">
-                <div class="color-preview" id="colorPreview"></div>
-                <div style="font-size: 0.8rem; font-family: monospace;" id="colorHex">#89B4FA</div>
-                <input type="color" id="themeColor">
-            </div>
-        </div>
-        <div class="group"><label>Atmosphere</label><select id="particleAmount"><option value="off">None</option><option value="low">Low</option><option value="mid">Standard</option><option value="high">Max</option></select></div>
-        <div class="footer">
-            <div class="btn-row">
-                <button class="btn-exit" onclick="window.parent.postMessage({type:'closeIframe'}, '*')">Cancel</button>
-                <button class="btn-save" onclick="save()">Apply Changes</button>
-            </div>
-            <button class="btn-reset" onclick="reset()">Factory Reset</button>
+        <div class="row"><label>Accent Color</label><input id="c" type="color" style="height:40px; padding:2px;"></div>
+        <div class="flex">
+            <button class="back" onclick="window.parent.postMessage('close', '*')">Cancel</button>
+            <button class="save" onclick="save()">Save</button>
         </div>
     </div>
     <script>
-        const colorInput = document.getElementById('themeColor');
-        const colorPreview = document.getElementById('colorPreview');
-        const colorHex = document.getElementById('colorHex');
-        const opacityInput = document.getElementById('logoOpacity');
-        const opacityVal = document.getElementById('opacityVal');
-
-        opacityInput.oninput = e => { opacityVal.textContent = Math.round(e.target.value * 100) + "%"; };
-        colorInput.oninput = e => { colorPreview.style.backgroundColor = e.target.value; colorHex.textContent = e.target.value.toUpperCase(); };
-
-        function save() {
-            localStorage.setItem('hrn_tab_title', document.getElementById('tabTitle').value);
-            localStorage.setItem('hrn_favicon_url', document.getElementById('faviconUrl').value);
-            localStorage.setItem('hrn_bg_url', document.getElementById('bgUrl').value);
-            localStorage.setItem('hrn_logo_opacity', opacityInput.value);
-            localStorage.setItem('hrn_theme_color', colorInput.value);
-            localStorage.setItem('hrn_particle_amount', document.getElementById('particleAmount').value);
-            window.parent.postMessage({ type: 'updateSettings' }, '*');
-            setTimeout(() => window.parent.postMessage({ type: 'closeIframe' }, '*'), 50);
-        }
-
-        function reset() {
-            if(confirm("Wipe all system settings?")) {
-                localStorage.clear();
-                window.parent.postMessage({ type: 'updateSettings' }, '*');
-                window.parent.postMessage({ type: 'closeIframe' }, '*');
-            }
-        }
+        const s = localStorage;
+        const $ = id => document.getElementById(id);
 
         window.onload = () => {
-            document.getElementById('tabTitle').value = localStorage.getItem('hrn_tab_title') || "";
-            document.getElementById('faviconUrl').value = localStorage.getItem('hrn_favicon_url') || "";
-            document.getElementById('bgUrl').value = localStorage.getItem('hrn_bg_url') || "";
-            const savedOpacity = localStorage.getItem('hrn_logo_opacity') || "0.5";
-            opacityInput.value = savedOpacity;
-            opacityVal.textContent = Math.round(savedOpacity * 100) + "%";
-            const savedColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
-            colorInput.value = savedColor;
-            colorPreview.style.backgroundColor = savedColor;
-            colorHex.textContent = savedColor.toUpperCase();
-            document.getElementById('particleAmount').value = localStorage.getItem('hrn_particle_amount') || "mid";
+            $("t").value = s.getItem('hrn_title') || "";
+            $("b").value = s.getItem('hrn_bg') || "";
+            $("o").value = s.getItem('hrn_op') || "0.5";
+            $("c").value = s.getItem('hrn_clr') || "#89b4fa";
+            $("ov").textContent = Math.round($("o").value * 100) + "%";
         };
+
+        $("o").oninput = () => $("ov").textContent = Math.round($("o").value * 100) + "%";
+
+        function save() {
+            s.setItem('hrn_title', $("t").value);
+            s.setItem('hrn_bg', $("b").value);
+            s.setItem('hrn_op', $("o").value);
+            s.setItem('hrn_clr', $("c").value);
+            window.parent.postMessage('sync', '*');
+            window.parent.postMessage('close', '*');
+        }
     </script>
 </body>
 </html>
