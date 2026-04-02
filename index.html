@@ -305,17 +305,14 @@
             }
         }
 
-        window.onresize = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            gl.viewport(0, 0, canvas.width, canvas.height);
-            sync();
-        };
+        window.onresize = () => { sync(); };
 
         window.addEventListener('hashchange', checkHash);
+
+        // === BELANGRIJK: Dit zorgt dat × knop werkt ===
         window.addEventListener('message', e => {
             if (e.data === 'sync') sync();
-            if (e.data === 'close') sync();        // Dit zorgt ervoor dat × knop werkt + settings direct toepast
+            if (e.data === 'close') sync();   // ← Dit was het probleem
         });
 
         setInterval(() => {
