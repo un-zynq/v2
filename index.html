@@ -13,53 +13,51 @@
             --accent: #89b4fa;
             --accent-glow: rgba(137, 180, 250, 0.15);
             --text-main: #f0f4ff;
-            --text-dim: rgba(255, 255, 255, 0.5);
-            --glass: rgba(255, 255, 255, 0.03);
+            --text-dim: rgba(255, 255, 255, 0.4);
             --glass-border: rgba(255, 255, 255, 0.08);
             --transition: all .25s cubic-bezier(.23, 1, .32, 1);
             --logo-opacity: 0.5;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: none; }
-        *::-webkit-scrollbar { display: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         html, body { height: 100dvh; width: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); overflow: hidden; user-select: none; }
         
         /* Preloader */
         #loader-wrapper {
             position: fixed; inset: 0; z-index: 9999; background: var(--bg);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease, visibility 0.5s;
+            transition: opacity 0.6s ease, visibility 0.6s;
         }
-        .loader-content { width: 250px; text-align: center; }
-        .loader-bar-bg { width: 100%; height: 2px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-top: 20px; }
-        #loader-progress { width: 0%; height: 100%; background: var(--accent); transition: width 0.4s cubic-bezier(.23, 1, .32, 1); box-shadow: 0 0 15px var(--accent); }
-        .loader-text { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-dim); font-weight: 700; }
+        .loader-content { width: 220px; text-align: center; }
+        .loader-bar-bg { width: 100%; height: 2px; background: rgba(255,255,255,0.03); border-radius: 10px; overflow: hidden; margin-top: 25px; }
+        #loader-progress { width: 0%; height: 100%; background: var(--accent); transition: width 0.4s ease; box-shadow: 0 0 20px var(--accent); }
+        .loader-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 5px; color: var(--text-main); font-weight: 900; margin-bottom: 4px; }
+        .loader-sub { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); font-weight: 500; }
 
-        /* UI State */
-        .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 25px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; opacity: 0; transform: scale(0.98); transition: opacity 0.8s ease, transform 0.8s ease; }
+        /* Main UI hidden initially */
+        .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 25px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; opacity: 0; transform: scale(1.02); transition: opacity 1s ease, transform 1s ease; }
         .wrapper.ready { opacity: 1; transform: scale(1); }
 
-        .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; opacity: 0; transition: opacity .4s ease; pointer-events: none; filter: brightness(0.6); }
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; opacity: 0; transition: opacity .8s ease; pointer-events: none; filter: brightness(0.5); }
         #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
-        .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.4; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
+        .glow { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.4; filter: blur(80px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
 
         .header { display: flex; justify-content: center; z-index: 50; margin-bottom: 20px; }
-        #status-pill { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.03); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        #status-pill { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(20px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         
         .main { display: flex; justify-content: space-between; align-items: center; flex-grow: 1; position: relative; z-index: 20; }
         .side-nav { display: flex; flex-direction: column; gap: 15px; z-index: 30; }
         .side-link { width: 58px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: var(--text-dim); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 18px; transition: var(--transition); cursor: pointer; position: relative; backdrop-filter: blur(10px); }
-        .side-link:hover, .side-link.active { color: var(--accent); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
-        .side-link.active::after { content: ''; position: absolute; left: -10px; width: 3px; height: 18px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 10px var(--accent); }
+        .side-link:hover, .side-link.active { color: var(--accent); border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        .side-link.active::after { content: ''; position: absolute; left: -12px; width: 3px; height: 18px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 10px var(--accent); }
         
         .center-brand { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .logo { font-size: clamp(4.5rem, 18vw, 11rem); font-weight: 900; letter-spacing: -.05em; line-height: .8; background: linear-gradient(180deg, #fff 40%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5)); opacity: var(--logo-opacity); transition: opacity 0.3s ease; }
+        .logo { font-size: clamp(4.5rem, 18vw, 11rem); font-weight: 900; letter-spacing: -.05em; line-height: .8; background: linear-gradient(180deg, #fff 40%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5)); opacity: var(--logo-opacity); transition: opacity 0.4s ease; }
         .logo:hover { opacity: calc(var(--logo-opacity) + 0.15); }
         
-        /* Tagline Animation */
-        .tagline { font-size: 0.9rem; letter-spacing: 5px; color: var(--text-dim); text-transform: uppercase; opacity: 0; transform: translateY(15px); transition: opacity 1s ease 0.5s, transform 1s ease 0.5s; }
+        .tagline { font-size: 0.9rem; letter-spacing: 6px; color: var(--text-dim); text-transform: uppercase; opacity: 0; transform: translateY(15px); transition: opacity 1.2s ease, transform 1.2s ease; }
         .tagline.show { opacity: 1; transform: translateY(0); }
 
-        #iframe-container { position: fixed; inset: 0; z-index: 100; background: var(--bg); opacity: 0; visibility: hidden; transition: opacity .2s ease; pointer-events: none; }
+        #iframe-container { position: fixed; inset: 0; z-index: 100; background: var(--bg); opacity: 0; visibility: hidden; transition: opacity .3s ease; pointer-events: none; }
         #iframe-container.active { opacity: 1; visibility: visible; pointer-events: auto; }
         #content-iframe { width: 100%; height: 100%; border: none; }
 
@@ -73,7 +71,8 @@
 <body>
     <div id="loader-wrapper">
         <div class="loader-content">
-            <div class="loader-text" id="loader-text">Initializing</div>
+            <div class="loader-title">HRN</div>
+            <div class="loader-sub" id="loader-status">Preparing System</div>
             <div class="loader-bar-bg"><div id="loader-progress"></div></div>
         </div>
     </div>
@@ -107,15 +106,11 @@
 
     <script>
         lucide.createIcons();
-        const taglines = ["ELITE GAMING","BUILT DIFFERENT","LEVEL UP","CLUTCH OR KICK","STAY AHEAD"];
+        const taglines = ["ELITE GAMING","BUILT DIFFERENT","LEVEL UP","STAY AHEAD","CLUTCH ONLY"];
         let pageCache = {}, currentAccentColor = '#89b4fa', particlesArray = [], w, h;
         const progress = document.getElementById('loader-progress');
-        const loaderText = document.getElementById('loader-text');
         
-        function updateProgress(percent, text) { 
-            progress.style.width = percent + '%'; 
-            if(text) loaderText.textContent = text;
-        }
+        const updateProgress = (p) => progress.style.width = p + '%';
 
         function updateTime() {
             const now = new Date();
@@ -124,13 +119,26 @@
         }
 
         async function initApp() {
-            updateTime();
-            setInterval(updateTime, 1000);
+            updateTime(); setInterval(updateTime, 1000);
             
-            updateProgress(20, "Loading Config");
+            // 1. Load Settings
+            updateProgress(20);
             syncSettings();
             
-            updateProgress(40, "Fetching Assets");
+            // 2. Fetch Background if exists
+            const bgUrl = localStorage.getItem('hrn_bg_url');
+            if (bgUrl && bgUrl.trim() !== "") {
+                updateProgress(40);
+                await new Promise(resolve => {
+                    const img = new Image();
+                    img.src = bgUrl;
+                    img.onload = resolve;
+                    img.onerror = resolve; // Continue anyway on error
+                });
+            }
+
+            // 3. Cache Pages
+            updateProgress(60);
             const pages = ['settings', 'games', 'about', 'add', 'bookmarklets'];
             let loaded = 0;
             for (const p of pages) {
@@ -139,20 +147,18 @@
                     if(res.ok) pageCache[p] = await res.text();
                 } catch(e) {}
                 loaded++;
-                updateProgress(40 + (loaded / pages.length * 50));
+                updateProgress(60 + (loaded / pages.length * 30));
             }
 
-            updateProgress(100, "Ready");
+            // 4. Finalize
+            updateProgress(100);
             setTimeout(() => {
                 document.getElementById('loader-wrapper').style.opacity = '0';
                 document.getElementById('loader-wrapper').style.visibility = 'hidden';
                 document.getElementById('main-wrapper').classList.add('ready');
-                
-                // Trigger tagline animation after UI is visible
                 const tag = document.getElementById('tagline-text');
                 tag.textContent = taglines[Math.floor(Math.random() * taglines.length)];
-                setTimeout(() => tag.classList.add('show'), 200);
-                
+                setTimeout(() => tag.classList.add('show'), 400);
                 checkHash();
             }, 800);
         }
@@ -165,9 +171,9 @@
             document.documentElement.style.setProperty('--accent', themeColor);
             document.documentElement.style.setProperty('--accent-glow', themeColor + '26');
             
-            const faviconUrl = localStorage.getItem('hrn_favicon_url');
             const link = document.getElementById('dynamic-favicon');
-            link.href = (faviconUrl && faviconUrl.trim() !== "") ? faviconUrl : "/logo.svg";
+            const fav = localStorage.getItem('hrn_favicon_url');
+            link.href = (fav && fav.trim() !== "") ? fav : "/logo.svg";
 
             const bgUrl = localStorage.getItem('hrn_bg_url');
             const ambient = document.getElementById('ambient-bg');
@@ -203,8 +209,8 @@
             init() { 
                 this.x = Math.random() * w; this.y = Math.random() * h; 
                 this.size = Math.random() * 1.5 + 0.5; 
-                this.speedX = Math.random() * 0.3 - 0.15; this.speedY = Math.random() * 0.3 - 0.15; 
-                this.opacity = Math.random() * 0.4 + 0.2;
+                this.speedX = Math.random() * 0.4 - 0.2; this.speedY = Math.random() * 0.4 - 0.2; 
+                this.opacity = Math.random() * 0.5 + 0.2;
             }
             update() { 
                 this.x += this.speedX; this.y += this.speedY; 
