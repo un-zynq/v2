@@ -9,48 +9,74 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg: #05070a;
+            --bg: #030508;
             --accent: #89b4fa;
             --accent-glow: rgba(137, 180, 250, 0.15);
             --text-main: #f0f4ff;
             --text-dim: rgba(255, 255, 255, 0.5);
-            --glass: rgba(255, 255, 255, 0.03);
+            --glass: rgba(0, 0, 0, 0.25);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --transition: all .3s cubic-bezier(.23, 1, .32, 1);
+            --transition: all .25s cubic-bezier(.23, 1, .32, 1);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: none; }
         *::-webkit-scrollbar { display: none; }
         html, body { height: 100dvh; width: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); overflow: hidden; user-select: none; }
         
-        .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; transition: opacity .8s ease; pointer-events: none; }
+        /* Achtergrond & Blur */
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; opacity: 0; transition: opacity .8s ease; pointer-events: none; filter: blur(40px) brightness(0.7); }
         #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
-        .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.5; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); transition: background 0.5s ease; }
+        .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.5; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
 
         .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 25px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; }
-        .header { display: flex; justify-content: center; z-index: 50; opacity: 0; transition: opacity .6s ease; margin-bottom: 20px; }
-        .header.show { opacity: 1; }
-        #status-pill { display: flex; align-items: center; gap: 14px; background: var(--glass); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Header - Geen fade meer */
+        .header { display: flex; justify-content: center; z-index: 50; margin-bottom: 20px; }
+        #status-pill { display: flex; align-items: center; gap: 14px; background: rgba(0,0,0,0.4); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(20px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         
         .main { display: flex; justify-content: space-between; align-items: center; flex-grow: 1; position: relative; z-index: 20; }
-        .side-nav { display: flex; flex-direction: column; gap: 15px; z-index: 30; }
-        .side-link { width: 58px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: var(--text-dim); background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; transition: var(--transition); text-decoration: none; cursor: pointer; position: relative; }
-        .side-link:hover, .side-link.active { color: var(--accent); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
-        .side-link.active::after { content: ''; position: absolute; left: -10px; width: 3px; height: 18px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 10px var(--accent); }
+        
+        /* Navigatie met extra contrast */
+        .side-nav { display: flex; flex-direction: column; gap: 18px; z-index: 30; }
+        .side-link { 
+            width: 60px; 
+            aspect-ratio: 1/1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-dim); 
+            background: rgba(0, 0, 0, 0.4); /* Donkere bg voor contrast */
+            border: 1px solid var(--glass-border); 
+            border-radius: 20px; 
+            transition: var(--transition); 
+            text-decoration: none; 
+            cursor: pointer; 
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        .side-link:hover, .side-link.active { 
+            color: var(--accent); 
+            border-color: var(--accent); 
+            background: rgba(137, 180, 250, 0.08); 
+            transform: scale(1.05); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .side-link.active::after { content: ''; position: absolute; left: -12px; width: 4px; height: 20px; background: var(--accent); border-radius: 10px; box-shadow: 0 0 15px var(--accent); }
         
         .center-brand { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .logo { font-size: clamp(4rem, 15vw, 10rem); font-weight: 900; letter-spacing: -.05em; line-height: .8; background: linear-gradient(180deg, #fff 30%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5)); opacity: 0.8; }
-        .tagline { font-size: 0.9rem; letter-spacing: 4px; color: var(--text-dim); text-transform: uppercase; opacity: 0; transform: translateY(10px); transition: 0.8s ease; }
+        .logo { font-size: clamp(4.5rem, 18vw, 11rem); font-weight: 900; letter-spacing: -.05em; line-height: .8; background: linear-gradient(180deg, #fff 40%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
+        .tagline { font-size: 0.9rem; letter-spacing: 5px; color: var(--text-dim); text-transform: uppercase; opacity: 0; transform: translateY(10px); transition: 0.8s ease; }
         .tagline.show { opacity: 1; transform: translateY(0); }
 
-        #iframe-container { position: fixed; inset: 0; z-index: 100; background: var(--bg); opacity: 0; visibility: hidden; transition: opacity .3s ease; pointer-events: none; }
+        /* Iframe container */
+        #iframe-container { position: fixed; inset: 0; z-index: 100; background: var(--bg); opacity: 0; visibility: hidden; transition: opacity .2s ease; pointer-events: none; }
         #iframe-container.active { opacity: 1; visibility: visible; pointer-events: auto; }
         #content-iframe { width: 100%; height: 100%; border: none; }
 
         @media (max-width: 768px) {
-            .main { flex-direction: column; justify-content: center; gap: 50px; }
+            .main { flex-direction: column; justify-content: center; gap: 40px; }
             .side-nav { flex-direction: row; order: 2; flex-wrap: wrap; justify-content: center; }
             .desktop-nav-right { display: none; }
-            .side-link.active::after { bottom: -10px; left: 50%; width: 18px; height: 3px; transform: translateX(-50%); }
+            .side-link.active::after { bottom: -12px; left: 50%; width: 20px; height: 4px; transform: translateX(-50%); }
         }
     </style>
 </head>
@@ -60,7 +86,7 @@
     <canvas id="particles"></canvas>
 
     <div class="wrapper">
-        <header class="header" id="header">
+        <header class="header">
             <div id="status-pill"><span id="date"></span><div style="width:1px;height:12px;background:var(--glass-border)"></div><span id="clock"></span></div>
         </header>
 
@@ -109,13 +135,10 @@
             const faviconUrl = localStorage.getItem('hrn_favicon_url');
             
             document.title = tabTitle;
-
             let link = document.getElementById('dynamic-favicon');
-            if (faviconUrl && faviconUrl.trim() !== "") {
+            if (faviconUrl) {
                 link.href = faviconUrl;
                 link.onerror = () => { link.href = "favicon.ico"; };
-            } else {
-                link.href = "favicon.ico";
             }
 
             currentAccentColor = themeColor;
@@ -124,8 +147,12 @@
             
             const bgUrl = localStorage.getItem('hrn_bg_url');
             const ambient = document.getElementById('ambient-bg');
-            ambient.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : "none";
-            ambient.style.opacity = bgUrl ? "0.4" : "0";
+            if (bgUrl) {
+                ambient.style.backgroundImage = `url('${bgUrl}')`;
+                ambient.style.opacity = "0.5";
+            } else {
+                ambient.style.opacity = "0";
+            }
             
             initParticles(localStorage.getItem('hrn_particle_amount') || "mid");
         }
@@ -134,19 +161,14 @@
             if (!page || !pageCache[page]) return;
             currentPage = page;
             if (window.location.hash !== '#' + page) history.pushState(null, null, '#' + page);
-            
             iframe.srcdoc = pageCache[page];
             container.classList.add('active');
-            
-            // UI Update voor de zijbalk
-            document.querySelectorAll('.side-link').forEach(l => {
-                l.classList.toggle('active', l.dataset.page === page);
-            });
+            document.querySelectorAll('.side-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
         }
 
         function closeIframe() {
             container.classList.remove('active');
-            iframe.srcdoc = ""; iframe.src = "about:blank";
+            setTimeout(() => { iframe.srcdoc = ""; iframe.src = "about:blank"; }, 200);
             currentPage = null;
             if (window.location.hash) history.pushState(null, null, ' ');
             document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
@@ -161,43 +183,32 @@
         class Particle {
             constructor() { this.init(); }
             init() { 
-                this.x = Math.random() * w; 
-                this.y = Math.random() * h; 
-                this.size = Math.random() * 1.8 + 0.8; 
-                this.speedX = Math.random() * 0.4 - 0.2; 
-                this.speedY = Math.random() * 0.4 - 0.2; 
-                this.opacity = Math.random() * 0.5 + 0.4;
+                this.x = Math.random() * w; this.y = Math.random() * h; 
+                this.size = Math.random() * 1.5 + 0.5; 
+                this.speedX = Math.random() * 0.3 - 0.15; 
+                this.speedY = Math.random() * 0.3 - 0.15; 
+                this.opacity = Math.random() * 0.4 + 0.2;
             }
             update() { 
-                this.x += this.speedX; 
-                this.y += this.speedY; 
-                if (this.x < 0) this.x = w;
-                if (this.x > w) this.x = 0;
-                if (this.y < 0) this.y = h;
-                if (this.y > h) this.y = 0;
+                this.x += this.speedX; this.y += this.speedY; 
+                if (this.x < 0) this.x = w; if (this.x > w) this.x = 0;
+                if (this.y < 0) this.y = h; if (this.y > h) this.y = 0;
             }
             draw(color) { 
-                ctx.fillStyle = color; 
-                ctx.globalAlpha = this.opacity; 
-                ctx.beginPath(); 
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
-                ctx.fill(); 
+                ctx.fillStyle = color; ctx.globalAlpha = this.opacity; 
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); 
             }
         }
 
         function initParticles(mode) {
             if (mode === 'off') { particlesArray = []; return; }
-            const counts = { low: 40, mid: 95, high: 240 };
-            const target = counts[mode] || 95;
-            particlesArray = Array.from({ length: target }, () => new Particle());
+            const counts = { low: 30, mid: 80, high: 200 };
+            particlesArray = Array.from({ length: counts[mode] || 80 }, () => new Particle());
         }
 
         function animate() { 
             ctx.clearRect(0, 0, w, h); 
-            particlesArray.forEach(p => { 
-                p.update(); 
-                p.draw(currentAccentColor); 
-            }); 
+            particlesArray.forEach(p => { p.update(); p.draw(currentAccentColor); }); 
             requestAnimationFrame(animate); 
         }
 
@@ -209,21 +220,18 @@
 
         document.querySelectorAll('.side-link').forEach(l => l.addEventListener('click', () => openPage(l.dataset.page)));
         window.addEventListener('mousemove', e => { 
-            glow.style.left = e.clientX + 'px'; 
-            glow.style.top = e.clientY + 'px'; 
+            glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; 
         });
         window.addEventListener('resize', () => { 
-            w = window.innerWidth; h = window.innerHeight; 
-            canvas.width = w; canvas.height = h; 
+            w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; 
         });
 
         window.addEventListener('load', () => { 
             w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
             syncSettings(); prefetchPages(); animate(); 
-            document.getElementById('header').classList.add('show');
             const tag = document.getElementById('tagline-text');
             tag.textContent = taglines[Math.floor(Math.random() * taglines.length)];
-            setTimeout(() => tag.classList.add('show'), 500);
+            tag.classList.add('show');
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
