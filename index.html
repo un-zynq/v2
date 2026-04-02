@@ -24,7 +24,7 @@
         
         .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; transition: opacity .8s ease; pointer-events: none; }
         #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
-        .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.5; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
+        .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.5; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); transition: background 0.5s ease; }
 
         .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 25px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; }
         .header { display: flex; justify-content: center; z-index: 50; opacity: 0; transition: opacity .6s ease; margin-bottom: 20px; }
@@ -86,7 +86,7 @@
     <script>
         lucide.createIcons();
         const taglines = ["ELITE GAMING","BUILT DIFFERENT","NO SKILL NO ENTRY","LEVEL UP","CLUTCH OR KICK","STAY AHEAD"];
-        let particlesArray = [], w, h, pageCache = {};
+        let particlesArray = [], w, h, pageCache = {}, currentAccentColor = '#89b4fa';
         const canvas = document.getElementById('particles'), ctx = canvas.getContext('2d');
         const container = document.getElementById('iframe-container'), iframe = document.getElementById('content-iframe');
         const glow = document.getElementById('mouse-glow');
@@ -100,16 +100,17 @@
                     if(res.ok) pageCache[p] = await res.text();
                 } catch(e) {}
             }
-            checkHash(); // Check hash pas NA het laden van cache
+            checkHash();
         }
 
         function syncSettings() {
-            const themeColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
+            currentAccentColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
             const bgUrl = localStorage.getItem('hrn_bg_url');
             const tabTitle = localStorage.getItem('hrn_tab_title') || "HRN | Gaming Hub";
             const favicon = localStorage.getItem('hrn_favicon_url');
             
-            document.documentElement.style.setProperty('--accent', themeColor);
+            document.documentElement.style.setProperty('--accent', currentAccentColor);
+            document.documentElement.style.setProperty('--accent-glow', currentAccentColor + '26'); // 15% hex alpha
             document.getElementById('dynamic-title').textContent = tabTitle;
             if(favicon) document.getElementById('dynamic-favicon').href = favicon;
             
@@ -121,15 +122,11 @@
         }
 
         function openPage(page) {
-            if (!page) return;
+            if (!page || !pageCache[page]) return;
             currentPage = page;
             if (window.location.hash !== '#' + page) history.pushState(null, null, '#' + page);
             
-            if (pageCache[page]) {
-                iframe.srcdoc = pageCache[page];
-            } else {
-                iframe.src = page + '.html';
-            }
+            iframe.srcdoc = pageCache[page];
             container.classList.add('active');
             document.querySelectorAll('.side-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
         }
@@ -149,21 +146,27 @@
         }
 
         class Particle {
-            constructor() { this.reset(); }
-            reset() { 
+            constructor() { this.init(); }
+            init() { 
                 this.x = Math.random() * w; 
                 this.y = Math.random() * h; 
-                this.size = Math.random() * 2 + 0.8; 
-                this.speedX = Math.random() * 0.3 - 0.15; 
-                this.speedY = Math.random() * 0.3 - 0.15; 
-                this.opacity = Math.random() * 0.5 + 0.4; // Feller
+                this.size = Math.random() * 1.8 + 0.8; 
+                this.speedX = Math.random() * 0.4 - 0.2; 
+                this.speedY = Math.random() * 0.4 - 0.2; 
+                this.opacity = Math.random() * 0.5 + 0.4;
             }
             update() { 
-                this.x += this.speedX; this.y += this.speedY; 
-                if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset(); 
+                this.x += this.speedX; 
+                this.y += this.speedY; 
+                
+                // Sexy Wrap Around
+                if (this.x < 0) this.x = w;
+                if (this.x > w) this.x = 0;
+                if (this.y < 0) this.y = h;
+                if (this.y > h) this.y = 0;
             }
-            draw() { 
-                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent'); 
+            draw(color) { 
+                ctx.fillStyle = color; 
                 ctx.globalAlpha = this.opacity; 
                 ctx.beginPath(); 
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
@@ -172,19 +175,19 @@
         }
 
         function initParticles(mode) {
-            ctx.clearRect(0, 0, w, h);
-            if (mode === 'off') {
-                particlesArray = [];
-                return;
-            }
-            const counts = { low: 35, mid: 90, high: 220 };
-            const target = counts[mode] || 90;
+            if (mode === 'off') { particlesArray = []; return; }
+            const counts = { low: 40, mid: 95, high: 240 };
+            const target = counts[mode] || 95;
             particlesArray = Array.from({ length: target }, () => new Particle());
         }
 
         function animate() { 
             ctx.clearRect(0, 0, w, h); 
-            particlesArray.forEach(p => { p.update(); p.draw(); }); 
+            // Kleur één keer per frame doorgeven voor performance
+            particlesArray.forEach(p => { 
+                p.update(); 
+                p.draw(currentAccentColor); 
+            }); 
             requestAnimationFrame(animate); 
         }
 
@@ -195,8 +198,14 @@
         });
 
         document.querySelectorAll('.side-link').forEach(l => l.addEventListener('click', () => openPage(l.dataset.page)));
-        window.addEventListener('mousemove', e => { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; });
-        window.addEventListener('resize', () => { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; });
+        window.addEventListener('mousemove', e => { 
+            glow.style.left = e.clientX + 'px'; 
+            glow.style.top = e.clientY + 'px'; 
+        });
+        window.addEventListener('resize', () => { 
+            w = window.innerWidth; h = window.innerHeight; 
+            canvas.width = w; canvas.height = h; 
+        });
 
         window.addEventListener('load', () => { 
             w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
