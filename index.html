@@ -18,49 +18,73 @@
             --accent: #89b4fa;
             --accent-rgb: 137, 180, 250;
             --text: #f0f4ff;
-            --dim: rgba(255, 255, 255, 0.6); 
             --border: rgba(255, 255, 255, 0.12);
+            
+            /* Gekoppelde variabelen via JS sync */
             --logo-opacity: 0.8;
-            --glow-opacity: 0.35;
-            --border-opacity: 0.6; 
-            --icon-opacity: 0.5; 
+            --hover-opacity: 1.0; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; text-transform: uppercase; }
 
-        #loader { position: fixed; inset: 0; z-index: 10000; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* LOADER */
+        #loader { position: fixed; inset: 0; z-index: 10000; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease; }
         .load-line { width: 140px; height: 1px; background: rgba(255,255,255,0.08); position: relative; }
         #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s; box-shadow: 0 0 15px var(--accent); }
 
+        /* BG & EFFECTS */
         .ambient-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; filter: brightness(0.4); transition: opacity 1.5s; }
         canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
         #mouse-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; pointer-events: none; z-index: 3; background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%); transform: translate(-50%, -50%); filter: blur(50px); }
 
+        /* UI WRAPPER */
         .wrapper { position: relative; display: flex; flex-direction: column; height: 100dvh; width: 100%; z-index: 10; opacity: 0; transition: opacity 0.8s ease; }
         .wrapper.active { opacity: 1; }
 
         .header { position: absolute; top: 40px; width: 100%; display: flex; justify-content: center; }
         .status-pill { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(12px); font-size: 9px; font-weight: 900; letter-spacing: 2px; color: var(--text); display: flex; gap: 20px; }
 
+        /* BRANDING (Gekoppeld aan --logo-opacity) */
         .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .logo { font-size: clamp(5rem, 22vw, 13rem); font-weight: 900; letter-spacing: -0.07em; line-height: 0.8; background: linear-gradient(180deg, #fff 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: var(--logo-opacity); transition: 0.4s; }
+        .logo { 
+            font-size: clamp(5rem, 22vw, 13rem); font-weight: 900; letter-spacing: -0.07em; line-height: 0.8; 
+            background: linear-gradient(180deg, #fff 50%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            opacity: var(--logo-opacity); transition: opacity 0.4s ease; 
+        }
         .tagline { font-size: 10px; letter-spacing: 11px; color: var(--text); margin-top: 30px; opacity: 0; transform: translateY(15px); transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s; font-weight: 500; }
-        .tagline.show { opacity: 0.6; transform: translateY(0); }
+        .tagline.show { opacity: calc(var(--logo-opacity) - 0.2); transform: translateY(0); }
 
+        /* NAVIGATION */
         .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; padding: 0 55px; z-index: 20; transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s; }
         .nav-left { left: -100px; opacity: 0; }
         .nav-right { right: -100px; opacity: 0; }
         .wrapper.active .nav-left { left: 0; opacity: 1; }
         .wrapper.active .nav-right { right: 0; opacity: 1; }
-
         .mobile-nav { display: none; gap: 20px; margin-top: 40px; pointer-events: all; }
         
-        .btn { width: 62px; height: 62px; border-radius: 22px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--dim); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: all; backdrop-filter: blur(8px); }
-        .btn:hover, .btn.active { color: rgba(var(--accent-rgb), var(--icon-opacity)); border: 1px solid rgba(var(--accent-rgb), var(--border-opacity)); background: rgba(var(--accent-rgb), 0.05); transform: scale(1.1) translateY(-2px); box-shadow: 0 10px 30px -10px rgba(var(--accent-rgb), var(--glow-opacity)); }
+        /* BUTTONS (Opacity volledig gekoppeld aan Logo settings) */
+        .btn { 
+            width: 62px; height: 62px; border-radius: 22px; 
+            background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--border); 
+            color: var(--text);
+            opacity: var(--logo-opacity); /* Gekoppeld aan de slider */
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            pointer-events: all; backdrop-filter: blur(8px); 
+        }
+
+        .btn:hover, .btn.active { 
+            opacity: var(--hover-opacity); /* Gekoppeld aan slider + 0.2 */
+            color: var(--accent); 
+            border: 1px solid var(--accent); 
+            background: rgba(var(--accent-rgb), 0.05); 
+            transform: scale(1.1) translateY(-2px); 
+            box-shadow: 0 10px 30px -10px rgba(var(--accent-rgb), 0.3); 
+        }
 
         @media (max-width: 900px) {
-            :root { --glow-opacity: 0.15; --border-opacity: 0.25; --icon-opacity: 0.25; }
             .side-nav { display: none !important; }
             .mobile-nav { display: flex; }
             .logo { font-size: clamp(6rem, 28vw, 10rem); }
@@ -173,18 +197,21 @@
 
         function sync() {
             const c = localStorage.getItem('hrn_clr') || "#89b4fa";
-            const o = localStorage.getItem('hrn_op') || "0.8";
+            const o = parseFloat(localStorage.getItem('hrn_op')) || 0.8;
             const b = localStorage.getItem('hrn_bg');
             const t = localStorage.getItem('hrn_title') || "HRN | CORE";
-            const f = localStorage.getItem('hrn_fav'); // Favicon check
+            const f = localStorage.getItem('hrn_fav'); 
             
             document.documentElement.style.setProperty('--accent', c);
             document.documentElement.style.setProperty('--accent-rgb', hexToRgb(c));
-            document.documentElement.style.setProperty('--logo-opacity', o);
-            $('dynamic-title').textContent = t;
             
+            // Zet basis opacity en bereken hover opacity (+0.2)
+            document.documentElement.style.setProperty('--logo-opacity', o);
+            document.documentElement.style.setProperty('--hover-opacity', Math.min(o + 0.2, 1.0));
+            
+            $('dynamic-title').textContent = t;
             if(b) { $('bg').style.backgroundImage = `url(${b})`; $('bg').style.opacity = 0.5; }
-            if(f) { $('app-favicon').href = f; } // Update favicon live
+            if(f) { $('app-favicon').href = f; } 
         }
 
         function setHash(name) { window.location.hash = name; }
