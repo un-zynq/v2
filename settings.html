@@ -4,59 +4,55 @@
     <meta charset="UTF-8">
     <title>SETTINGS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root { --bg: #030508; --accent: #89b4fa; --text: #f0f4ff; --panel: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 40px 20px; text-transform: uppercase; }
-        .container { max-width: 500px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 30px 20px; text-transform: uppercase; }
+        .container { max-width: 450px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         h1 { font-size: 10px; letter-spacing: 4px; color: var(--accent); }
-        .close-btn { background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 8px 15px; border-radius: 10px; cursor: pointer; font-size: 9px; font-weight: 900; }
         .group { background: var(--panel); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 15px; }
-        .label { font-size: 8px; color: rgba(255,255,255,0.4); margin-bottom: 10px; display: block; letter-spacing: 2px; }
+        .label { font-size: 8px; color: rgba(255,255,255,0.4); margin-bottom: 12px; display: block; letter-spacing: 2px; }
         input[type="text"] { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: white; font-size: 10px; outline: none; margin-bottom: 10px; }
         .flex { display: flex; gap: 15px; align-items: center; justify-content: space-between; }
         
-        /* TOGGLE SWITCH */
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        /* UI ELEMENTS */
+        .switch { position: relative; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent); }
+        .slider { position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
+        input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; }
 
-        .btn-save { width: 100%; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; font-size: 10px; cursor: pointer; margin-top: 10px; }
+        .btn-save { width: 100%; background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 900; font-size: 10px; cursor: pointer; transition: 0.2s; }
+        .btn-save:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>SETTINGS.SYS</h1>
-            <button class="close-btn" onclick="window.parent.postMessage('close', '*')">EXIT</button>
-        </header>
+        <header><h1>SYSTEM.CONFIG</h1><button style="background:none; border:none; color:white; cursor:pointer; font-weight:900;" onclick="window.parent.postMessage('close', '*')">X</button></header>
 
         <div class="group">
-            <span class="label">System Identity</span>
-            <input type="text" id="sys-title" placeholder="Title">
+            <span class="label">Identity</span>
+            <input type="text" id="sys-title" placeholder="Tab Title">
             <input type="text" id="sys-fav" placeholder="Favicon URL">
         </div>
 
         <div class="group">
-            <span class="label">Particles</span>
-            <div class="flex">
-                <span style="font-size: 10px;">Enable Particles</span>
-                <label class="switch">
-                    <input type="checkbox" id="sys-part">
-                    <span class="slider"></span>
-                </label>
+            <span class="label">Particle Engine</span>
+            <div class="flex" style="margin-bottom:15px;">
+                <span style="font-size:9px;">Active</span>
+                <label class="switch"><input type="checkbox" id="sys-part"><span class="slider"></span></label>
             </div>
+            <span class="label">Intensity & Speed</span>
+            <div class="flex"><input type="range" id="sys-int" min="0.1" max="1" step="0.1"></div>
         </div>
 
         <div class="group">
-            <span class="label">Appearance</span>
+            <span class="label">Visuals</span>
             <div class="flex">
                 <input type="color" id="sys-color">
-                <input type="range" id="sys-opacity" min="0.1" max="1" step="0.1" style="flex:1">
+                <input type="range" id="sys-opacity" min="0.1" max="1" step="0.1">
             </div>
         </div>
 
@@ -65,7 +61,7 @@
             <input type="text" id="sys-bg" placeholder="URL">
         </div>
 
-        <button class="btn-save" onclick="save()">APPLY CHANGES</button>
+        <button class="btn-save" onclick="save()">SAVE & REBOOT</button>
     </div>
 
     <script>
@@ -76,6 +72,7 @@
             document.getElementById('sys-opacity').value = localStorage.getItem('hrn_op') || "0.8";
             document.getElementById('sys-bg').value = localStorage.getItem('hrn_bg') || "";
             document.getElementById('sys-part').checked = localStorage.getItem('hrn_part') !== 'false';
+            document.getElementById('sys-int').value = localStorage.getItem('hrn_int') || "0.5";
         };
 
         function save() {
@@ -85,9 +82,9 @@
             localStorage.setItem('hrn_op', document.getElementById('sys-opacity').value);
             localStorage.setItem('hrn_bg', document.getElementById('sys-bg').value);
             localStorage.setItem('hrn_part', document.getElementById('sys-part').checked);
+            localStorage.setItem('hrn_int', document.getElementById('sys-int').value);
             window.parent.postMessage('sync', '*');
-            document.querySelector('.btn-save').textContent = "DONE";
-            setTimeout(() => document.querySelector('.btn-save').textContent = "APPLY CHANGES", 1000);
+            const b = document.querySelector('.btn-save'); b.textContent = "SYNCED"; setTimeout(()=>b.textContent="SAVE & REBOOT", 1000);
         }
     </script>
 </body>
