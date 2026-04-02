@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #050608; --card: #111318; --border: #242930; --text: #8e95a2; --accent: #89b4fa; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -13,10 +14,12 @@
         .color-box { width: 28px; height: 28px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
         .color-info span { font-size: 0.75rem; font-family: monospace; color: #fff; text-transform: uppercase; }
         #themeColor { position: absolute; opacity: 0; width: 0; height: 0; }
-        .footer { margin-top: 25px; display: flex; gap: 10px; }
-        button { flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+        .footer { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-row { display: flex; gap: 10px; }
+        button { flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-family: inherit; }
         .btn-apply { background: var(--accent); color: #000; }
         .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-reset { background: rgba(255, 70, 70, 0.1); color: #ff4646; border: 1px solid rgba(255, 70, 70, 0.2); font-size: 0.7rem; margin-top: 5px; }
         button:hover { filter: brightness(1.2); }
     </style>
 </head>
@@ -35,18 +38,23 @@
         </div>
         <div class="group"><label>Particle Density</label><select id="particleAmount"><option value="off">Off</option><option value="low">Low</option><option value="mid">Mid</option><option value="high">High</option></select></div>
         <div class="footer">
-            <button class="btn-cancel" onclick="window.parent.postMessage({type:'closeIframe'}, '*')">Cancel</button>
-            <button class="btn-apply" onclick="save()">Save Settings</button>
+            <div class="btn-row">
+                <button class="btn-cancel" onclick="window.parent.postMessage({type:'closeIframe'}, '*')">Cancel</button>
+                <button class="btn-apply" onclick="save()">Save Settings</button>
+            </div>
+            <button class="btn-reset" onclick="resetDefaults()">Reset to Defaults</button>
         </div>
     </div>
     <script>
         const colorInput = document.getElementById('themeColor');
         const colorPreview = document.getElementById('colorPreview');
         const colorHexText = document.getElementById('colorHexText');
+
         colorInput.addEventListener('input', e => {
             colorPreview.style.backgroundColor = e.target.value;
             colorHexText.textContent = e.target.value;
         });
+
         function save() {
             localStorage.setItem('hrn_tab_title', document.getElementById('tabTitle').value);
             localStorage.setItem('hrn_favicon_url', document.getElementById('faviconUrl').value);
@@ -56,6 +64,15 @@
             window.parent.postMessage({ type: 'updateSettings' }, '*');
             setTimeout(() => window.parent.postMessage({ type: 'closeIframe' }, '*'), 50);
         }
+
+        function resetDefaults() {
+            if(confirm("Are you sure? This will clear all custom settings.")) {
+                localStorage.clear();
+                window.parent.postMessage({ type: 'updateSettings' }, '*');
+                window.parent.postMessage({ type: 'closeIframe' }, '*');
+            }
+        }
+
         window.onload = () => {
             document.getElementById('tabTitle').value = localStorage.getItem('hrn_tab_title') || "";
             document.getElementById('faviconUrl').value = localStorage.getItem('hrn_favicon_url') || "";
