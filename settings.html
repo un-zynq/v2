@@ -11,7 +11,6 @@
 <body>
     <div class="ambient-bg" id="bg-layer"></div>
     <div class="overlay-dim"></div>
-    
     <div class="core-pane">
         <div class="nav">
             <h2>SETTINGS</h2>
@@ -19,7 +18,6 @@
                 <i data-lucide="x" size="18"></i>
             </div>
         </div>
-
         <div class="row">
             <div class="flex-group">
                 <div class="group">
@@ -33,12 +31,10 @@
                 </div>
             </div>
         </div>
-
         <div class="row">
             <label>Remote Background URL</label>
             <input type="text" id="bg" placeholder="Paste link here...">
         </div>
-
         <div class="row">
             <div class="toggle-box" onclick="document.getElementById('part').click()" style="cursor:pointer">
                 <label style="margin:0; opacity:1">Particles</label>
@@ -46,7 +42,6 @@
                 <div class="dot"></div>
             </div>
         </div>
-
         <div class="row flex-group">
             <div class="group">
                 <label>Density</label>
@@ -57,12 +52,10 @@
                 <div class="slider-box"><input type="range" id="op" min="0.1" max="1" step="0.05"></div>
             </div>
         </div>
-
         <div class="row">
             <label>Identity Presets</label>
             <div class="chips" id="p-list"></div>
         </div>
-
         <div class="row flex-group">
             <div class="group">
                 <label>Tab Title</label>
@@ -74,12 +67,10 @@
             </div>
         </div>
     </div>
-
     <script>
         lucide.createIcons();
         const sync = () => window.parent.postMessage('sync', '*');
         const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg?semt=ais_incoming&w=740&q=80";
-        
         const presets = [
             {n:"Default",t:"HRN",f:"/logo.svg"},
             {n:"Google",t:"Google",f:"https://google.cm/favicon.ico"},
@@ -87,7 +78,6 @@
             {n:"Mail",t:"Gmail",f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"},
             {n:"Classroom",t:"Home - Classroom",f:"https://www.gstatic.com/classroom/favicon.png"}
         ];
-
         presets.forEach(p => {
             const c = document.createElement('div'); 
             c.className = 'chip'; 
@@ -101,13 +91,26 @@
             };
             document.getElementById('p-list').appendChild(c);
         });
-
         function updateBg(val) {
             const bgLayer = document.getElementById('bg-layer');
-            const bgToSet = (val && val.length > 5) ? val : defaultBg;
-            localStorage.setItem('hrn_bg', bgToSet); 
-            bgLayer.style.backgroundImage = `url(${bgToSet})`; 
-            sync();
+            if (!val || val.trim() === "") {
+                localStorage.setItem('hrn_bg', defaultBg);
+                bgLayer.style.backgroundImage = `url(${defaultBg})`;
+                sync();
+                return;
+            }
+            const img = new Image();
+            img.onload = () => {
+                localStorage.setItem('hrn_bg', val);
+                bgLayer.style.backgroundImage = `url(${val})`;
+                sync();
+            };
+            img.onerror = () => {
+                bgLayer.style.backgroundImage = 'none';
+                localStorage.setItem('hrn_bg', 'none');
+                sync();
+            };
+            img.src = val;
         }
         document.getElementById('bg-file').onchange = (e) => { 
             if(!e.target.files[0]) return;
@@ -116,25 +119,11 @@
             fr.readAsDataURL(e.target.files[0]); 
         };
         const bgInput = document.getElementById('bg');
-        bgInput.onchange = async () => {
-            const url = bgInput.value.trim();
-            if(!url || !url.startsWith('http')) return;
-
-            try { 
-                const r = await fetch(url); 
-                if (!r.ok) throw new Error();
-                const b = await r.blob(); 
-                const fr = new FileReader(); 
-                fr.onloadend = () => updateBg(fr.result); 
-                fr.readAsDataURL(b); 
-            } catch (err) { 
-                updateBg(url); 
-            }
-        };
+        bgInput.onchange = () => updateBg(bgInput.value.trim());
         ['title', 'clr', 'op', 'int', 'fav'].forEach(f => {
             const el = document.getElementById(f); 
             const defs = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:''};
-                        const saved = localStorage.getItem('hrn_'+f);
+            const saved = localStorage.getItem('hrn_'+f);
             el.value = saved !== null ? saved : defs[f]; 
             el.oninput = () => { 
                 localStorage.setItem('hrn_'+f, el.value); 
@@ -148,12 +137,12 @@
             sync(); 
         };
         const initialBg = localStorage.getItem('hrn_bg');
-        if(initialBg) {
-            updateBg(initialBg);
-            if(initialBg.startsWith('http')) bgInput.value = initialBg;
+        if (initialBg === 'none') {
+            document.getElementById('bg-layer').style.backgroundImage = 'none';
         } else {
-            updateBg(defaultBg);
+            updateBg(initialBg || defaultBg);
         }
+        if(initialBg && initialBg.startsWith('http')) bgInput.value = initialBg;
     </script>
 </body>
 </html>
