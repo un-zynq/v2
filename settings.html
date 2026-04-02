@@ -234,7 +234,6 @@
         };
 
         const resetBg = () => { updateBg(defaultBg); document.getElementById('bg').value = ""; };
-        const resetAll = () => (fields.forEach(f => (localStorage.removeItem('hrn_'+f), document.getElementById(f).value = defaults[f])), localStorage.removeItem('hrn_part'), localStorage.removeItem('hrn_bg'), document.getElementById('part-toggle').classList.add('active'), [['slider-int', defaults.int, 0.1, 4.0], ['slider-op', defaults.op, 0.1, 1]].forEach(([id, v, min, max]) => { const w = document.getElementById(id); const p = ((v - min) / (max - min)) * 100; w.querySelector('.slider-fill').style.width = p + '%'; w.querySelector('.slider-knob').style.left = p + '%'; }), document.getElementById('bg').value = "", updateBg(defaultBg), sync());
-    </script>
+        const resetAll = () => (fields.forEach(f => (localStorage.removeItem('hrn_'+f), document.getElementById(f).value = defaults[f])), document.documentElement.style.setProperty('--accent', defaults.clr), localStorage.removeItem('hrn_part'), localStorage.removeItem('hrn_bg'), document.getElementById('part-toggle').classList.add('active'), [['slider-int', defaults.int, 0.1, 4.0], ['slider-op', defaults.op, 0.1, 1]].forEach(([id, v, min, max]) => { const w = document.getElementById(id); const p = ((v - min) / (max - min)) * 100; w.querySelector('.slider-fill').style.width = p + '%'; w.querySelector('.slider-knob').style.left = p + '%'; }), document.getElementById('bg').value = "", updateBg(defaultBg), sync());    </script>
 </body>
 </html>
