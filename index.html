@@ -25,17 +25,14 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; text-transform: uppercase; }
 
-        /* GPU Layers */
         #webgl-canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
         .ambient-bg { position: fixed; inset: -50px; z-index: 1; pointer-events: none; background-size: cover; background-position: center; opacity: 0; filter: brightness(0.3) blur(40px); transition: 2.5s ease; }
         .ambient-bg.loaded { opacity: 0.4; filter: brightness(0.4) blur(0px); }
 
-        /* LOADER */
         #loader { position: fixed; inset: 0; z-index: 10000; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
         .load-line { width: 200px; height: 1px; background: rgba(255,255,255,0.03); position: relative; overflow: hidden; }
         #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.5s ease; box-shadow: 0 0 20px var(--accent); }
 
-        /* UI */
         .wrapper { position: relative; display: flex; flex-direction: column; height: 100dvh; width: 100%; z-index: 10; opacity: 0; transform: scale(1.02); transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .wrapper.active { opacity: 1; transform: scale(1); }
 
@@ -79,7 +76,7 @@
         </div>
         <div class="brand">
             <h1 class="logo">HRN</h1>
-            <p class="tagline" id="tagline">WEBGL CORE ACTIVE</p>
+            <p class="tagline" id="tagline">VISUAL OVERRIDE ACTIVE</p>
             <div class="mobile-nav">
                 <div class="btn" onclick="setHash('settings')"><i data-lucide="settings"></i></div>
                 <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
@@ -115,8 +112,9 @@
         varying float v_op;
         void main() {
             float dist = distance(gl_PointCoord, vec2(0.5));
-            if (dist > 0.5) discard;
-            gl_FragColor = vec4(u_color, v_op * (1.0 - dist * 2.0));
+            // Glow effect: smooth falloff instead of hard circle
+            float strength = smoothstep(0.5, 0.2, dist);
+            gl_FragColor = vec4(u_color, v_op * strength);
         }
     </script>
 
@@ -124,7 +122,7 @@
         lucide.createIcons();
         const $ = id => document.getElementById(id);
         const canvas = $('webgl-canvas');
-        const gl = canvas.getContext('webgl', { antialias: true });
+        const gl = canvas.getContext('webgl', { antialias: true, alpha: true });
         let cache = {}, particles = [], pAmount = 150, pEnabled = true;
         let program, posAttr, sizeAttr, opAttr, resUni, colUni;
 
@@ -148,7 +146,7 @@
             colUni = gl.getUniformLocation(program, "u_color");
 
             gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE); // Additive blending voor maximale glow
         }
 
         function sync() {
@@ -166,9 +164,12 @@
             particles = [];
             for(let i=0; i<pAmount; i++) {
                 particles.push({
-                    x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight,
-                    s: Math.random()*4+1, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
-                    o: Math.random()*0.5
+                    x: Math.random()*window.innerWidth, 
+                    y: Math.random()*window.innerHeight,
+                    s: Math.random()*6+2, // Grotere particles
+                    vx: (Math.random()-0.5)*0.4, 
+                    vy: (Math.random()-0.5)*0.4,
+                    o: Math.random()*0.7 + 0.2 // Hogere basis visibility
                 });
             }
             if(localStorage.getItem('hrn_bg')) { $('bg').style.backgroundImage = `url(${localStorage.getItem('hrn_bg')})`; $('bg').classList.add('loaded'); }
@@ -195,23 +196,27 @@
             gl.uniform2f(resUni, window.innerWidth, window.innerHeight);
 
             const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-            
-            gl.bufferData(gl.ARRAY_BUFFER, posData, gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, posData, gl.STREAM_DRAW);
             gl.enableVertexAttribArray(posAttr); gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
 
             const sBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, sBuf);
-            gl.bufferData(gl.ARRAY_BUFFER, sizeData, gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, sizeData, gl.STREAM_DRAW);
             gl.enableVertexAttribArray(sizeAttr); gl.vertexAttribPointer(sizeAttr, 1, gl.FLOAT, false, 0, 0);
 
             const oBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, oBuf);
-            gl.bufferData(gl.ARRAY_BUFFER, opData, gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, opData, gl.STREAM_DRAW);
             gl.enableVertexAttribArray(opAttr); gl.vertexAttribPointer(opAttr, 1, gl.FLOAT, false, 0, 0);
 
             gl.drawArrays(gl.POINTS, 0, pAmount);
             requestAnimationFrame(render);
         }
 
-        window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0,0,canvas.width,canvas.height); };
+        window.onresize = () => { 
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr; 
+            canvas.height = window.innerHeight * dpr; 
+            gl.viewport(0, 0, canvas.width, canvas.height); 
+        };
         
         async function init() {
             window.onresize(); initGL(); sync();
