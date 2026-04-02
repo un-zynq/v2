@@ -1,65 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <style>
-        :root { --bg: #0d1117; --border: #30363d; --accent: #89b4fa; --text: #c9d1d9; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #030508; color: white; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        
-        .panel { width: 340px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
-        .row { margin-bottom: 16px; }
-        label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #8b949e; margin-bottom: 8px; font-weight: 700; }
-        
-        /* Optimized Inputs - No padding/margin bugs */
-        input, select {
-            width: 100%; display: block; background: #010409; border: 1px solid var(--border);
-            padding: 10px; border-radius: 8px; color: white; font-size: 13px; outline: none;
-        }
-        input:focus { border-color: var(--accent); }
-
-        /* Clean Slider */
-        input[type="range"] { -webkit-appearance: none; background: #161b22; height: 4px; padding: 0; cursor: pointer; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #fff; border-radius: 50%; border: 2px solid var(--accent); }
-
-        .flex { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 13px; }
-        .save { background: var(--accent); color: #000; }
+        body { background: #030508; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { width: 320px; background: #0d1117; border: 1px solid #30363d; padding: 25px; border-radius: 15px; }
+        .item { margin-bottom: 15px; }
+        label { display: block; font-size: 10px; color: #8b949e; margin-bottom: 5px; text-transform: uppercase; }
+        input { width: 100%; padding: 10px; background: #010409; border: 1px solid #30363d; color: white; border-radius: 5px; box-sizing: border-box; }
+        .btns { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .save { background: #89b4fa; color: #030508; }
         .back { background: #21262d; color: white; }
     </style>
 </head>
 <body>
-    <div class="panel">
-        <div class="row"><label>Title</label><input id="t" type="text"></div>
-        <div class="row"><label>Background (URL)</label><input id="b" type="text"></div>
-        <div class="row">
-            <label>Transparency: <span id="ov">50%</span></label>
-            <input id="o" type="range" min="0.2" max="1" step="0.05">
-        </div>
-        <div class="row"><label>Accent Color</label><input id="c" type="color" style="height:40px; padding:2px;"></div>
-        <div class="flex">
-            <button class="back" onclick="window.parent.postMessage('close', '*')">Cancel</button>
-            <button class="save" onclick="save()">Save</button>
+    <div class="card">
+        <div class="item"><label>Background URL</label><input id="bg" type="text"></div>
+        <div class="item"><label>Opacity (0.2 - 1.0)</label><input id="op" type="number" step="0.1" min="0.2" max="1"></div>
+        <div class="item"><label>Accent Color</label><input id="clr" type="color"></div>
+        <div class="btns">
+            <button class="back" onclick="window.parent.postMessage('close','*')">Cancel</button>
+            <button class="save" onclick="save()">Apply</button>
         </div>
     </div>
     <script>
         const s = localStorage;
-        const $ = id => document.getElementById(id);
-
         window.onload = () => {
-            $("t").value = s.getItem('hrn_title') || "";
-            $("b").value = s.getItem('hrn_bg') || "";
-            $("o").value = s.getItem('hrn_op') || "0.5";
-            $("c").value = s.getItem('hrn_clr') || "#89b4fa";
-            $("ov").textContent = Math.round($("o").value * 100) + "%";
+            document.getElementById('bg').value = s.getItem('hrn_bg') || "";
+            document.getElementById('op').value = s.getItem('hrn_op') || "0.5";
+            document.getElementById('clr').value = s.getItem('hrn_clr') || "#89b4fa";
         };
-
-        $("o").oninput = () => $("ov").textContent = Math.round($("o").value * 100) + "%";
-
         function save() {
-            s.setItem('hrn_title', $("t").value);
-            s.setItem('hrn_bg', $("b").value);
-            s.setItem('hrn_op', $("o").value);
-            s.setItem('hrn_clr', $("c").value);
+            s.setItem('hrn_bg', document.getElementById('bg').value);
+            s.setItem('hrn_op', document.getElementById('op').value);
+            s.setItem('hrn_clr', document.getElementById('clr').value);
             window.parent.postMessage('sync', '*');
             window.parent.postMessage('close', '*');
         }
