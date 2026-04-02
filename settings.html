@@ -6,249 +6,213 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg: #030508;
             --accent: #89b4fa;
-            --card: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #ebf0ff;
+            --bg: #030508;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        body, html { 
-            height: 100%; width: 100%; 
+        body { 
             background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Inter', system-ui, sans-serif; 
-            overflow-x: hidden;
+            color: #fff; 
+            height: 100dvh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            overflow: hidden;
         }
 
-        .ambient-bg { 
-            position: fixed; inset: -50px; z-index: 1; 
-            pointer-events: none; background-size: cover; background-position: center; 
-            opacity: 0.3; filter: blur(20px) brightness(0.5); transition: 1s ease;
+        .ambient-preview { 
+            position: fixed; inset: 0; z-index: 1; 
+            background-size: cover; background-position: center; 
+            opacity: 0.2; filter: blur(40px); 
         }
 
-        .wrapper { 
-            position: relative; display: flex; justify-content: center; 
-            min-height: 100dvh; width: 100%; padding: 40px 20px; z-index: 10;
+        .core-pane { 
+            position: relative; z-index: 10;
+            width: 90%; max-width: 400px; 
+            background: rgba(10, 10, 15, 0.8); 
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border);
+            border-radius: 30px; 
+            padding: 25px;
         }
 
-        .pane { 
-            width: 100%; max-width: 460px; 
-            background: rgba(10, 12, 18, 0.8); 
-            backdrop-filter: blur(50px) saturate(180%);
-            -webkit-backdrop-filter: blur(50px) saturate(180%);
-            border: 1px solid var(--border); 
-            border-radius: 40px; padding: 35px; 
-            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-        }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .header h2 { font-size: 10px; font-weight: 900; letter-spacing: 5px; color: var(--accent); }
-
+        .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .nav h2 { font-size: 10px; font-weight: 900; color: var(--accent); opacity: 0.8; }
+        
         .close-btn { 
-            width: 42px; height: 42px; background: var(--card);
-            border: 1px solid var(--border); border-radius: 14px; color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer; opacity: 0.5; transition: 0.2s; 
         }
-        .close-btn:hover { background: var(--accent); color: var(--bg); transform: scale(1.1); border-color: var(--accent); }
+        .close-btn:hover { opacity: 1; transform: scale(1.1); color: var(--accent); }
 
-        .section { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 20px; }
-        .section-title { display: flex; align-items: center; gap: 10px; font-size: 9px; font-weight: 800; color: var(--accent); margin-bottom: 18px; opacity: 0.8; }
+        .row { margin-bottom: 15px; }
+        label { font-size: 7px; font-weight: 800; opacity: 0.3; display: block; margin-bottom: 8px; }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .full { grid-column: span 2; }
-        .group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 8px; font-weight: 800; opacity: 0.4; margin-left: 4px; }
-
-        input[type="text"], input[type="color"] { 
-            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border); 
-            padding: 14px; border-radius: 16px; color: #fff; font-size: 11px; outline: none;
-            transition: 0.3s;
+        input[type="text"], .btn-action { 
+            width: 100%; background: var(--glass); border: 1px solid var(--border); 
+            padding: 12px; border-radius: 12px; color: #fff; font-size: 10px; outline: none;
         }
-        input[type="text"]:focus { border-color: var(--accent); background: rgba(0,0,0,0.4); }
 
-        input[type="color"] { height: 48px; cursor: pointer; padding: 6px; }
-        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 10px; }
+        .flex-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        .file-box { 
-            position: relative; height: 48px; background: var(--accent); 
-            border-radius: 16px; display: flex; align-items: center; justify-content: center;
-            color: var(--bg); font-size: 10px; font-weight: 900; cursor: pointer; transition: 0.3s;
+        input[type="color"] { 
+            -webkit-appearance: none; border: 1px solid var(--border);
+            width: 100%; height: 40px; border-radius: 12px; background: var(--glass); cursor: pointer;
         }
-        .file-box:hover { opacity: 0.9; transform: translateY(-2px); }
-        #bg-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
 
-        .slider-wrap { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 16px; border: 1px solid var(--border); }
+        .slider-box { 
+            background: var(--glass); padding: 12px; border-radius: 12px; border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+        }
         input[type="range"] { -webkit-appearance: none; flex: 1; height: 2px; background: rgba(255,255,255,0.1); }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px var(--accent); }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
 
-        .toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-        .switch { width: 34px; height: 18px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; transition: 0.3s; }
-        .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: 0.3s; }
-        input:checked + .switch { background: var(--accent); }
-        input:checked + .switch::after { left: 19px; }
-
-        .preset-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-        .chip { 
-            padding: 8px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); 
-            border-radius: 12px; font-size: 9px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        .toggle-box {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px; background: var(--glass); border-radius: 12px; border: 1px solid var(--border);
         }
-        .chip:hover { border-color: var(--accent); background: rgba(137, 180, 250, 0.1); color: var(--accent); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: 0.3s; }
+        input:checked + .dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 
-        @media (max-width: 450px) { .grid { grid-template-columns: 1fr; } .full { grid-column: span 1; } }
+        .chips { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; }
+        .chip { 
+            padding: 6px 10px; background: var(--glass); border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 8px; font-weight: 700; cursor: pointer; white-space: nowrap;
+        }
+        .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+        .hidden-file { position: absolute; width: 1px; height: 1px; opacity: 0; }
     </style>
 </head>
 <body>
-    <div class="ambient-bg" id="bg-layer"></div>
-    <div class="wrapper">
-        <div class="pane">
-            <div class="header">
-                <h2>CORE CONFIG</h2>
-                <div class="close-btn" onclick="window.parent.postMessage('close', '*')">
-                    <i data-lucide="x"></i>
+    <div class="ambient-preview" id="bg-view"></div>
+    
+    <div class="core-pane">
+        <div class="nav">
+            <h2>SYSTEM_V3</h2>
+            <div class="close-btn" onclick="window.parent.postMessage('close', '*')">
+                <i data-lucide="x-circle" size="18"></i>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="flex-group">
+                <div class="group">
+                    <label>Accent</label>
+                    <input type="color" id="clr">
+                </div>
+                <div class="group">
+                    <label>Wallpaper</label>
+                    <button class="btn-action" onclick="document.getElementById('bg-file').click()">Upload</button>
+                    <input type="file" id="bg-file" class="hidden-file" accept="image/*">
                 </div>
             </div>
+        </div>
 
-            <div class="section">
-                <div class="section-title"><i data-lucide="palette" size="14"></i> Aesthetics</div>
-                <div class="grid">
-                    <div class="group">
-                        <label>Theme Color</label>
-                        <input type="color" id="clr">
-                    </div>
-                    <div class="group">
-                        <label>Wallpaper</label>
-                        <div class="file-box">
-                            <span id="file-status">Upload Image</span>
-                            <input type="file" id="bg-file" accept="image/*">
-                        </div>
-                    </div>
-                    <div class="group full">
-                        <input type="text" id="bg" placeholder="Or paste image URL here...">
-                    </div>
-                </div>
+        <div class="row">
+            <label>Remote Background URL</label>
+            <input type="text" id="bg" placeholder="https://...">
+        </div>
+
+        <div class="row">
+            <div class="toggle-box" onclick="document.getElementById('part').click()" style="cursor:pointer">
+                <label style="margin:0; opacity:1">Particles</label>
+                <input type="checkbox" id="part" hidden>
+                <div class="dot"></div>
             </div>
+        </div>
 
-            <div class="section">
-                <div class="section-title"><i data-lucide="zap" size="14"></i> Particle Engine</div>
-                <div class="group full" style="margin-bottom:15px">
-                    <label class="toggle">
-                        <span>Neural Network Overlay</span>
-                        <input type="checkbox" id="part" hidden>
-                        <div class="switch"></div>
-                    </label>
-                </div>
-                <div class="grid">
-                    <div class="group">
-                        <label>Density</label>
-                        <div class="slider-wrap"><input type="range" id="int" min="0.1" max="4.0" step="0.1"></div>
-                    </div>
-                    <div class="group">
-                        <label>UI Glass</label>
-                        <div class="slider-wrap"><input type="range" id="op" min="0.1" max="1" step="0.05"></div>
-                    </div>
-                </div>
+        <div class="row flex-group">
+            <div class="group">
+                <label>Density</label>
+                <div class="slider-box"><input type="range" id="int" min="0.1" max="4.0" step="0.1"></div>
             </div>
+            <div class="group">
+                <label>Opacity</label>
+                <div class="slider-box"><input type="range" id="op" min="0.1" max="1" step="0.05"></div>
+            </div>
+        </div>
 
-            <div class="section">
-                <div class="section-title"><i data-lucide="shield" size="14"></i> Identity Cloak</div>
-                <div class="grid" style="margin-bottom:15px">
-                    <div class="group"><label>Tab Title</label><input type="text" id="title"></div>
-                    <div class="group"><label>Favicon</label><input type="text" id="fav"></div>
-                </div>
-                <div class="preset-chips" id="preset-list"></div>
+        <div class="row">
+            <label>Masking Presets</label>
+            <div class="chips" id="p-list"></div>
+        </div>
+
+        <div class="row">
+            <div class="flex-group">
+                <input type="text" id="title" placeholder="Title">
+                <input type="text" id="fav" placeholder="Favicon URL">
             </div>
         </div>
     </div>
 
     <script>
         lucide.createIcons();
-
+        const msg = () => window.parent.postMessage('sync', '*');
         const presets = [
-            { n: "Default", t: "HRN | CORE", f: "favicon.png" },
-            { n: "Google", t: "Google", f: "https://google.com/favicon.ico" },
-            { n: "Drive", t: "My Drive", f: "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" },
-            { n: "Class", t: "Classes", f: "https://www.gstatic.com/classroom/favicon.png" },
-            { n: "Mail", t: "Gmail", f: "https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico" }
+            {n:"Default", t:"HRN | CORE", f:"favicon.png"},
+            {n:"Google", t:"Google", f:"https://google.com/favicon.ico"},
+            {n:"Drive", t:"My Drive", f:"https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"},
+            {n:"Mail", t:"Gmail", f:"https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon5.ico"}
         ];
 
-        const fields = ['title', 'clr', 'op', 'int', 'fav'];
-        const defaults = { title: 'HRN | CORE', clr: '#89b4fa', op: 0.8, int: 1.1, fav: '' };
-
-        function sync() { window.parent.postMessage('sync', '*'); }
-
-        async function toBase64(url) {
-            try {
-                const r = await fetch(url);
-                const b = await r.blob();
-                return new Promise(res => {
-                    const fr = new FileReader();
-                    fr.onloadend = () => res(fr.result);
-                    fr.readAsDataURL(b);
-                });
-            } catch(e) { return url; }
-        }
-
         // Init Presets
-        const pList = document.getElementById('preset-list');
         presets.forEach(p => {
             const c = document.createElement('div');
-            c.className = 'chip';
-            c.innerText = p.n;
+            c.className = 'chip'; c.innerText = p.n;
             c.onclick = () => {
                 document.getElementById('title').value = p.t;
                 document.getElementById('fav').value = p.f;
                 localStorage.setItem('hrn_title', p.t);
                 localStorage.setItem('hrn_fav', p.f);
-                sync();
+                msg();
             };
-            pList.appendChild(c);
+            document.getElementById('p-list').appendChild(c);
         });
 
-        // Load & Events
-        function load() {
-            const bg = localStorage.getItem('hrn_bg');
-            if(bg) document.getElementById('bg-layer').style.backgroundImage = `url(${bg})`;
+        // Background Logic
+        const setBg = (val) => {
+            localStorage.setItem('hrn_bg', val);
+            document.getElementById('bg-view').style.backgroundImage = `url(${val})`;
+            msg();
+        };
 
-            fields.forEach(f => {
-                const el = document.getElementById(f);
-                const val = localStorage.getItem('hrn_' + f) || defaults[f];
-                el.value = val;
-                el.oninput = () => { localStorage.setItem('hrn_' + f, el.value); sync(); };
-            });
+        document.getElementById('bg-file').onchange = (e) => {
+            const fr = new FileReader();
+            fr.onload = () => setBg(fr.result);
+            fr.readAsDataURL(e.target.files[0]);
+        };
 
-            const p = document.getElementById('part');
-            p.checked = localStorage.getItem('hrn_part') !== 'false';
-            p.onchange = () => { localStorage.setItem('hrn_part', p.checked); sync(); };
+        document.getElementById('bg').onchange = async (e) => {
+            if(e.target.value.startsWith('http')) {
+                try {
+                    const r = await fetch(e.target.value);
+                    const b = await r.blob();
+                    const fr = new FileReader();
+                    fr.onloadend = () => { setBg(fr.result); e.target.value = ''; };
+                    fr.readAsDataURL(b);
+                } catch { setBg(e.target.value); }
+            }
+        };
 
-            document.getElementById('bg-file').onchange = (e) => {
-                const fr = new FileReader();
-                fr.onload = () => {
-                    localStorage.setItem('hrn_bg', fr.result);
-                    document.getElementById('bg-layer').style.backgroundImage = `url(${fr.result})`;
-                    document.getElementById('file-status').innerText = "SUCCESS!";
-                    sync();
-                };
-                fr.readAsDataURL(e.target.files[0]);
-            };
+        // Standard Fields
+        ['title', 'clr', 'op', 'int', 'fav'].forEach(f => {
+            const el = document.getElementById(f);
+            el.value = localStorage.getItem('hrn_'+f) || {title:'HRN', clr:'#89b4fa', op:0.8, int:1.1, fav:''}[f];
+            el.oninput = () => { localStorage.setItem('hrn_'+f, el.value); msg(); };
+        });
 
-            document.getElementById('bg').onchange = async (e) => {
-                if(e.target.value.startsWith('http')) {
-                    const b64 = await toBase64(e.target.value);
-                    localStorage.setItem('hrn_bg', b64);
-                    document.getElementById('bg-layer').style.backgroundImage = `url(${b64})`;
-                    e.target.value = '';
-                    sync();
-                }
-            };
-        }
-
-        load();
+        const p = document.getElementById('part');
+        p.checked = localStorage.getItem('hrn_part') !== 'false';
+        p.onchange = () => { localStorage.setItem('hrn_part', p.checked); msg(); };
+        
+        if(localStorage.getItem('hrn_bg')) setBg(localStorage.getItem('hrn_bg'));
     </script>
 </body>
 </html>
