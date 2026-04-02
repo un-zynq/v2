@@ -21,12 +21,11 @@
             background: var(--bg);
             color: var(--ui-silver);
             font-family: Inter, sans-serif;
-            overflow-x: hidden;
-            height: 100vh;
+            overflow: hidden;
             text-transform: uppercase;
         }
 
-        /* BG REPRODUCTIE */
+        /* BG SYNC */
         .ambient-bg {
             position: fixed; inset: 0; z-index: 1;
             background-size: cover; background-position: center;
@@ -34,27 +33,26 @@
             transition: 2.5s cubic-bezier(.4, 0, .2, 1);
         }
         .ambient-bg.loaded { opacity: 1; }
-        .overlay-dim { position: fixed; inset: 0; z-index: 2; background: rgba(0, 0, 0, .3); pointer-events: none; }
+        .overlay-dim { position: fixed; inset: 0; z-index: 2; background: rgba(0,0,0,.3); pointer-events: none; }
 
-        /* WRAPPER & SCROLL */
+        /* WRAPPER */
         .wrapper {
             position: relative; z-index: 10;
-            height: 100vh; overflow-y: auto;
-            padding: 60px 40px; opacity: 0;
-            transition: opacity 1s ease;
+            height: 100vh; width: 100%;
+            overflow-y: auto; padding: 50px 40px;
+            opacity: 0; transform: scale(1.02);
+            transition: 1.5s cubic-bezier(.16, 1, .3, 1);
             scrollbar-width: none;
         }
         .wrapper::-webkit-scrollbar { display: none; }
-        .wrapper.active { opacity: 1; }
+        .wrapper.active { opacity: 1; transform: scale(1); }
 
-        .header-box {
+        /* HEADER */
+        .header {
             display: flex; align-items: center; justify-content: space-between;
-            max-width: 1600px; margin: 0 auto 50px auto;
+            max-width: 1600px; margin: 0 auto 40px auto;
         }
-
-        .title-group { display: flex; flex-direction: column; gap: 8px; }
-        .category { font-size: 9px; letter-spacing: 5px; color: var(--accent); font-weight: 900; }
-        .main-title { font-size: 24px; font-weight: 900; letter-spacing: -1px; color: #fff; }
+        .title { font-size: 24px; font-weight: 900; letter-spacing: -1px; color: #fff; }
 
         .close-btn {
             width: 58px; height: 58px; border-radius: 18px;
@@ -63,39 +61,38 @@
             cursor: pointer; transition: .4s cubic-bezier(.16, 1, .3, 1);
             backdrop-filter: blur(12px);
         }
-        .close-btn:hover { transform: scale(1.08); border-color: rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .1); }
+        .close-btn:hover { opacity: 1; color: #fff; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); transform: scale(1.08); }
 
-        /* GRID */
+        /* GRID 4:3 */
         #games-grid {
-            display: grid; gap: 25px; max-width: 1600px; margin: 0 auto;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            padding-bottom: 100px;
+            display: grid; gap: 20px; max-width: 1600px; margin: 0 auto;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            padding-bottom: 80px;
         }
         @media (min-width: 1200px) { #games-grid { grid-template-columns: repeat(5, 1fr); } }
 
-        /* CARD & LAZY LOADING */
+        /* CARD */
         .game-card {
-            position: relative; aspect-ratio: 16/10;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--ui-border); border-radius: 20px;
-            overflow: hidden; cursor: pointer;
+            position: relative; aspect-ratio: 4/3;
+            background: rgba(0, 0, 0, .4); border: 1px solid var(--ui-border);
+            border-radius: 20px; overflow: hidden; cursor: pointer;
             transition: .4s cubic-bezier(.16, 1, .3, 1);
             backdrop-filter: blur(12px);
-            opacity: 0; transform: translateY(10px);
+            opacity: 0; transform: translateY(15px);
         }
         .game-card.visible { opacity: 1; transform: translateY(0); }
-        .game-card:hover { transform: translateY(-8px); border-color: var(--accent); background: rgba(255, 255, 255, 0.05); }
+        .game-card:hover { transform: translateY(-8px); border-color: var(--accent); background: rgba(255,255,255,0.05); }
 
         .game-img {
             width: 100%; height: 100%;
             background-size: cover; background-position: center;
-            opacity: 0; transition: opacity 0.8s ease, transform 0.8s ease;
+            opacity: 0; transition: opacity 0.6s ease;
         }
-        .game-img.loaded { opacity: 0.5; }
-        .game-card:hover .game-img.loaded { opacity: 0.8; transform: scale(1.05); }
+        .game-img.loaded { opacity: 0.6; }
+        .game-card:hover .game-img.loaded { opacity: 0.9; transform: scale(1.05); }
 
         .game-info {
-            position: absolute; bottom: 0; width: 100%; padding: 20px;
+            position: absolute; bottom: 0; width: 100%; padding: 18px;
             background: linear-gradient(to top, rgba(3,5,8,0.9), transparent);
             text-align: center;
         }
@@ -107,12 +104,9 @@
     <div class="ambient-bg" id="bg"></div>
     <div class="overlay-dim"></div>
 
-    <div class="wrapper" id="ui-layer">
-        <div class="header-box">
-            <div class="title-group">
-                <span class="category">DATABASE</span>
-                <span class="main-title">GAMES</span>
-            </div>
+    <div class="wrapper" id="ui">
+        <div class="header">
+            <h1 class="title">GAMES</h1>
             <div class="close-btn" onclick="window.parent.postMessage('close', '*')">
                 <i data-lucide="x"></i>
             </div>
@@ -126,8 +120,8 @@
         const accent = localStorage.getItem('hrn_clr') || "#89b4fa";
         document.documentElement.style.setProperty('--accent', accent);
 
-        // 1. ACHTERGROND LADEN (IndexedDB)
-        async function loadBackground() {
+        // BG SYNC
+        async function loadBG() {
             const req = indexedDB.open("hrn_db", 1);
             req.onsuccess = e => {
                 const db = e.target.result;
@@ -140,44 +134,31 @@
                         $('bg').style.backgroundImage = `url('${url}')`;
                         $('bg').classList.add('loaded');
                     };
-                } catch(err) { updateBgDefault(); }
+                } catch(e) { $('bg').classList.add('loaded'); }
             };
-            req.onerror = updateBgDefault;
-        }
-        function updateBgDefault() {
-            $('bg').style.backgroundImage = `url('https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg')`;
-            $('bg').classList.add('loaded');
         }
 
-        // 2. LAZY LOADING LOGICA
-        const observerOptions = { root: $('ui-layer'), rootMargin: '0px 0px 200px 0px', threshold: 0.1 };
-        
-        const cardObserver = new IntersectionObserver((entries) => {
+        // LAZY LOADING
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const card = entry.target;
                     const img = card.querySelector('.game-img');
-                    const realSrc = img.getAttribute('data-src');
-                    
-                    // Start laden van img
-                    if (realSrc) {
-                        const tempImg = new Image();
-                        tempImg.src = realSrc;
-                        tempImg.onload = () => {
-                            img.style.backgroundImage = `url('${realSrc}')`;
-                            img.classList.add('loaded');
-                        };
-                    }
-                    
+                    const src = img.getAttribute('data-src');
+                    const temp = new Image();
+                    temp.src = src;
+                    temp.onload = () => {
+                        img.style.backgroundImage = `url('${src}')`;
+                        img.classList.add('loaded');
+                    };
                     card.classList.add('visible');
-                    cardObserver.unobserve(card);
+                    observer.unobserve(card);
                 }
             });
-        }, observerOptions);
+        }, { rootMargin: '100px' });
 
-        // 3. FETCH & BUILD
         async function init() {
-            await loadBackground();
+            await loadBG();
             try {
                 const res = await fetch('https://un-zynq.github.io/games2.json');
                 const data = await res.json();
@@ -186,28 +167,22 @@
                 data.forEach(groupWrapper => {
                     const groupKey = Object.keys(groupWrapper)[0];
                     const games = groupWrapper[groupKey];
-
                     Object.values(games).forEach(game => {
                         const card = document.createElement('div');
                         card.className = 'game-card';
-                        
-                        const thumbUrl = `https://placehold.co/600x400/030508/${accent.replace('#','')}/?text=${encodeURIComponent(game.name)}`;
+                        const thumb = `https://placehold.co/600x450/030508/${accent.replace('#','')}/?text=${encodeURIComponent(game.name)}`;
                         
                         card.innerHTML = `
-                            <div class="game-img" data-src="${thumbUrl}"></div>
-                            <div class="game-info">
-                                <div class="game-name">${game.name}</div>
-                            </div>
+                            <div class="game-img" data-src="${thumb}"></div>
+                            <div class="game-info"><div class="game-name">${game.name}</div></div>
                         `;
-
                         card.onclick = () => window.parent.location.href = `/game/${game.alias}`;
                         grid.appendChild(card);
-                        cardObserver.observe(card);
+                        observer.observe(card);
                     });
                 });
-
-                $('ui-layer').classList.add('active');
-            } catch (e) { console.error(e); }
+                $('ui').classList.add('active');
+            } catch (e) { console.log(e); }
         }
 
         window.onload = init;
