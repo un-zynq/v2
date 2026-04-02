@@ -5,31 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root { --bg: #050608; --card: #12141a; --border: #2d333b; --text: #9ca3af; --accent: #2563eb; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { width: 100%; max-width: 500px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; }
-        .group { margin-bottom: 20px; }
-        label { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 8px; }
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; }
-        input[type="color"] { height: 45px; padding: 5px; cursor: pointer; }
-        .footer { margin-top: 32px; display: flex; justify-content: flex-end; }
-        button { padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        .card { width: 90%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .group { margin-bottom: 16px; }
+        label { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 6px; font-weight: 700; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; font-size: 0.9rem; box-sizing: border-box; }
+        input:focus { border-color: var(--accent); }
+        input[type="color"] { height: 40px; padding: 4px; cursor: pointer; }
+        .footer { margin-top: 24px; display: flex; gap: 10px; justify-content: flex-end; }
+        button { padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        button:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="group"><label>Tab Title</label><input type="text" id="tabTitle"></div>
-        <div class="group"><label>Background URL</label><input type="url" id="bgUrl"></div>
+        <div class="group"><label>Tab Title</label><input type="text" id="tabTitle" placeholder="HRN | Gaming Hub"></div>
+        <div class="group"><label>Background URL</label><input type="url" id="bgUrl" placeholder="https://..."></div>
         <div class="group"><label>Theme Color</label><input type="color" id="themeColor"></div>
         <div class="group">
-            <label>Particles Amount</label>
+            <label>Particles</label>
             <select id="particleAmount">
-                <option value="off">Disabled</option>
-                <option value="low">Low (40)</option>
-                <option value="mid">Medium (100)</option>
-                <option value="high">High (250)</option>
+                <option value="off">Off</option>
+                <option value="low">Low</option>
+                <option value="mid">Medium</option>
+                <option value="high">High</option>
             </select>
         </div>
-        <div class="footer"><button onclick="save()">Save Changes</button></div>
+        <div class="footer">
+            <button class="secondary" onclick="window.parent.postMessage({type:'closeIframe'}, '*')">Cancel</button>
+            <button onclick="save()">Apply Settings</button>
+        </div>
     </div>
 
     <script>
@@ -40,7 +46,9 @@
             localStorage.setItem('hrn_particle_amount', document.getElementById('particleAmount').value);
 
             window.parent.postMessage({ type: 'updateSettings' }, '*');
-            setTimeout(() => window.parent.postMessage({ type: 'closeIframe' }, '*'), 100);
+            setTimeout(() => {
+                window.parent.postMessage({ type: 'closeIframe' }, '*');
+            }, 50);
         }
 
         window.onload = () => {
