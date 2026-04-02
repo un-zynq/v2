@@ -20,14 +20,14 @@
         .close-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
         .group { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; backdrop-filter: blur(10px); }
         .label { font-size: 9px; font-weight: 600; letter-spacing: 2px; color: rgba(255,255,255,0.4); margin-bottom: 15px; display: block; }
-        input[type="text"] { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 15px; border-radius: 12px; color: white; font-family: inherit; font-size: 11px; letter-spacing: 1px; outline: none; transition: 0.3s; }
+        input[type="text"] { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 15px; border-radius: 12px; color: white; font-family: inherit; font-size: 11px; letter-spacing: 1px; outline: none; transition: 0.3s; margin-bottom: 10px; }
         input[type="text"]:focus { border-color: var(--accent); }
         .flex-row { display: flex; gap: 15px; align-items: center; }
         input[type="color"] { -webkit-appearance: none; border: none; width: 50px; height: 50px; border-radius: 12px; background: none; cursor: pointer; }
-        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 12px; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 12px; padding: 0; }
         input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; }
         .btn-save { width: 100%; background: var(--accent); color: #000; border: none; padding: 18px; border-radius: 15px; font-weight: 900; font-size: 11px; letter-spacing: 3px; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        .btn-save:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         .hint { font-size: 8px; color: rgba(255,255,255,0.2); margin-top: 10px; line-height: 1.5; }
     </style>
 </head>
@@ -35,23 +35,24 @@
 
 <div class="container">
     <header>
-        <h1><i data-lucide="sliders-horizontal" style="width:14px; vertical-align:middle; margin-right:10px"></i> Core Settings</h1>
+        <h1><i data-lucide="sliders-horizontal" style="width:14px; vertical-align:middle; margin-right:10px"></i> CORE SETTINGS</h1>
         <button class="close-btn" onclick="window.parent.postMessage('close', '*')">EXIT</button>
     </header>
 
     <div class="group">
         <span class="label">System Identity</span>
-        <input type="text" id="sys-title" placeholder="HRN | CORE" style="margin-bottom: 10px;">
+        <input type="text" id="sys-title" placeholder="HRN | CORE">
         <input type="text" id="sys-fav" placeholder="Favicon URL (png/ico)">
-        <p class="hint">Title and Tab Icon. Use a direct image link for the favicon.</p>
+        <p class="hint">Updates browser tab title and icon.</p>
     </div>
 
     <div class="group">
-        <span class="label">Visuals</span>
+        <span class="label">Visuals (Color & Transparency)</span>
         <div class="flex-row">
             <input type="color" id="sys-color" value="#89b4fa">
-            <input type="range" id="sys-opacity" min="0.1" max="1" step="0.1" value="0.8">
+            <input type="range" id="sys-opacity" min="0.1" max="0.8" step="0.1" value="0.8">
         </div>
+        <p class="hint">Opacity affects logo and UI icons simultaneously.</p>
     </div>
 
     <div class="group">
@@ -81,6 +82,7 @@
         localStorage.setItem('hrn_op', document.getElementById('sys-opacity').value);
         localStorage.setItem('hrn_bg', document.getElementById('sys-bg').value);
 
+        // Tell index.html to update live
         window.parent.postMessage('sync', '*');
         
         const btn = document.querySelector('.btn-save');
