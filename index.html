@@ -83,59 +83,7 @@
         let particles = [], pAmount = 0, pEnabled = true, program, posAttr, sizeAttr, opAttr, resUni, colUni, timeUni, posBuffer, sizeBuffer, opBuffer, cache = {}, startTime = Date.now();
         const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg?semt=ais_incoming&w=740&q=80";
 
-const taglines = [
-    "NO SKILL = NO ENTRY",
-    "ONLY THE ELITE SURVIVE",
-    "YOU ARE THE AURA",
-    "ENTER IF YOU DARE",
-    "THIS IS NOT FOR CASUALS",
-    "BUILT DIFFERENT, PLAY DIFFERENT",
-    "1 HUB, 500+ GAMES",
-    "1 WEBSITE, INFINITE FUN",
-    "WHERE LEGENDS ARE FORGED",
-    "SKILL TALKS, TRASH WALKS",
-    "LEVEL UP OR LOG OUT",
-    "YOUR SKILL IS YOUR IDENTITY",
-    "NO RNG, JUST PURE SKILL",
-    "THIS IS YOUR FINAL FORM",
-    "WELCOME TO THE NEXT LEVEL",
-    "YOU DON'T PLAY, YOU DOMINATE",
-    "EVERY CLICK COUNTS",
-    "NOT EVERYONE BELONGS HERE",
-    "THE GRIND NEVER STOPS",
-    "ARE YOU WORTHY?",
-    "THIS IS WHERE YOU PROVE IT",
-    "PLAY HARD OR GO HOME",
-    "THE INTERNET, BUT BETTER",
-    "REAL PLAYERS ONLY",
-    "THIS IS YOUR ARENA",
-    "OUTPLAY. OUTSMART. OUTLAST.",
-    "YOU VS EVERYONE",
-    "NO LIMITS, JUST SKILL",
-    "CREATE YOUR LEGACY",
-    "YOU EITHER WIN OR LEARN",
-    "WELCOME TO YOUR OBSESSION",
-    "GAME LIKE YOU MEAN IT",
-    "SKILL IS THE ONLY LANGUAGE HERE",
-    "THE FUTURE OF PLAY STARTS HERE",
-    "YOU DON'T FIND THIS PLACE — YOU EARN IT",
-    "STAY SHARP. STAY AHEAD.",
-    "THIS IS MORE THAN GAMING",
-    "ENTER THE ZONE",
-    "ONLY THE HUNGRY MAKE IT",
-    "YOUR TIME. YOUR RULES.",
-    "POWERED BY PURE SKILL",
-    "THIS IS WHERE YOU LEVEL UP IRL",
-    "PLAYERS COME AND GO — LEGENDS STAY",
-    "YOU'RE NOT READY… OR ARE YOU?",
-    "NO SHORTCUTS. JUST SKILL.",
-    "THIS IS YOUR KINGDOM",
-    "THE ULTIMATE GAMING PLAYGROUND",
-    "EVERY SECOND MATTERS",
-    "LOCK IN. GO ALL IN.",
-    "YOU BUILT FOR THIS",
-    "JUST ONE MORE GAME…",
-];
+        const taglines = ["NO SKILL = NO ENTRY", "ONLY THE ELITE SURVIVE", "YOU ARE THE AURA", "ENTER IF YOU DARE", "THIS IS NOT FOR CASUALS", "BUILT DIFFERENT, PLAY DIFFERENT", "1 HUB, 500+ GAMES", "1 WEBSITE, INFINITE FUN", "WHERE LEGENDS ARE FORGED", "SKILL TALKS, TRASH WALKS", "LEVEL UP OR LOG OUT", "YOUR SKILL IS YOUR IDENTITY", "NO RNG, JUST PURE SKILL", "THIS IS YOUR FINAL FORM", "WELCOME TO THE NEXT LEVEL", "YOU DON'T PLAY, YOU DOMINATE", "EVERY CLICK COUNTS", "NOT EVERYONE BELONGS HERE", "THE GRIND NEVER STOPS", "ARE YOU WORTHY?", "THIS IS WHERE YOU PROVE IT", "PLAY HARD OR GO HOME", "THE INTERNET, BUT BETTER", "REAL PLAYERS ONLY", "THIS IS YOUR ARENA", "OUTPLAY. OUTSMART. OUTLAST.", "YOU VS EVERYONE", "NO LIMITS, JUST SKILL", "CREATE YOUR LEGACY", "YOU EITHER WIN OR LEARN", "WELCOME TO YOUR OBSESSION", "GAME LIKE YOU MEAN IT", "SKILL IS THE ONLY LANGUAGE HERE", "THE FUTURE OF PLAY STARTS HERE", "YOU DON'T FIND THIS PLACE — YOU EARN IT", "STAY SHARP. STAY AHEAD.", "THIS IS MORE THAN GAMING", "ENTER THE ZONE", "ONLY THE HUNGRY MAKE IT", "YOUR TIME. YOUR RULES.", "POWERED BY PURE SKILL", "THIS IS WHERE YOU LEVEL UP IRL", "PLAYERS COME AND GO — LEGENDS STAY", "YOU'RE NOT READY… OR ARE YOU?", "NO SHORTCUTS. JUST SKILL.", "THIS IS YOUR KINGDOM", "THE ULTIMATE GAMING PLAYGROUND", "EVERY SECOND MATTERS", "LOCK IN. GO ALL IN.", "YOU BUILT FOR THIS", "JUST ONE MORE GAME…"];
 
         function createShader(gl, type, source) {
             const s = gl.createShader(type);
@@ -163,6 +111,28 @@ const taglines = [
             opBuffer = gl.createBuffer();
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
+
+        function updateBg(val) {
+            const bgLayer = $('bg');
+            if (!val || val.trim() === "") {
+                localStorage.setItem('hrn_bg', defaultBg);
+                bgLayer.style.backgroundImage = `url(${defaultBg})`;
+                bgLayer.classList.add('loaded');
+                return;
+            }
+            const img = new Image();
+            img.onload = () => {
+                localStorage.setItem('hrn_bg', val);
+                bgLayer.style.backgroundImage = `url(${val})`;
+                bgLayer.classList.add('loaded');
+            };
+            img.onerror = () => {
+                bgLayer.style.backgroundImage = 'none';
+                localStorage.setItem('hrn_bg', 'none');
+                bgLayer.classList.add('loaded');
+            };
+            img.src = val;
         }
 
         function sync() {
@@ -198,9 +168,15 @@ const taglines = [
                     });
                 }
             }
-            const bgUrl = localStorage.getItem('hrn_bg') || defaultBg;
-            $('bg').style.backgroundImage = `url(${bgUrl})`;
-            $('bg').classList.add('loaded');
+            
+            const savedBg = localStorage.getItem('hrn_bg');
+            if (savedBg === 'none') {
+                $('bg').style.backgroundImage = 'none';
+                $('bg').classList.add('loaded');
+            } else {
+                updateBg(savedBg || defaultBg);
+            }
+            
             if (localStorage.getItem('hrn_fav')) $('app-favicon').href = localStorage.getItem('hrn_fav');
         }
 
@@ -252,17 +228,13 @@ const taglines = [
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             gl.viewport(0, 0, canvas.width, canvas.height);
-            
             $('tagline').textContent = taglines[Math.floor(Math.random() * taglines.length)];
-            
             initGL();
             sync();
             render();
-            
             const pages = ['settings', 'games', 'about', 'add'];
             let loadedCount = 0;
             $('progress').style.width = '10%';
-            
             await Promise.all(pages.map(async (p) => {
                 try {
                     const r = await fetch(p + '.html');
@@ -271,14 +243,10 @@ const taglines = [
                     cache[p] = 'Page not found';
                 }
                 loadedCount++;
-                let percentage = 10 + (loadedCount / pages.length * 80);
-                $('progress').style.width = percentage + '%';
+                $('progress').style.width = (10 + (loadedCount / pages.length * 90)) + '%';
             }));
-            
-            $('progress').style.width = '100%';
             const h = window.location.hash.slice(1);
             if (h && cache[h]) checkHash();
-            
             setTimeout(() => {
                 $('loader').style.opacity = '0';
                 setTimeout(() => {
@@ -292,9 +260,7 @@ const taglines = [
         function setHash(n) { window.location.hash = n; }
 
         function checkHash() {
-            const h = window.location.hash.slice(1),
-                container = $('container'),
-                frame = $('frame');
+            const h = window.location.hash.slice(1), container = $('container'), frame = $('frame');
             if (h && cache[h]) {
                 frame.srcdoc = cache[h];
                 container.style.display = 'block';
@@ -325,10 +291,7 @@ const taglines = [
         setInterval(() => {
             const n = new Date();
             $('clock').textContent = n.toTimeString().split(' ')[0];
-            $('date').textContent = n.toLocaleDateString('en-US', {
-                weekday: 'short',
-                day: 'numeric'
-            }).toUpperCase();
+            $('date').textContent = n.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' }).toUpperCase();
         }, 1000);
         window.onload = init;
     </script>
