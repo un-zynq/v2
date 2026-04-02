@@ -12,12 +12,15 @@
             --border: rgba(255, 255, 255, 0.12);
         }
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Inter', -apple-system, sans-serif;
-            user-select: none; -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            background: transparent; /* Changed to transparent for iframe blending */
+            background: var(--bg);
             color: #fff;
             height: 100dvh;
             display: flex;
@@ -26,94 +29,157 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             overflow: hidden;
+            touch-action: none;
+        }
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.5);
+            transition: opacity 0.5s ease;
+        }
+        .overlay-dim {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            background: radial-gradient(circle at center, transparent, rgba(0, 0, 0, 0.5));
         }
         .core-pane {
             position: relative;
             z-index: 10;
             width: 92%;
             max-width: 380px;
-            max-height: 90dvh;
-            background: rgba(8, 10, 15, 0.95);
+            max-height: 85dvh;
+            background: rgba(8, 10, 15, 0.9);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+            gap: 14px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9);
             overflow-y: auto;
         }
         .core-pane::-webkit-scrollbar { display: none; }
-        .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .nav h2 { font-size: 11px; font-weight: 900; color: var(--accent); letter-spacing: 3px; }
-        .close-btn { cursor: pointer; font-size: 22px; opacity: 0.4; transition: 0.2s; line-height: 1; }
+        .nav { display: flex; justify-content: space-between; align-items: center; }
+        .nav h2 { font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 3px; }
+        .close-btn { cursor: pointer; font-size: 18px; opacity: 0.4; padding: 4px; transition: 0.2s; }
         .close-btn:hover { opacity: 1; transform: scale(1.1); }
         .row { width: 100%; }
-        label { font-size: 8px; font-weight: 800; opacity: 0.5; display: block; margin-bottom: 8px; letter-spacing: 1px; }
+        label { font-size: 8px; font-weight: 800; opacity: 0.4; display: block; margin-bottom: 6px; letter-spacing: 1px; }
         input[type="text"] {
-            width: 100%; background: var(--glass); border: 1px solid var(--border);
-            padding: 12px; border-radius: 10px; color: #fff; font-size: 10px;
-            font-weight: 700; outline: none; transition: 0.2s;
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            outline: none;
+            cursor: text;
         }
-        input[type="text"]:focus { border-color: var(--accent); background: rgba(255,255,255,0.08); }
         .btn-action {
-            width: 100%; background: var(--glass); border: 1px solid var(--border);
-            padding: 12px; border-radius: 10px; color: #fff; font-size: 10px;
-            font-weight: 700; cursor: pointer; transition: 0.2s;
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+            transition: 0.2s;
         }
         .btn-action:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent); }
-        .flex-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .flex-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-reset { background: rgba(243, 139, 168, 0.05); border-color: rgba(243, 139, 168, 0.2); color: #f38ba8; }
         .btn-reset:hover { background: rgba(243, 139, 168, 0.15); border-color: #f38ba8; }
         input[type="color"] {
-            -webkit-appearance: none; border: 1px solid var(--border);
-            width: 100%; height: 40px; border-radius: 10px;
-            background: var(--glass); cursor: pointer; padding: 4px;
+            -webkit-appearance: none;
+            border: 1px solid var(--border);
+            width: 100%;
+            height: 38px;
+            border-radius: 8px;
+            background: var(--glass);
+            cursor: pointer;
+            padding: 0;
         }
-        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
         .slider-wrap {
-            width: 100%; height: 40px; background: var(--glass);
-            border: 1px solid var(--border); border-radius: 10px;
-            display: flex; align-items: center; padding: 0 15px;
-            position: relative; cursor: ew-resize;
+            width: 100%;
+            height: 38px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            position: relative;
+            touch-action: none;
+            cursor: ew-resize;
         }
-        .slider-track { width: 100%; height: 3px; background: rgba(255, 255, 255, 0.1); position: relative; border-radius: 2px; }
-        .slider-fill { position: absolute; height: 100%; background: var(--accent); width: 0%; border-radius: 2px; }
+        .slider-track { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.1); position: relative; pointer-events: none; }
+        .slider-fill { position: absolute; height: 100%; background: var(--accent); width: 0%; pointer-events: none; }
         .slider-knob {
-            position: absolute; width: 14px; height: 14px; background: #fff;
-            border-radius: 50%; left: 0%; top: 50%; transform: translate(-50%, -50%);
-            box-shadow: 0 0 15px var(--accent);
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 50%;
+            left: 0%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
         }
         .toggle-box {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 14px; background: var(--glass); border-radius: 10px;
-            border: 1px solid var(--border); cursor: pointer; transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: var(--glass);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: 0.2s;
         }
         .toggle-box:hover { border-color: var(--accent); }
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: #222; transition: 0.3s; }
-        .active .dot { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
-        .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #222; transition: 0.3s; }
+        .active .dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
         .chips::-webkit-scrollbar { display: none; }
         .chip {
-            padding: 8px 14px; background: var(--glass); border: 1px solid var(--border);
-            border-radius: 8px; font-size: 8px; font-weight: 800; cursor: pointer; transition: 0.2s;
+            padding: 8px 12px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 8px;
+            font-weight: 800;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
         }
         .chip:hover { border-color: var(--accent); color: var(--accent); }
         .hidden-file { display: none; }
     </style>
 </head>
 <body>
+    <div class="ambient-bg" id="bg-layer"></div>
+    <div class="overlay-dim"></div>
     <div class="core-pane">
         <div class="nav">
             <h2>SETTINGS</h2>
             <div class="close-btn" onclick="window.parent.postMessage('close', '*')">×</div>
         </div>
-
         <div class="row flex-group">
             <div class="group">
-                <label>ACCENT COLOR</label>
+                <label>ACCENT</label>
                 <input type="color" id="clr">
             </div>
             <div class="group">
@@ -122,64 +188,73 @@
                 <input type="file" id="bg-file" class="hidden-file" accept="image/*">
             </div>
         </div>
-
         <div class="row">
-            <label>IMAGE URL</label>
-            <input type="text" id="bg" placeholder="PASTE DIRECT IMAGE LINK...">
+            <label>REMOTE URL</label>
+            <input type="text" id="bg" placeholder="PASTE LINK...">
         </div>
-
+        <div class="row flex-group">
+            <button class="btn-action btn-reset" onclick="resetBg()">RESET BG</button>
+            <button class="btn-action btn-reset" onclick="resetAll()">PURGE ALL</button>
+        </div>
         <div class="row">
             <div class="toggle-box" id="part-toggle">
-                <label style="margin:0; opacity:1; cursor:pointer">PARTICLE SYSTEM</label>
+                <label style="margin:0; opacity:1; cursor:pointer">PARTICLES</label>
                 <div class="dot"></div>
             </div>
         </div>
-
         <div class="row flex-group">
             <div class="group">
                 <label>DENSITY</label>
                 <div class="slider-wrap" id="slider-int" data-min="0.1" data-max="4.0" data-step="0.1">
-                    <div class="slider-track"><div class="slider-fill"></div><div class="slider-knob"></div></div>
+                    <div class="slider-track">
+                        <div class="slider-fill"></div>
+                        <div class="slider-knob"></div>
+                    </div>
                 </div>
             </div>
             <div class="group">
-                <label>GLOW</label>
+                <label>OPACITY</label>
                 <div class="slider-wrap" id="slider-op" data-min="0.1" data-max="1" data-step="0.05">
-                    <div class="slider-track"><div class="slider-fill"></div><div class="slider-knob"></div></div>
+                    <div class="slider-track">
+                        <div class="slider-fill"></div>
+                        <div class="slider-knob"></div>
+                    </div>
                 </div>
             </div>
         </div>
-
         <div class="row">
             <label>PRESETS</label>
             <div class="chips" id="p-list"></div>
         </div>
-
         <div class="row flex-group">
-            <div class="group"><label>APP TITLE</label><input type="text" id="title"></div>
-            <div class="group"><label>FAVICON URL</label><input type="text" id="fav"></div>
-        </div>
-
-        <div class="row flex-group">
-            <button class="btn-action btn-reset" onclick="resetBg()">RESET BG</button>
-            <button class="btn-action btn-reset" onclick="resetAll()">PURGE DATA</button>
+            <div class="group"><label>TITLE</label><input type="text" id="title"></div>
+            <div class="group"><label>FAVICON</label><input type="text" id="fav"></div>
         </div>
     </div>
 
     <script>
         const sync = () => window.parent.postMessage('sync', '*');
-        const defaults = { title: 'HRN | CORE', clr: '#89b4fa', op: 0.8, int: 1.1, fav: '/logo.svg', part: true };
+        const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
+        const defaults = { title: 'HRN | CORE', clr: '#89b4fa', op: 0.8, int: 1.1, fav: '', part: true };
         const presets = [
             { n: "DEFAULT", t: "HRN | CORE", f: "/logo.svg" },
             { n: "GOOGLE", t: "Google", f: "https://google.com/favicon.ico" },
-            { n: "DISCORD", t: "Discord", f: "https://discord.com/favicon.ico" }
+            { n: "DRIVE", t: "My Drive", f: "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" },
         ];
+
+        function updateBg(val) {
+            const bgLayer = document.getElementById('bg-layer');
+            const finalVal = val || defaultBg;
+            bgLayer.style.backgroundImage = `url('${finalVal}')`;
+            localStorage.setItem('hrn_bg', finalVal);
+            sync();
+        }
 
         function setSliderUI(id, val) {
             const wrap = document.getElementById(id);
             const min = parseFloat(wrap.dataset.min);
             const max = parseFloat(wrap.dataset.max);
-            const p = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+            const p = ((val - min) / (max - min)) * 100;
             wrap.querySelector('.slider-fill').style.width = p + '%';
             wrap.querySelector('.slider-knob').style.left = p + '%';
         }
@@ -198,15 +273,16 @@
                 pos = Math.max(0, Math.min(1, pos));
                 let val = min + (pos * (max - min));
                 val = Math.round(val / step) * step;
+                
                 setSliderUI(id, val);
                 localStorage.setItem('hrn_' + key, val.toFixed(2));
                 sync();
             };
 
-            wrap.onmousedown = (e) => { isDragging = true; update(e); };
+            wrap.addEventListener('mousedown', (e) => { isDragging = true; update(e); });
             window.addEventListener('mousemove', (e) => { if (isDragging) update(e); });
             window.addEventListener('mouseup', () => isDragging = false);
-            wrap.ontouchstart = (e) => { isDragging = true; update(e); };
+            wrap.addEventListener('touchstart', (e) => { isDragging = true; update(e); });
             window.addEventListener('touchmove', (e) => { if (isDragging) update(e); });
             window.addEventListener('touchend', () => isDragging = false);
 
@@ -220,9 +296,11 @@
         ['title', 'clr', 'fav', 'bg'].forEach(id => {
             const el = document.getElementById(id);
             el.value = localStorage.getItem('hrn_' + id) || (id === 'bg' ? '' : defaults[id]);
+            
             el.oninput = () => {
                 localStorage.setItem('hrn_' + id, el.value);
                 if (id === 'clr') document.documentElement.style.setProperty('--accent', el.value);
+                if (id === 'bg') updateBg(el.value);
                 sync();
             };
         });
@@ -230,6 +308,7 @@
         const partBtn = document.getElementById('part-toggle');
         let partActive = localStorage.getItem('hrn_part') !== 'false';
         partBtn.classList.toggle('active', partActive);
+        
         partBtn.onclick = () => {
             partActive = !partActive;
             partBtn.classList.toggle('active', partActive);
@@ -238,24 +317,21 @@
         };
 
         window.resetBg = () => {
-            localStorage.removeItem('hrn_bg');
             document.getElementById('bg').value = "";
-            sync();
+            updateBg(defaultBg);
         };
 
         window.resetAll = () => {
             localStorage.clear();
             location.reload();
-            sync();
         };
 
         document.getElementById('bg-file').onchange = (e) => {
             if (e.target.files[0]) {
                 const fr = new FileReader();
                 fr.onload = () => {
-                    localStorage.setItem('hrn_bg', fr.result);
+                    updateBg(fr.result);
                     document.getElementById('bg').value = "Local File Uploaded";
-                    sync();
                 };
                 fr.readAsDataURL(e.target.files[0]);
             }
@@ -276,7 +352,7 @@
             list.appendChild(c);
         });
 
-        // Live color preview
+        updateBg(localStorage.getItem('hrn_bg'));
         document.documentElement.style.setProperty('--accent', localStorage.getItem('hrn_clr') || defaults.clr);
     </script>
 </body>
