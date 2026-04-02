@@ -234,8 +234,7 @@
         };
 
         const resetBg = () => { updateBg(defaultBg); document.getElementById('bg').value = ""; };
-        const resetAll = () => { localStorage.clear(); location.reload(); };
-
+        const resetAll = () => (fields.forEach(f => (localStorage.removeItem('hrn_'+f), document.getElementById(f).value = defaults[f])), localStorage.removeItem('hrn_part'), localStorage.removeItem('hrn_bg'), document.getElementById('part').checked = true, document.getElementById('bg').value = "", updateBg(defaultBg), sync());
         updateBg(localStorage.getItem('hrn_bg'));
     </script>
 </body>
