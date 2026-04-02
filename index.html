@@ -11,7 +11,7 @@
         :root {
             --bg: #05070a;
             --accent: #89b4fa;
-            --accent-glow: rgba(137, 180, 250, 0.1);
+            --accent-glow: rgba(137, 180, 250, 0.15);
             --text-main: #f0f4ff;
             --text-dim: rgba(255, 255, 255, 0.5);
             --glass: rgba(255, 255, 255, 0.03);
@@ -24,16 +24,14 @@
         
         .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; transition: opacity .8s ease; pointer-events: none; }
         #particles { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
-        .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.4; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
+        .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 4; opacity: 0.5; filter: blur(60px); mix-blend-mode: screen; transform: translate(-50%, -50%); }
 
         .wrapper { display: flex; flex-direction: column; height: 100dvh; padding: 25px; max-width: 1600px; margin: 0 auto; position: relative; z-index: 10; }
-        
         .header { display: flex; justify-content: center; z-index: 50; opacity: 0; transition: opacity .6s ease; margin-bottom: 20px; }
         .header.show { opacity: 1; }
         #status-pill { display: flex; align-items: center; gap: 14px; background: var(--glass); padding: 10px 22px; border-radius: 99px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); font-size: .7rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
         
         .main { display: flex; justify-content: space-between; align-items: center; flex-grow: 1; position: relative; z-index: 20; }
-        
         .side-nav { display: flex; flex-direction: column; gap: 15px; z-index: 30; }
         .side-link { width: 58px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; color: var(--text-dim); background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; transition: var(--transition); text-decoration: none; cursor: pointer; position: relative; }
         .side-link:hover, .side-link.active { color: var(--accent); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
@@ -48,7 +46,6 @@
         #iframe-container.active { opacity: 1; visibility: visible; pointer-events: auto; }
         #content-iframe { width: 100%; height: 100%; border: none; }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .main { flex-direction: column; justify-content: center; gap: 50px; }
             .side-nav { flex-direction: row; order: 2; flex-wrap: wrap; justify-content: center; }
@@ -72,15 +69,11 @@
                 <div class="side-link" data-page="settings"><i data-lucide="settings"></i></div>
                 <div class="side-link" data-page="games"><i data-lucide="gamepad-2"></i></div>
                 <div class="side-link" data-page="bookmarklets"><i data-lucide="bookmark"></i></div>
-                <div class="side-link mobile-only" style="display:none" data-page="about"><i data-lucide="info"></i></div>
-                <div class="side-link mobile-only" style="display:none" data-page="add"><i data-lucide="plus"></i></div>
             </nav>
-
             <div class="center-brand">
                 <h1 class="logo">HRN</h1>
                 <p class="tagline" id="tagline-text"></p>
             </div>
-
             <nav class="side-nav desktop-nav-right">
                 <div class="side-link" data-page="about"><i data-lucide="info"></i></div>
                 <div class="side-link" data-page="add"><i data-lucide="plus"></i></div>
@@ -103,10 +96,8 @@
             ['settings', 'games', 'about', 'add', 'bookmarklets'].forEach(async p => {
                 try {
                     const res = await fetch(p + '.html');
-                    if(res.ok) {
-                        pageCache[p] = await res.text();
-                        if(window.location.hash === '#' + p) openPage(p);
-                    }
+                    if(res.ok) pageCache[p] = await res.text();
+                    checkHash();
                 } catch(e) {}
             });
         }
@@ -118,7 +109,6 @@
             const favicon = localStorage.getItem('hrn_favicon_url');
             
             document.documentElement.style.setProperty('--accent', themeColor);
-            document.documentElement.style.setProperty('--accent-glow', themeColor + '1A'); // Subtiele 10% opacity
             document.getElementById('dynamic-title').textContent = tabTitle;
             if(favicon) document.getElementById('dynamic-favicon').href = favicon;
             
@@ -129,9 +119,9 @@
         }
 
         function openPage(page) {
-            if (currentPage === page) { closeIframe(); return; }
+            if (currentPage === page && container.classList.contains('active')) return;
             currentPage = page;
-            window.location.hash = page;
+            if (window.location.hash !== '#' + page) history.pushState(null, null, '#' + page);
             
             if (pageCache[page]) {
                 iframe.srcdoc = pageCache[page];
@@ -146,25 +136,56 @@
             container.classList.remove('active');
             iframe.srcdoc = ""; iframe.src = "about:blank";
             currentPage = null;
-            window.location.hash = "";
+            if (window.location.hash) history.pushState(null, null, ' ');
             document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+        }
+
+        function checkHash() {
+            const hash = window.location.hash.substring(1);
+            if (hash && hash !== currentPage) openPage(hash);
+            else if (!hash && currentPage) closeIframe();
         }
 
         class Particle {
             constructor() { this.reset(); }
-            reset() { this.x = Math.random() * w; this.y = Math.random() * h; this.size = Math.random() * 1.5 + 0.5; this.speedX = Math.random() * 0.15 - 0.07; this.speedY = Math.random() * 0.15 - 0.07; this.opacity = Math.random() * 0.4 + 0.1; }
-            update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset(); }
-            draw() { ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent'); ctx.globalAlpha = this.opacity; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+            reset() { 
+                this.x = Math.random() * w; 
+                this.y = Math.random() * h; 
+                this.size = Math.random() * 2 + 1; // Groter voor betere zichtbaarheid
+                this.speedX = Math.random() * 0.4 - 0.2; 
+                this.speedY = Math.random() * 0.4 - 0.2; 
+                this.opacity = Math.random() * 0.6 + 0.3; // Hogere basis opacity
+            }
+            update() { 
+                this.x += this.speedX; this.y += this.speedY; 
+                if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset(); 
+            }
+            draw() { 
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent'); 
+                ctx.globalAlpha = this.opacity; 
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.fill(); 
+                // Optionele subtiele glow per deeltje
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = ctx.fillStyle;
+            }
         }
 
         function initParticles(mode) {
-            const counts = { off: 0, low: 25, mid: 70, high: 180 };
-            const target = counts[mode] || 70;
+            const counts = { off: 0, low: 40, mid: 100, high: 250 };
+            const target = counts[mode] || 100;
             particlesArray = Array.from({ length: target }, () => new Particle());
         }
 
-        function animate() { ctx.clearRect(0, 0, w, h); particlesArray.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        function animate() { 
+            ctx.clearRect(0, 0, w, h); 
+            ctx.shadowBlur = 0; // Reset shadow voor prestaties
+            particlesArray.forEach(p => { p.update(); p.draw(); }); 
+            requestAnimationFrame(animate); 
+        }
 
+        window.addEventListener('hashchange', checkHash);
         window.addEventListener('message', e => {
             if (e.data.type === 'updateSettings') syncSettings();
             if (e.data.type === 'closeIframe') closeIframe();
