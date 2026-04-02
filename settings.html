@@ -23,7 +23,7 @@
             text-transform: uppercase; 
         }
 
-        /* INSTANT BACKGROUND - GEEN FADE, GEEN DELAY */
+        /* EXACTE OVERLAY & BG STYLING - INSTANT LOAD */
         .ambient-bg { 
             position: fixed; 
             inset: -50px; 
@@ -31,8 +31,10 @@
             pointer-events: none; 
             background-size: cover; 
             background-position: center; 
-            filter: brightness(0.4); /* Direct op de juiste helderheid */
-            display: none; /* Wordt direct op block gezet in JS */
+            /* Matcht exact de main page .loaded state */
+            opacity: 0.4; 
+            filter: brightness(0.4) blur(0px);
+            display: none; 
         }
 
         .wrapper { 
@@ -45,59 +47,63 @@
             z-index: 10; 
         }
 
+        /* HET PANEEL MET DE GLASS-OVERLAY */
         .pane { 
             width: 90%;
             max-width: 540px; 
-            background: rgba(13, 15, 23, 0.80);
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(13, 15, 23, 0.85); /* Donkere overlay */
+            backdrop-filter: blur(40px) saturate(150%); 
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
             border: 1px solid var(--ui-border); 
-            border-radius: 24px; 
+            border-radius: 28px; 
             padding: 35px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        h2 { font-size: 9px; font-weight: 900; letter-spacing: 2.5px; color: var(--accent); }
+        h2 { font-size: 9px; font-weight: 900; letter-spacing: 3px; color: var(--accent); }
 
         .close-btn { 
             width: 40px; height: 40px;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255,255,255,0.03);
             border: 1px solid var(--ui-border);
-            border-radius: 14px;
-            color: var(--ui-silver);
+            border-radius: 12px;
+            color: #fff;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
+            cursor: pointer; transition: 0.2s;
         }
+        .close-btn:hover { background: rgba(255,255,255,0.08); transform: scale(1.05); }
 
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
         .full { grid-column: span 2; }
-        .section-label { grid-column: span 2; font-size: 8px; letter-spacing: 2px; color: rgba(255,255,255,0.3); margin-top: 10px; }
-
+        
         .group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 8px; font-weight: 700; opacity: 0.5; letter-spacing: 1.5px; }
+        label { font-size: 8px; font-weight: 700; opacity: 0.4; letter-spacing: 2px; }
 
         input[type="text"] { 
-            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--ui-border); 
-            padding: 12px; border-radius: 12px; color: #fff; font-size: 10px; outline: none; text-transform: uppercase;
+            width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--ui-border); 
+            padding: 12px; border-radius: 12px; color: #fff; font-size: 10px; outline: none;
         }
 
         input[type="color"] { 
             -webkit-appearance: none; border: 1px solid var(--ui-border);
-            width: 100%; height: 40px; border-radius: 12px; background: transparent; cursor: pointer;
+            width: 100%; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.04); cursor: pointer;
         }
         input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
 
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 2px; background: var(--ui-border); margin: 15px 0; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin: 15px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px var(--accent); }
 
         .toggle-row {
             display: flex; align-items: center; justify-content: space-between;
             background: rgba(255,255,255,0.02); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--ui-border); cursor: pointer;
         }
-        .switch { width: 30px; height: 16px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; }
-        .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; background: #fff; border-radius: 50%; }
+        .switch { width: 30px; height: 16px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; transition: 0.2s; }
+        .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: 0.2s; }
         .active .switch { background: var(--accent); }
         .active .switch::after { left: 16px; }
+
+        .section-label { grid-column: span 2; font-size: 7px; color: var(--accent); opacity: 0.6; margin-top: 10px; border-bottom: 1px solid var(--ui-border); padding-bottom: 5px; }
 
         @media (max-width: 500px) { .grid { grid-template-columns: 1fr; } .full { grid-column: span 1; } }
     </style>
@@ -125,30 +131,30 @@
                     <input type="color" id="clr">
                 </div>
 
-                <div class="section-label">Particle Controls</div>
+                <div class="section-label">Engine Config</div>
                 <div class="group">
                     <div class="toggle-row" id="part-row" onclick="toggle('part')">
-                        <label style="margin:0; cursor:pointer; opacity: 1;">Engine Particles</label>
+                        <label style="margin:0; cursor:pointer; opacity:1;">Neural Particles</label>
                         <div class="switch"></div>
                     </div>
                 </div>
                 <div class="group">
-                    <label>Particle Count</label>
+                    <label>Density</label>
                     <input type="range" id="int" min="0" max="400" step="10">
                 </div>
 
                 <div class="group full">
-                    <label>Global Opacity</label>
+                    <label>Interface Opacity</label>
                     <input type="range" id="op" min="0.1" max="1" step="0.05">
                 </div>
 
-                <div class="section-label">External Assets</div>
+                <div class="section-label">Assets</div>
                 <div class="group">
-                    <label>Wallpaper URL (of Data URI)</label>
-                    <input type="text" id="bg" placeholder="data:image/png;base64,...">
+                    <label>Wallpaper (Data/URL)</label>
+                    <input type="text" id="bg" placeholder="Paste data:image... here">
                 </div>
                 <div class="group">
-                    <label>Favicon URL</label>
+                    <label>Favicon</label>
                     <input type="text" id="fav" placeholder="https://...">
                 </div>
             </div>
@@ -172,7 +178,6 @@
         }
 
         function load() {
-            // Laad achtergrond direct in zonder animatie
             updateBg(localStorage.getItem('hrn_bg'));
 
             fields.forEach(f => {
