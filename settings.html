@@ -8,9 +8,14 @@
         body { font-family: 'Inter', sans-serif; background: transparent; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .card { width: 90%; max-width: 380px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); backdrop-filter: blur(15px); }
         .group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.6rem; text-transform: uppercase; color: var(--text); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
+        label { display: flex; justify-content: space-between; font-size: 0.6rem; text-transform: uppercase; color: var(--text); margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; }
         input, select { width: 100%; padding: 10px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; font-size: 0.8rem; box-sizing: border-box; }
-        .color-picker-wrapper { display: flex; align-items: center; gap: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; transition: 0.2s; }
+        
+        /* Custom Slider Styling */
+        input[type="range"] { -webkit-appearance: none; height: 6px; background: #242930; border-radius: 5px; border: none; padding: 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+
+        .color-picker-wrapper { display: flex; align-items: center; gap: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
         .color-box { width: 28px; height: 28px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
         #themeColor { position: absolute; opacity: 0; width: 0; height: 0; }
         .footer { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
@@ -18,7 +23,7 @@
         button { flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-family: inherit; }
         .btn-apply { background: var(--accent); color: #000; }
         .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); }
-        .btn-reset { background: transparent; color: #ff4646; font-size: 0.7rem; text-decoration: underline; border: none; padding-top: 5px; }
+        .btn-reset { background: transparent; color: #ff4646; font-size: 0.75rem; text-decoration: underline; border: none; padding-top: 5px; }
         button:hover { filter: brightness(1.2); }
     </style>
 </head>
@@ -27,6 +32,10 @@
         <div class="group"><label>Tab Title</label><input type="text" id="tabTitle"></div>
         <div class="group"><label>Favicon URL</label><input type="url" id="faviconUrl"></div>
         <div class="group"><label>Background Image URL</label><input type="url" id="bgUrl"></div>
+        <div class="group">
+            <label>Logo Opacity <span id="opacityVal">50%</span></label>
+            <input type="range" id="logoOpacity" min="0.2" max="1" step="0.05" value="0.5">
+        </div>
         <div class="group">
             <label>Theme Accent Color</label>
             <div class="color-picker-wrapper" onclick="document.getElementById('themeColor').click()">
@@ -48,6 +57,12 @@
         const colorInput = document.getElementById('themeColor');
         const colorPreview = document.getElementById('colorPreview');
         const colorHexText = document.getElementById('colorHexText');
+        const opacityInput = document.getElementById('logoOpacity');
+        const opacityValLabel = document.getElementById('opacityVal');
+
+        opacityInput.addEventListener('input', e => {
+            opacityValLabel.textContent = Math.round(e.target.value * 100) + "%";
+        });
 
         colorInput.addEventListener('input', e => {
             colorPreview.style.backgroundColor = e.target.value;
@@ -58,6 +73,7 @@
             localStorage.setItem('hrn_tab_title', document.getElementById('tabTitle').value);
             localStorage.setItem('hrn_favicon_url', document.getElementById('faviconUrl').value);
             localStorage.setItem('hrn_bg_url', document.getElementById('bgUrl').value);
+            localStorage.setItem('hrn_logo_opacity', opacityInput.value);
             localStorage.setItem('hrn_theme_color', colorInput.value);
             localStorage.setItem('hrn_particle_amount', document.getElementById('particleAmount').value);
             window.parent.postMessage({ type: 'updateSettings' }, '*');
@@ -76,6 +92,11 @@
             document.getElementById('tabTitle').value = localStorage.getItem('hrn_tab_title') || "";
             document.getElementById('faviconUrl').value = localStorage.getItem('hrn_favicon_url') || "";
             document.getElementById('bgUrl').value = localStorage.getItem('hrn_bg_url') || "";
+            
+            const savedOpacity = localStorage.getItem('hrn_logo_opacity') || "0.5";
+            opacityInput.value = savedOpacity;
+            opacityValLabel.textContent = Math.round(savedOpacity * 100) + "%";
+
             const savedColor = localStorage.getItem('hrn_theme_color') || "#89b4fa";
             colorInput.value = savedColor;
             colorPreview.style.backgroundColor = savedColor;
