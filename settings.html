@@ -1,23 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Settings | Core</title>
+<div id="app-root">
+  <div class="ambient-bg" id="bg-layer"></div>
+  <div class="overlay-dim"></div>
+  <div class="core-pane">
+    <div class="nav"><h2>SETTINGS</h2><div class="close-btn" id="closeBtn">×</div></div>
+
+    <div class="row"><div class="toggle-box" id="nav-toggle"><label style="margin:0;opacity:1;cursor:pointer">SIDE NAVIGATION</label><div class="dot"></div></div></div>
+
+    <div class="row flex-group">
+      <div><label>ACCENT</label><input type="color" id="clr"></div>
+      <div><label>WALLPAPER</label><button class="btn-action" id="uploadBtn">UPLOAD</button><input type="file" id="bg-file" class="hidden-file" accept="image/*"></div>
+    </div>
+
+    <div class="row"><label>REMOTE URL</label><input type="text" id="bg" placeholder="PASTE LINK..."></div>
+
+    <div class="row flex-group">
+      <button class="btn-action btn-reset" id="resetBgBtn">RESET BG</button>
+      <button class="btn-action btn-reset" id="resetAllBtn">PURGE ALL</button>
+    </div>
+
+    <div class="row"><div class="toggle-box" id="part-toggle"><label style="margin:0;opacity:1;cursor:pointer">PARTICLES</label><div class="dot"></div></div></div>
+
+    <div class="row flex-group">
+      <div><label>DENSITY</label><div class="slider-wrap" id="slider-int" data-min="0.1" data-max="4.0" data-step="0.1"><div class="slider-track"><div class="slider-fill"></div><div class="slider-knob"></div></div></div></div>
+      <div><label>OPACITY</label><div class="slider-wrap" id="slider-op" data-min="0.1" data-max="1" data-step="0.05"><div class="slider-track"><div class="slider-fill"></div><div class="slider-knob"></div></div></div></div>
+    </div>
+
+    <div class="row flex-group">
+      <div><label>TITLE</label><input type="text" id="title"></div>
+      <div><label>FAVICON</label><input type="text" id="fav"></div>
+    </div>
+  </div>
+</div>
+
 <style>
 :root{--accent:#89b4fa;--bg:#030508;--glass:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.12)}
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,-apple-system,sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:#fff;height:100dvh;display:flex;align-items:center;justify-content:center;text-transform:uppercase;letter-spacing:1px;overflow:hidden;touch-action:none}
+#app-root{height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--bg);color:#fff}
 .ambient-bg{position:fixed;inset:0;z-index:1;background-size:cover;background-position:center;filter:brightness(0.5);transition:opacity 0.5s ease}
 .overlay-dim{position:fixed;inset:0;z-index:2;background:radial-gradient(circle at center,transparent,rgba(0,0,0,0.5))}
-.core-pane{position:relative;z-index:10;width:92%;max-width:380px;max-height:85dvh;background:rgba(8,10,15,0.9);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 40px 80px rgba(0,0,0,0.9);overflow-y:auto}
+.core-pane{position:relative;z-index:10;width:92%;max-width:380px;max-height:85vh;background:rgba(8,10,15,0.9);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid var(--border);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 40px 80px rgba(0,0,0,0.9);overflow-y:auto;color:#fff}
 .core-pane::-webkit-scrollbar{display:none}
 .nav{display:flex;justify-content:space-between;align-items:center}
 .nav h2{font-size:10px;font-weight:900;color:var(--accent);letter-spacing:3px}
 .close-btn{cursor:pointer;font-size:18px;opacity:0.4;padding:4px;transition:0.2s}
 .close-btn:hover{opacity:1;transform:scale(1.1)}
 .row{width:100%}
-label{font-size:8px;font-weight:800;opacity:0.4;display:block;margin-bottom:6px;letter-spacing:1px}
+label{font-size:8px;font-weight:800;opacity:1;display:block;margin-bottom:6px;letter-spacing:1px;color:#fff}
 input[type="text"],input[type="color"]{width:100%;background:var(--glass);border:1px solid var(--border);padding:12px;border-radius:8px;color:#fff;font-size:10px;font-weight:700;outline:none}
 input[type="color"]{-webkit-appearance:none;height:38px;padding:0;cursor:pointer}
 input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
@@ -36,247 +64,46 @@ input[type="color"]::-webkit-color-swatch{border:none;border-radius:4px}
 .active .dot{background:var(--accent);box-shadow:0 0 10px var(--accent)}
 .hidden-file{display:none}
 </style>
-</head>
-<body>
-<div class="ambient-bg" id="bg-layer"></div>
-<div class="overlay-dim"></div>
-<div class="core-pane">
-<div class="nav">
-<h2>SETTINGS</h2>
-<div class="close-btn" id="closeBtn">×</div>
-</div>
-
-<div class="row">
-<div class="toggle-box" id="nav-toggle">
-<label style="margin:0;opacity:1;cursor:pointer">SIDE NAVIGATION</label>
-<div class="dot"></div>
-</div>
-</div>
-
-<div class="row flex-group">
-<div>
-<label>ACCENT</label>
-<input type="color" id="clr">
-</div>
-<div>
-<label>WALLPAPER</label>
-<button class="btn-action" id="uploadBtn">UPLOAD</button>
-<input type="file" id="bg-file" class="hidden-file" accept="image/*">
-</div>
-</div>
-
-<div class="row">
-<label>REMOTE URL</label>
-<input type="text" id="bg" placeholder="PASTE LINK...">
-</div>
-
-<div class="row flex-group">
-<button class="btn-action btn-reset" id="resetBgBtn">RESET BG</button>
-<button class="btn-action btn-reset" id="resetAllBtn">PURGE ALL</button>
-</div>
-
-<div class="row">
-<div class="toggle-box" id="part-toggle">
-<label style="margin:0;opacity:1;cursor:pointer">PARTICLES</label>
-<div class="dot"></div>
-</div>
-</div>
-
-<div class="row flex-group">
-<div>
-<label>DENSITY</label>
-<div class="slider-wrap" id="slider-int" data-min="0.1" data-max="4.0" data-step="0.1">
-<div class="slider-track"><div class="slider-fill"></div><div class="slider-knob"></div></div>
-</div>
-</div>
-<div>
-<label>OPACITY</label>
-<div class="slider-wrap" id="slider-op" data-min="0.1" data-max="1" data-step="0.05">
-<div class="slider-track"><div class="slider-fill"></div><div class="slider-knob"></div></div>
-</div>
-</div>
-</div>
-
-<div class="row flex-group">
-<div>
-<label>TITLE</label>
-<input type="text" id="title">
-</div>
-<div>
-<label>FAVICON</label>
-<input type="text" id="fav">
-</div>
-</div>
-</div>
 
 <script>
-const sync = ()=>window.parent.postMessage('sync','*');
-const defaultBg = "https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
-const defaults = {title:'HRN | CORE', clr:'#89b4fa', op:0.8, int:1.1, fav:'', part:true};
+(async()=>{
+const sync=()=>{try{window.parent.postMessage('sync','*')}catch(e){console.warn('Sync failed',e)}};
+const defaultBg="https://img.freepik.com/free-vector/black-background-with-wavy-lines_52683-76524.jpg";
+const defaults={title:'HRN | CORE',clr:'#89b4fa',op:0.8,int:1.1,fav:'',part:true};
 let db; const DB_NAME="hrn_db"; const DB_VERSION=1;
 
-// Blob to DataURL
-function blobToDataURL(blob){
-  return new Promise(res=>{
-    const fr = new FileReader();
-    fr.onload = e=>res(e.target.result);
-    fr.readAsDataURL(blob);
-  });
-}
+// IndexedDB helpers
+async function initDB(){return new Promise(r=>{try{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=e=>{try{db=e.target.result;if(!db.objectStoreNames.contains('background'))db.createObjectStore('background',{keyPath:'id'});}catch(e){console.warn(e);}};req.onsuccess=e=>{db=e.target.result;r();};req.onerror=e=>{console.warn(e);r();};}catch(e){console.warn(e);r();}});}
+async function saveBackground(value){try{if(!db) await initDB(); let storeVal=value; if(value instanceof Blob) storeVal=await new Promise(res=>{const fr=new FileReader(); fr.onload=e=>res(e.target.result); fr.readAsDataURL(value);}); const tx=db.transaction('background','readwrite'); tx.objectStore('background').put({id:'current_bg',value:storeVal,timestamp:Date.now()}); return new Promise(r=>{tx.oncomplete=r; tx.onerror=e=>{console.warn('BG save failed',e); r();};});}catch(e){console.warn(e);}}
+async function loadBackground(){try{if(!db) await initDB(); const tx=db.transaction('background','readonly'); const req=tx.objectStore('background').get('current_bg'); return new Promise(r=>{req.onsuccess=()=>r(req.result?req.result.value:defaultBg); req.onerror=e=>{console.warn(e);r(defaultBg);};});}catch(e){console.warn(e);return defaultBg;}}
+async function updateBg(val){try{const bgLayer=document.getElementById('bg-layer');let displayUrl=defaultBg;if(val instanceof Blob){displayUrl=URL.createObjectURL(val); await saveBackground(val);}else if(typeof val==='string'&&val.length>0){displayUrl=val; await saveBackground(val);}else{displayUrl=defaultBg; await saveBackground(defaultBg);} bgLayer.style.backgroundImage=`url('${displayUrl}')`; sync();}catch(e){console.warn(e);}}
+async function resetBg(){try{document.getElementById('bg').value=""; await updateBg(defaultBg);}catch(e){console.warn(e);}}
+async function resetAll(){try{localStorage.clear(); if(db) try{db.transaction('background','readwrite').objectStore('background').delete('current_bg');}catch(e){console.warn(e);} document.getElementById('title').value=defaults.title; document.getElementById('fav').value=defaults.fav; document.getElementById('clr').value=defaults.clr; document.documentElement.style.setProperty('--accent',defaults.clr); setSliderUI('slider-int',defaults.int); setSliderUI('slider-op',defaults.op); navBtn.classList.add('active'); partBtn.classList.add('active'); await updateBg(defaultBg); sync();}catch(e){console.warn(e);}}
 
-// IndexedDB init
-function initDB(){
-  return new Promise(r=>{
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = e=>{
-      db = e.target.result;
-      if(!db.objectStoreNames.contains('background'))
-        db.createObjectStore('background',{keyPath:'id'});
-    };
-    req.onsuccess = e => { db = e.target.result; r(); };
-    req.onerror = () => r();
-  });
-}
+function setSliderUI(id,val){try{const wrap=document.getElementById(id); const min=parseFloat(wrap.dataset.min), max=parseFloat(wrap.dataset.max); const p=((val-min)/(max-min))*100; wrap.querySelector('.slider-fill').style.width=p+'%'; wrap.querySelector('.slider-knob').style.left=p+'%';}catch(e){console.warn(e);}}
+function initSlider(id,key){try{const wrap=document.getElementById(id); const min=parseFloat(wrap.dataset.min), max=parseFloat(wrap.dataset.max), step=parseFloat(wrap.dataset.step); let dragging=false; const update=e=>{try{const rect=wrap.getBoundingClientRect(); const x=e.touches?e.touches[0].clientX:e.clientX; let pos=Math.max(0,Math.min(1,(x-rect.left)/rect.width)); let val=min+pos*(max-min); val=Math.round(val/step)*step; setSliderUI(id,val); localStorage.setItem('hrn_'+key,val.toFixed(2)); sync();}catch(e){console.warn(e);}}; wrap.addEventListener('mousedown',e=>{dragging=true;update(e)}); window.addEventListener('mousemove',e=>{if(dragging)update(e)}); window.addEventListener('mouseup',()=>dragging=false); wrap.addEventListener('touchstart',e=>{dragging=true;update(e)}); window.addEventListener('touchmove',e=>{if(dragging)update(e)}); window.addEventListener('touchend',()=>dragging=false); const saved=parseFloat(localStorage.getItem('hrn_'+key)||defaults[key]); setSliderUI(id,saved);}catch(e){console.warn(e);}}
 
-// Save bg
-async function saveBackground(value){
-  if(!db) await initDB();
-  let storeVal = value;
-  if(value instanceof Blob) storeVal = await blobToDataURL(value);
-  return new Promise(r=>{
-    const tx = db.transaction('background','readwrite');
-    tx.objectStore('background').put({id:'current_bg', value:storeVal, timestamp:Date.now()});
-    tx.oncomplete = ()=>r();
-  });
-}
-
-// Load bg
-async function loadBackground(){
-  if(!db) await initDB();
-  return new Promise(r=>{
-    const tx = db.transaction('background','readonly');
-    const req = tx.objectStore('background').get('current_bg');
-    req.onsuccess = ()=>r(req.result?req.result.value:defaultBg);
-    req.onerror = ()=>r(defaultBg);
-  });
-}
-
-// Update bg
-async function updateBg(val){
-  const bgLayer = document.getElementById('bg-layer');
-  let displayUrl = defaultBg;
-  if(val instanceof Blob){ displayUrl = URL.createObjectURL(val); await saveBackground(val); }
-  else if(typeof val==='string' && val.length>0){ displayUrl=val; await saveBackground(val); }
-  else { displayUrl=defaultBg; await saveBackground(defaultBg); }
-  bgLayer.style.backgroundImage=`url('${displayUrl}')`;
-  sync();
-}
-
-// Reset functions
-async function resetBg(){
-  document.getElementById('bg').value="";
-  await updateBg(defaultBg);
-}
-async function resetAll(){
-  localStorage.clear();
-  if(db) db.transaction('background','readwrite').objectStore('background').delete('current_bg');
-  document.getElementById('title').value=defaults.title;
-  document.getElementById('fav').value=defaults.fav;
-  document.getElementById('clr').value=defaults.clr;
-  document.getElementById('bg').value="";
-  document.documentElement.style.setProperty('--accent',defaults.clr);
-  setSliderUI('slider-int',defaults.int);
-  setSliderUI('slider-op',defaults.op);
-  partBtn.classList.add('active');
-  navBtn.classList.add('active');
-  await updateBg(defaultBg);
-  sync();
-}
-
-// Sliders
-function setSliderUI(id,val){
-  const wrap=document.getElementById(id);
-  const min=parseFloat(wrap.dataset.min), max=parseFloat(wrap.dataset.max);
-  const p=((val-min)/(max-min))*100;
-  wrap.querySelector('.slider-fill').style.width=p+'%';
-  wrap.querySelector('.slider-knob').style.left=p+'%';
-}
-function initSlider(id,key){
-  const wrap=document.getElementById(id);
-  const min=parseFloat(wrap.dataset.min), max=parseFloat(wrap.dataset.max), step=parseFloat(wrap.dataset.step);
-  let dragging=false;
-  const update=e=>{
-    const rect=wrap.getBoundingClientRect();
-    const x=e.touches?e.touches[0].clientX:e.clientX;
-    let pos=(x-rect.left)/rect.width;
-    pos=Math.max(0,Math.min(1,pos));
-    let val = min + pos*(max-min);
-    val = Math.round(val/step)*step;
-    setSliderUI(id,val);
-    localStorage.setItem('hrn_'+key,val.toFixed(2));
-    sync();
-  };
-  wrap.addEventListener('mousedown',e=>{dragging=true;update(e)});
-  window.addEventListener('mousemove',e=>{if(dragging)update(e)});
-  window.addEventListener('mouseup',()=>dragging=false);
-  wrap.addEventListener('touchstart',e=>{dragging=true;update(e)});
-  window.addEventListener('touchmove',e=>{if(dragging)update(e)});
-  window.addEventListener('touchend',()=>dragging=false);
-  const saved=localStorage.getItem('hrn_'+key)||defaults[key];
-  setSliderUI(id,parseFloat(saved));
-}
 initSlider('slider-int','int'); initSlider('slider-op','op');
 
 // Inputs
-['title','clr','fav','bg'].forEach(id=>{
-  const el=document.getElementById(id);
-  el.value=localStorage.getItem('hrn_'+id)||(id==='bg'?'':defaults[id]);
-  el.addEventListener('input',()=> {
-    localStorage.setItem('hrn_'+id,el.value);
-    if(id==='clr') document.documentElement.style.setProperty('--accent',el.value);
-    if(id==='bg') updateBg(el.value);
-    sync();
-  });
-});
+['title','clr','fav','bg'].forEach(id=>{try{const el=document.getElementById(id); el.value=localStorage.getItem('hrn_'+id)||(id==='bg'?'':defaults[id]); el.addEventListener('input',()=>{try{localStorage.setItem('hrn_'+id,el.value); if(id==='clr') document.documentElement.style.setProperty('--accent',el.value); if(id==='bg') updateBg(el.value); sync();}catch(e){console.warn(e);}});}catch(e){console.warn(e);}});
 
 // Toggles
-const navBtn=document.getElementById('nav-toggle');
-let useSideNav=localStorage.getItem('hrn_nav_mode')!=='bottom';
-if(useSideNav) navBtn.classList.add('active');
-navBtn.addEventListener('click',()=>{
-  useSideNav=!useSideNav;
-  navBtn.classList.toggle('active',useSideNav);
-  localStorage.setItem('hrn_nav_mode',useSideNav?'side':'bottom');
-  sync();
-});
-const partBtn=document.getElementById('part-toggle');
-let partActive=localStorage.getItem('hrn_part')!=='false';
-if(partActive) partBtn.classList.add('active');
-partBtn.addEventListener('click',()=>{
-  partActive=!partActive;
-  partBtn.classList.toggle('active',partActive);
-  localStorage.setItem('hrn_part',partActive);
-  sync();
-});
+const navBtn=document.getElementById('nav-toggle'); let useSideNav=localStorage.getItem('hrn_nav_mode')!=='bottom'; if(useSideNav) navBtn.classList.add('active'); navBtn.addEventListener('click',()=>{try{useSideNav=!useSideNav; navBtn.classList.toggle('active',useSideNav); localStorage.setItem('hrn_nav_mode',useSideNav?'side':'bottom'); sync();}catch(e){console.warn(e);}});
+const partBtn=document.getElementById('part-toggle'); let partActive=localStorage.getItem('hrn_part')!=='false'; if(partActive) partBtn.classList.add('active'); partBtn.addEventListener('click',()=>{try{partActive=!partActive; partBtn.classList.toggle('active',partActive); localStorage.setItem('hrn_part',partActive); sync();}catch(e){console.warn(e);}});
 
-// Upload file
+// File upload
 document.getElementById('uploadBtn').addEventListener('click',()=>document.getElementById('bg-file').click());
-document.getElementById('bg-file').addEventListener('change',async e=>{
-  const file=e.target.files[0]; if(!file) return;
-  await updateBg(file);
-  document.getElementById('bg').value="Local File Uploaded";
-});
+document.getElementById('bg-file').addEventListener('change',async e=>{try{const file=e.target.files[0]; if(!file) return; await updateBg(file); document.getElementById('bg').value="Local File Uploaded";}catch(e){console.warn(e);}});
+
+// Reset / Purge
+document.getElementById('resetBgBtn').addEventListener('click',resetBg);
+document.getElementById('resetAllBtn').addEventListener('click',resetAll);
 
 // Close btn
-document.getElementById('closeBtn').addEventListener('click',()=>window.parent.postMessage('close','*'));
+document.getElementById('closeBtn').addEventListener('click',()=>{try{window.parent.postMessage('close','*');}catch(e){console.warn(e);}});
 
 // Startup
-(async function startup(){
-  document.documentElement.style.setProperty('--accent',localStorage.getItem('hrn_clr')||defaults.clr);
-  await initDB();
-  const bg = await loadBackground();
-  await updateBg(bg);
+try{document.documentElement.style.setProperty('--accent',localStorage.getItem('hrn_clr')||defaults.clr); await initDB(); const bg=await loadBackground(); await updateBg(bg);}catch(e){console.error('Startup error',e);}
 })();
 </script>
-</body>
-</html>
