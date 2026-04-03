@@ -147,7 +147,7 @@
             <div id="close" onclick="window.parent.postMessage('close', '*')">
                 <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
             </div>
-            <h1>Game library</h1>
+            <h1>Games</h1>
         </div>
         <input id="search" placeholder="Search games..." autocomplete="off">
     </div>
@@ -224,7 +224,7 @@
             const card = document.createElement('div');
             card.className = 'card';
             card.textContent = game.replaceAll('-', ' ');
-            card.onclick = () => window.location.href = `${game}/index.html`;
+            card.onclick = () => window.location.href = `$/game/{game}`;
             fragment.appendChild(card);
         }
 
