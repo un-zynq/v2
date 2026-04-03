@@ -39,19 +39,19 @@
             <div class="mobile-nav" id="mobile-nav">
                 <div class="btn" onclick="setHash('settings')"><i data-lucide="settings"></i></div>
                 <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
-                <div class="btn" onclick="setHash('about')"><i data-lucide="info"></i></div>
+                <div class="btn" onclick="setHash('info')"><i data-lucide="info"></i></div>
             </div>
 
             <div class="bottom-nav" id="bottom-nav">
                 <div class="btn" onclick="setHash('settings')"><i data-lucide="settings"></i></div>
                 <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
-                <div class="btn" onclick="setHash('about')"><i data-lucide="info"></i></div>
+                <div class="btn" onclick="setHash('info')"><i data-lucide="info"></i></div>
                 <div class="btn" onclick="setHash('add')"><i data-lucide="plus"></i></div>
             </div>
         </div>
 
         <div class="side-nav nav-right" id="side-right">
-            <div class="btn" onclick="setHash('about')"><i data-lucide="info"></i></div>
+            <div class="btn" onclick="setHash('info')"><i data-lucide="info"></i></div>
             <div class="btn" onclick="setHash('add')"><i data-lucide="plus"></i></div>
         </div>
     </div>
@@ -284,7 +284,7 @@
             await sync();
             render();
 
-            const pages=['settings','games','about','add'];
+            const pages=['settings','games','info','add'];
             let loadedCount=0;
             $('progress').style.width='10%';
 
