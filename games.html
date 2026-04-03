@@ -224,7 +224,7 @@
             const card = document.createElement('div');
             card.className = 'card';
             card.textContent = game.replaceAll('-', ' ');
-            card.onclick = () => window.location.href = `$/game/{game}`;
+            card.onclick = () => window.location.href = `/game/${game}`;
             fragment.appendChild(card);
         }
 
