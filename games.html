@@ -10,136 +10,117 @@
             --border: rgba(255, 255, 255, .08);
             --text: rgba(255, 255, 255, .92);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: Inter, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             color: var(--text);
             overflow: hidden;
             background: #000;
         }
-
         #bg {
             position: fixed;
-            inset: 0;
+            inset: -20px;
             background-size: cover;
             background-position: center;
-            filter: brightness(.65) saturate(1.1);
+            filter: brightness(.3) blur(15px); 
             z-index: 0;
+            transform: translateZ(0);
         }
-
-        #overlay {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(0, 0, 0, .25), rgba(0, 0, 0, .7));
-            backdrop-filter: blur(6px);
-            z-index: 1;
-        }
-
         #wrap {
             position: relative;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 28px 26px 18px 26px;
+            padding: 25px;
             z-index: 10;
         }
-
         #header {
             flex-shrink: 0;
-            margin-bottom: 14px;
-            z-index: 20;
+            margin-bottom: 20px;
         }
-
         #title-container {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 15px;
         }
-
         #close {
             cursor: pointer;
             opacity: .6;
-            transition: .2s;
             display: flex;
         }
-
         #close:hover { opacity: 1; }
-        #close svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.5; fill: none; }
-
-        h1 { font-size: 20px; letter-spacing: 1px; opacity: .85; font-weight: 600; }
-
+        #close svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+        h1 { font-size: 20px; letter-spacing: 0.5px; font-weight: 600; opacity: 0.9; }
         #search {
             width: 100%;
             background: rgba(255, 255, 255, .06);
             border: 1px solid var(--border);
-            padding: 14px 16px;
-            border-radius: 14px;
+            padding: 12px 16px;
+            border-radius: 10px;
             color: #fff;
             outline: none;
-            font-size: 13px;
+            font-size: 14px;
         }
-
+        
+        /* Hidden Scrollbar Logic */
         #viewport {
             flex: 1;
             overflow-y: auto;
             position: relative;
-            padding-right: 4px;
-            /* Browser optimalisaties */
-            contain: size layout style; 
+            contain: size layout style;
+            /* Firefox */
+            scrollbar-width: none; 
+            /* IE/Edge */
+            -ms-overflow-style: none; 
         }
-
-        #viewport::-webkit-scrollbar { width: 5px; }
-        #viewport::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 10px; }
+        /* Chrome, Safari, Edge */
+        #viewport::-webkit-scrollbar {
+            display: none;
+            width: 0 !important;
+            height: 0 !important;
+        }
 
         #spacer {
             position: absolute;
             top: 0; left: 0; right: 0;
             pointer-events: none;
         }
-
         #grid {
             position: absolute;
             top: 0; left: 0; right: 0;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 14px;
-            /* Forceer GPU rendering */
+            gap: 10px;
             will-change: transform;
-            transform: translateZ(0); 
+            transform: translate3d(0,0,0);
         }
-
         .card {
             background: rgba(255, 255, 255, .04);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             font-size: 11px;
-            letter-spacing: 1px;
+            font-weight: 500;
+            text-transform: capitalize;
             cursor: pointer;
-            height: 82px;
-            padding: 10px;
-            transition: background .2s;
-            color: inherit;
-            /* Voorkom tekst selectie tijdens snel scrollen */
+            height: 70px;
+            padding: 8px;
             user-select: none;
+            transition: background 0.1s, border-color 0.1s;
         }
-
         .card:hover {
-            background: rgba(255, 255, 255, .08);
-            border: 1px solid rgba(255, 255, 255, .25);
+            background: rgba(255, 255, 255, .1);
+            border-color: rgba(255, 255, 255, .15);
         }
     </style>
 </head>
 <body>
 
 <div id="bg"></div>
-<div id="overlay"></div>
 
 <div id="wrap">
     <div id="header">
@@ -149,7 +130,7 @@
             </div>
             <h1>Games</h1>
         </div>
-        <input id="search" placeholder="Search games..." autocomplete="off">
+        <input id="search" placeholder="Quick search..." autocomplete="off">
     </div>
     
     <div id="viewport">
@@ -165,70 +146,79 @@
     const search = document.getElementById('search');
     const bg = document.getElementById('bg');
 
-    let allGames = [], filteredGames = [];
-    const CARD_HEIGHT = 82;
-    const GAP = 14;
-    const OVERSCAN_ROWS = 4; // Hoeveel rijen buiten beeld we alvast laden
-
+    let allGames = [];
+    let filteredGames = [];
+    
+    const CARD_HEIGHT = 70;
+    const GAP = 10;
+    const OVERSCAN = 3;
     let columns = 0;
     let ticking = false;
 
+    function openGame(slug, group) {
+        const url = `${window.location.origin}/${group}/${slug}`;
+        const win = window.open('about:blank', '_blank');
+        if (!win) return;
+
+        const doc = win.document;
+        doc.open();
+        doc.write(`
+            <!DOCTYPE html>
+            <html style="margin:0;padding:0;height:100%;overflow:hidden;">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>\u200E</title>
+                    <link rel="icon" href="data:image/x-icon;base64,AAABAAEAAQEAAAEAIAAwAAAAFgAAACgAAAABAAAAAgAAAAEAIAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//AAAAAA==">
+                    <style>
+                        * { margin: 0; padding: 0; border: none; outline: none; }
+                        body, html { height: 100%; width: 100%; background: #000; }
+                        iframe { width: 100vw; height: 100vh; display: block; }
+                    </style>
+                </head>
+                <body><iframe src="${url}"></iframe></body>
+            </html>
+        `);
+        doc.close();
+    }
+
     async function applyBackground() {
-        try {
-            const req = indexedDB.open("hrn_db", 1);
-            req.onsuccess = e => {
-                const db = e.target.result;
-                const tx = db.transaction('background', 'readonly');
-                const store = tx.objectStore('background').get('current_bg');
-                store.onsuccess = () => {
-                    const val = store.result?.value;
-                    if (val) bg.style.backgroundImage = `url('${val instanceof Blob ? URL.createObjectURL(val) : val}')`;
-                };
+        const req = indexedDB.open("hrn_db", 1);
+        req.onsuccess = e => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('background')) return;
+            const tx = db.transaction('background', 'readonly');
+            const store = tx.objectStore('background').get('current_bg');
+            store.onsuccess = () => {
+                const val = store.result?.value;
+                if (val) bg.style.backgroundImage = `url('${val instanceof Blob ? URL.createObjectURL(val) : val}')`;
             };
-        } catch(e) {}
+        };
     }
 
     function calculateLayout() {
         const containerWidth = viewport.clientWidth;
         columns = Math.floor((containerWidth + GAP) / (150 + GAP)) || 1;
-        const rowHeight = CARD_HEIGHT + GAP;
-        spacer.style.height = `${Math.ceil(filteredGames.length / columns) * rowHeight}px`;
+        spacer.style.height = `${Math.ceil(filteredGames.length / columns) * (CARD_HEIGHT + GAP)}px`;
     }
 
     function updateVirtualScroll() {
-        if (filteredGames.length === 0) {
-            grid.innerHTML = '';
-            return;
-        }
-
         const scrollTop = viewport.scrollTop;
         const rowHeight = CARD_HEIGHT + GAP;
         
-        // Bereken bereik met extra buffer (overscan)
-        let startRow = Math.floor(scrollTop / rowHeight) - OVERSCAN_ROWS;
-        startRow = Math.max(0, startRow);
+        let startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - OVERSCAN);
+        const visibleRows = Math.ceil(viewport.clientHeight / rowHeight) + (OVERSCAN * 2);
         
-        const visibleRows = Math.ceil(viewport.clientHeight / rowHeight);
-        const endRow = startRow + visibleRows + (OVERSCAN_ROWS * 2);
-
         const startIndex = startRow * columns;
-        const endIndex = Math.min(filteredGames.length, endRow * columns);
+        const endIndex = Math.min(filteredGames.length, (startRow + visibleRows) * columns);
 
-        // Positioneer de grid precies op de startRow
-        grid.style.transform = `translateY(${startRow * rowHeight}px)`;
+        grid.style.transform = `translate3d(0, ${startRow * rowHeight}px, 0)`;
 
-        // Renderen via Fragment (snelste methode)
-        const fragment = document.createDocumentFragment();
+        let html = '';
         for (let i = startIndex; i < endIndex; i++) {
             const game = filteredGames[i];
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.textContent = game.replaceAll('-', ' ');
-            card.onclick = () => window.location.href = `/game/${game}`;
-            fragment.appendChild(card);
+            html += `<div class="card" onclick="openGame('${game.name}', '${game.group}')">${game.name.replace(/-/g, ' ')}</div>`;
         }
-
-        grid.replaceChildren(fragment);
+        grid.innerHTML = html;
         ticking = false;
     }
 
@@ -236,18 +226,22 @@
         try {
             const res = await fetch("https://un-zynq.github.io/games.json");
             const data = await res.json();
-            allGames = Object.values(data).flat();
+            
+            allGames = [];
+            for (const group in data) {
+                data[group].forEach(name => allGames.push({ name, group }));
+            }
+
             filteredGames = allGames;
             calculateLayout();
             updateVirtualScroll();
-        } catch(e) { console.error(e); }
+        } catch(e) {}
     }
 
-    // Handlers met performance optimalisatie
     search.addEventListener("input", () => {
-        const q = search.value.toLowerCase().trim().replace(/[\s-]/g, '');
+        const q = search.value.toLowerCase().replace(/[\s-]/g, '');
         filteredGames = allGames.filter(g => 
-            g.toLowerCase().replace(/[\s-]/g, '').includes(q)
+            g.name.toLowerCase().replace(/-/g, '').includes(q)
         );
         viewport.scrollTop = 0;
         calculateLayout();
@@ -256,18 +250,17 @@
 
     viewport.addEventListener('scroll', () => {
         if (!ticking) {
-            requestAnimationFrame(updateVirtualScroll);
+            window.requestAnimationFrame(() => {
+                updateVirtualScroll();
+                ticking = false;
+            });
             ticking = true;
         }
-    });
+    }, { passive: true });
 
     window.addEventListener('resize', () => {
         calculateLayout();
         updateVirtualScroll();
-    });
-
-    window.addEventListener('keydown', e => {
-        if(e.key === "Escape") window.parent.postMessage('close', '*');
     });
 
     applyBackground();
