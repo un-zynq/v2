@@ -142,7 +142,7 @@
     
     const CARD_HEIGHT = 72;
     const GAP = 10;
-    const OVERSCAN = 4;
+    const OVERSCAN = 5;
     let columns = 0;
     let ticking = false;
 
@@ -163,7 +163,7 @@
                     <style>
                         * { margin: 0; padding: 0; border: none; outline: none; }
                         body, html { height: 100%; width: 100%; background: #000; overflow: hidden; }
-                        iframe { width: 100vw; height: 100vh; display: block; }
+                        iframe { width: 100vw; height: 100vh; display: block; border: none; }
                     </style>
                 </head>
                 <body><iframe src="${url}"></iframe></body>
@@ -189,7 +189,8 @@
     function calculateLayout() {
         const containerWidth = viewport.clientWidth;
         columns = Math.floor((containerWidth + GAP) / (155 + GAP)) || 1;
-        spacer.style.height = `${Math.ceil(filteredGames.length / columns) * (CARD_HEIGHT + GAP)}px`;
+        const rowCount = Math.ceil(filteredGames.length / columns);
+        spacer.style.height = `${rowCount * (CARD_HEIGHT + GAP)}px`;
     }
 
     function updateVirtualScroll() {
@@ -218,20 +219,24 @@
             const res = await fetch("https://un-zynq.github.io/games2.json");
             const rawData = await res.json();
             
-            // games2.json is een array met 1 object bevattende g1, g2 etc.
-            const groups = rawData[0]; 
-            
             allGames = [];
-            for (const groupKey in groups) {
-                const gamesInGroup = groups[groupKey];
-                for (const gameId in gamesInGroup) {
-                    allGames.push({
-                        name: gamesInGroup[gameId].name,
-                        alias: gamesInGroup[gameId].alias,
-                        group: groupKey
-                    });
+            
+            // Loop door elk object in de array (meestal is er maar 1, maar dit pakt alles)
+            rawData.forEach(entry => {
+                // Loop door g1, g2, g3, etc.
+                for (const groupKey in entry) {
+                    const gamesInGroup = entry[groupKey];
+                    // Loop door de individuele game objecten
+                    for (const gameId in gamesInGroup) {
+                        const gameData = gamesInGroup[gameId];
+                        allGames.push({
+                            name: gameData.name,
+                            alias: gameData.alias,
+                            group: groupKey
+                        });
+                    }
                 }
-            }
+            });
 
             filteredGames = allGames;
             calculateLayout();
