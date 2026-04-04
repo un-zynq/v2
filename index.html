@@ -267,18 +267,17 @@
             requestAnimationFrame(render);
         }
 
-        async function sync(){
-            // Fetch pages.txt voor updates
-            try {
-                const r=await fetch('pages.txt?v='+cacheVersion);
-                const text=await r.text();
-                const regex = /\/:(\w+):\/\s*([\s\S]*?)(?=\/:\w+:\/|$)/g;
-                let m; cache={};
-                while ((m = regex.exec(text)) !== null) cache[m[1]] = m[2].trim();
-            } catch(e) {}
-            await applyAllSettings();
-            checkHash();
-        }
+let lastSync = 0;
+
+async function sync(){
+    const now = Date.now();
+
+    // kleine cooldown zodat je geen spam krijgt
+    if(now - lastSync < 150) return;
+    lastSync = now;
+
+    await applyAllSettings();
+}
 
         async function init(){
             canvas.width=window.innerWidth;
