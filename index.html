@@ -9,240 +9,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --bg: #030508;
-            --accent: #89b4fa;
-            --ui-silver: rgba(235, 240, 255, .9);
-            --ui-border: rgba(255, 255, 255, .1);
-        }
+        :root { --bg: #030508; --accent: #89b4fa; --ui-silver: rgba(235,240,255,.9); --ui-border: rgba(255,255,255,.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { height: 100vh; background: var(--bg); color: var(--ui-silver); font-family: 'Inter', sans-serif; overflow: hidden; text-transform: uppercase; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            height: 100vh;
-            background: var(--bg);
-            color: var(--ui-silver);
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            text-transform: uppercase;
-        }
-
-        /* --- BACKGROUND & VISUALS --- */
-        .ambient-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            filter: brightness(.4) blur(60px);
-            transform: scale(1.25);
-            will-change: transform, filter, opacity;
-            transition: opacity 2s ease, filter 2.5s cubic-bezier(0.16, 1, 0.3, 1), transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .ambient-bg.loaded {
-            opacity: 1;
-            filter: brightness(.6) blur(0px);
-            transform: scale(1);
-        }
-
-        .overlay-dim {
-            position: fixed;
-            inset: 0;
-            z-index: 2;
-            background: rgba(0, 0, 0, .2);
-            pointer-events: none;
-        }
-
-        #webgl-canvas {
-            position: fixed;
-            inset: 0;
-            z-index: 3;
-            pointer-events: none;
-        }
+        /* --- VISUAL LAYER --- */
+        .ambient-bg { position: fixed; inset: 0; z-index: 1; background-size: cover; background-position: center; opacity: 0; filter: brightness(.4) blur(60px); transform: scale(1.1); transition: all 2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .ambient-bg.loaded { opacity: 1; filter: brightness(.6) blur(0px); transform: scale(1); }
+        #webgl-canvas { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
 
         /* --- LOADER --- */
-        #loader {
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
-        }
+        #loader { position: fixed; inset: 0; z-index: 10000; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.6s ease; }
+        .load-line { width: 200px; height: 2px; background: rgba(255,255,255,.05); position: relative; overflow: hidden; border-radius: 10px; }
+        #progress { position: absolute; height: 100%; width: 0%; background: var(--accent); transition: width 0.3s cubic-bezier(0.1, 0.5, 0.5, 1); box-shadow: 0 0 15px var(--accent); }
+        #load-perc { font-size: 9px; font-weight: 900; letter-spacing: 2px; margin-top: 12px; opacity: 0; transition: opacity 0.4s; }
 
-        .load-line {
-            width: 240px;
-            height: 2px;
-            background: rgba(255, 255, 255, .05);
-            position: relative;
-            overflow: hidden;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
+        /* --- UI WRAPPER --- */
+        .wrapper { position: relative; height: 100dvh; width: 100%; z-index: 10; opacity: 0; display: none; transition: 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .wrapper.active { opacity: 1; display: block; }
+        .header { position: absolute; top: 40px; width: 100%; display: flex; justify-content: center; }
+        .status-pill { background: rgba(0,0,0,.4); border: 1px solid var(--ui-border); padding: 10px 25px; border-radius: 100px; backdrop-filter: blur(10px); font-size: 10px; font-weight: 900; letter-spacing: 2px; display: flex; gap: 30px; }
+        .brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); text-align: center; pointer-events: none; }
+        .logo { font-size: clamp(5rem, 20vw, 12rem); font-weight: 900; letter-spacing: -.05em; background: linear-gradient(180deg, #fff 30%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: .8; }
+        .tagline { font-size: 10px; font-weight: 600; letter-spacing: 8px; margin-top: 30px; opacity: 0; transform: translateY(15px); transition: 1s ease 0.3s; }
+        .tagline.show { opacity: .8; transform: translateY(0); }
 
-        #progress {
-            position: absolute;
-            height: 100%;
-            width: 0%;
-            background: var(--accent);
-            transition: width 0.2s ease-out;
-            box-shadow: 0 0 20px var(--accent);
-        }
+        .side-nav { position: absolute; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; padding: 0 50px; z-index: 20; }
+        .nav-left { left: 0; } .nav-right { right: 0; }
+        .btn { width: 64px; height: 64px; border-radius: 22px; background: rgba(0,0,0,.3); border: 1px solid var(--ui-border); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); backdrop-filter: blur(15px); }
+        .btn:hover { background: rgba(255,255,255,.1); transform: scale(1.1) translateY(-3px); border-color: var(--accent); }
 
-        #load-perc {
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+        /* --- BUTTERY SMOOTH IFRAME SYSTEM --- */
+        #container { position: fixed; inset: 0; z-index: 1000; visibility: hidden; pointer-events: none; background: rgba(0,0,0,0.4); backdrop-filter: blur(0px); transition: backdrop-filter 0.6s, visibility 0.6s; }
+        #container.active { visibility: visible; pointer-events: all; backdrop-filter: blur(30px); }
 
-        /* --- MAIN UI WRAPPER --- */
-        .wrapper {
-            position: relative;
-            height: 100dvh;
-            width: 100%;
-            z-index: 10;
-            opacity: 0;
-            display: none;
-            transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .wrapper.active {
-            opacity: 1;
-            display: block;
-        }
-
-        .header {
-            position: absolute;
-            top: 45px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        .status-pill {
-            background: rgba(0, 0, 0, .45);
-            border: 1px solid var(--ui-border);
-            padding: 12px 32px;
-            border-radius: 100px;
-            backdrop-filter: blur(15px);
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            display: flex;
-            gap: 35px;
-        }
-
-        .brand {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            width: 100%;
-            pointer-events: none;
-        }
-
-        .logo {
-            font-size: clamp(6rem, 25vw, 13rem);
-            font-weight: 900;
-            letter-spacing: -.06em;
-            line-height: .8;
-            background: linear-gradient(180deg, #fff 40%, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            opacity: .7;
-        }
-
-        .tagline {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 10px;
-            margin-top: 40px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: 1s ease;
-        }
-
-        .tagline.show {
-            opacity: .9;
-            transform: translateY(0);
-        }
-
-        /* --- NAVIGATION --- */
-        .side-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            padding: 0 60px;
-            z-index: 20;
-        }
-
-        .nav-left { left: 0; }
-        .nav-right { right: 0; }
-
-        .btn {
-            width: 68px;
-            height: 68px;
-            border-radius: 24px;
-            background: rgba(0, 0, 0, .4);
-            border: 1px solid var(--ui-border);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(20px);
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, .1);
-            transform: scale(1.1) translateY(-2px);
-            border-color: rgba(255, 255, 255, .3);
-        }
-
-        /* --- IFRAME CONTAINER --- */
-        #container {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(30px);
-            background: rgba(0, 0, 0, 0.6);
-        }
-
-        #container.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            transition: opacity 0.3s ease;
-        }
-
-        iframe.loading {
-            opacity: 0;
-        }
+        .frame-slot { position: absolute; inset: 0; border: none; opacity: 0; transform: scale(1.02); transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; }
+        .frame-slot.active { opacity: 1; transform: scale(1); pointer-events: all; z-index: 2; }
     </style>
 </head>
 <body>
@@ -253,45 +55,39 @@
     </div>
     
     <div class="ambient-bg" id="bg"></div>
-    <div class="overlay-dim"></div>
     <canvas id="webgl-canvas"></canvas>
 
     <div class="wrapper" id="ui">
-        <div class="header">
-            <div class="status-pill">
-                <span id="date">SYNC</span>
-                <span id="clock">00:00:00</span>
-            </div>
-        </div>
-
+        <div class="header"><div class="status-pill"><span id="date">SYNC</span><span id="clock">00:00:00</span></div></div>
         <div class="side-nav nav-left">
             <div class="btn" onclick="setHash('settings')"><i data-lucide="settings"></i></div>
             <div class="btn" onclick="setHash('games')"><i data-lucide="gamepad-2"></i></div>
         </div>
-
         <div class="brand">
             <h1 class="logo">HRN</h1>
             <p class="tagline" id="tagline"></p>
         </div>
-
         <div class="side-nav nav-right">
             <div class="btn" onclick="setHash('info')"><i data-lucide="info"></i></div>
             <div class="btn" onclick="setHash('add')"><i data-lucide="plus"></i></div>
         </div>
     </div>
 
-    <div id="container"><iframe id="frame"></iframe></div>
+    <div id="container">
+        <iframe id="frame1" class="frame-slot"></iframe>
+        <iframe id="frame2" class="frame-slot"></iframe>
+    </div>
 
     <script id="particle-worker" type="application/javascript">
         let c, p = [];
         self.onmessage = function(e) {
-            const { cmd, w, h, amount, opacity } = e.data;
+            const { cmd, w, h, amount } = e.data;
             if (cmd === 'init') {
                 c = amount;
                 p = Array.from({length: c}, () => ({
                     x: Math.random() * w, y: Math.random() * h,
-                    vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
-                    s: Math.random() * 2.5 + 1.5, o: opacity * (Math.random() * 0.5 + 0.5)
+                    vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+                    s: Math.random() * 2 + 1, o: Math.random() * 0.5 + 0.3
                 }));
                 const u = () => {
                     const pD = new Float32Array(c * 2), sD = new Float32Array(c), oD = new Float32Array(c);
@@ -308,17 +104,34 @@
 
     <script>
         const $ = id => document.getElementById(id);
-        const taglines = ["YOU ARE THE AURA","LEGEND IN MAKING","POWER WITHIN YOU","OWN THE GAME","RISE ABOVE ALL"];
-        let cache = {}, gl, prog, posB, szB, opB, count;
-        let currentProgress = 0;
-        let isDataLoaded = false;
+        const taglines = ["YOU ARE THE AURA","LEGEND IN MAKING","POWER WITHIN YOU","OWN THE GAME"];
+        let cache = {}, currentProgress = 0, activeFrame = 1;
 
-        // --- PROGRESS SYSTEM ---
+        // --- BUTTERY TRANSITION LOGIC ---
+        function switchFrame(content) {
+            const nextFrameNum = activeFrame === 1 ? 2 : 1;
+            const currentF = $('frame' + activeFrame);
+            const nextF = $('frame' + nextFrameNum);
+
+            // Laad content in onzichtbare frame
+            nextF.srcdoc = content;
+            
+            nextF.onload = () => {
+                // De eigenlijke "Smooth" swap
+                nextF.classList.add('active');
+                currentF.classList.remove('active');
+                activeFrame = nextFrameNum;
+                
+                // Ruim de oude op na de transitie
+                setTimeout(() => { currentF.srcdoc = ""; }, 500);
+            };
+        }
+
         function updateProgress(target) {
             if(target > 0) $('load-perc').style.opacity = 1;
             const step = () => {
                 if (currentProgress < target) {
-                    currentProgress += (target - currentProgress) * 0.12 + 1;
+                    currentProgress += (target - currentProgress) * 0.15 + 0.8;
                     if(currentProgress >= target) currentProgress = target;
                     $('progress').style.width = currentProgress + '%';
                     $('load-perc').textContent = Math.floor(currentProgress) + '%';
@@ -328,161 +141,103 @@
             requestAnimationFrame(step);
         }
 
-        // --- DATA SYNC (WITHOUT RELOAD) ---
         async function syncData(isInitial = false) {
-            isDataLoaded = false;
-            if(!isInitial) {
-                currentProgress = 0;
-                $('loader').style.display = 'flex';
-                $('loader').style.opacity = 1;
-                $('progress').style.width = '0%';
-            }
-
             try {
-                const response = await fetch('./pages.txt?t=' + Date.now()); // Bypass browser cache
-                const reader = response.body.getReader();
-                const total = +response.headers.get('Content-Length') || 100000;
-                let received = 0; let chunks = [];
+                const res = await fetch('./pages.txt?t=' + Date.now());
+                const reader = res.body.getReader();
+                const total = +res.headers.get('Content-Length') || 100000;
+                let received = 0, chunks = [];
 
                 while(true) {
                     const {done, value} = await reader.read();
                     if(done) break;
-                    chunks.push(value); 
-                    received += value.length;
-                    updateProgress(Math.min(98, Math.floor((received / total) * 100)));
+                    chunks.push(value); received += value.length;
+                    updateProgress(Math.min(99, Math.floor((received / total) * 100)));
                 }
 
                 const text = new TextDecoder().decode(new Uint8Array(chunks.reduce((a,c) => [...a, ...c], [])));
                 const regex = /\/:(\w+):\/\s*([\s\S]*?)(?=\/:\w+:\/|$)/g;
+                cache = {}; let m; while ((m = regex.exec(text)) !== null) cache[m[1]] = m[2].trim();
                 
-                cache = {}; // Reset cache
-                let m; while ((m = regex.exec(text)) !== null) cache[m[1]] = m[2].trim();
-                
-                isDataLoaded = true;
                 updateProgress(100);
-                
-                if(!isInitial) {
-                    setTimeout(reveal, 600);
-                    // Update current open frame if active
-                    const currentHash = window.location.hash.slice(1);
-                    if(currentHash) handleNavigation(currentHash);
+                if(isInitial) checkFinish();
+                else {
+                    const h = window.location.hash.slice(1);
+                    if(h && cache[h]) switchFrame(cache[h]);
                 }
-            } catch(e) { 
-                console.error("Sync failed", e);
-                updateProgress(100); 
-                isDataLoaded = true;
-            }
-        }
-
-        // --- INITIALIZATION ---
-        async function init() {
-            // Setup WebGL Particles
-            const canvas = $('webgl-canvas');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            gl = canvas.getContext('webgl', {alpha: true});
-            
-            if (gl) {
-                const vs = `attribute vec2 p;attribute float s;attribute float o;uniform vec2 r;uniform float t;varying float vO;void main(){gl_Position=vec4((p/r*2.0-1.0)*vec2(1,-1),0,1);gl_PointSize=s*(0.9+sin(t*2.0+o)*0.15);vO=o;}`;
-                const fs = `precision lowp float;uniform vec3 c;varying float vO;void main(){float d=distance(gl_PointCoord,vec2(0.5));if(d>0.5)discard;gl_FragColor=vec4(c,vO*(1.0-d*2.0));}`;
-                const sh = (t, s) => { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); return x; };
-                prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
-                gl.linkProgram(prog); gl.useProgram(prog);
-                posB = gl.createBuffer(); szB = gl.createBuffer(); opB = gl.createBuffer();
-                gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-                
-                const clr = localStorage.getItem('hrn_clr') || "#89b4fa";
-                document.documentElement.style.setProperty('--accent', clr);
-                gl.uniform3fv(gl.getUniformLocation(prog, "c"), [parseInt(clr.slice(1,3),16)/255, parseInt(clr.slice(3,5),16)/255, parseInt(clr.slice(5,7),16)/255]);
-                
-                count = Math.floor((canvas.width * canvas.height / 10000) * 1.2);
-                const workerBlob = new Blob([$('particle-worker').textContent], {type:'text/javascript'});
-                const worker = new Worker(URL.createObjectURL(workerBlob));
-                worker.postMessage({cmd:'init', w:canvas.width, h:canvas.height, amount:count, opacity:0.8});
-                worker.onmessage = e => {
-                    const {pD, sD, oD} = e.data;
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    gl.uniform2f(gl.getUniformLocation(prog, "r"), canvas.width, canvas.height);
-                    gl.uniform1f(gl.getUniformLocation(prog, "t"), performance.now()/1000);
-                    const b = (bf, l, d, z) => { gl.bindBuffer(gl.ARRAY_BUFFER, bf); gl.bufferData(gl.ARRAY_BUFFER, d, gl.STREAM_DRAW); const a = gl.getAttribLocation(prog, l); gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a, z, gl.FLOAT, false, 0, 0); };
-                    b(posB, "p", pD, 2); b(szB, "s", sD, 1); b(opB, "o", oD, 1);
-                    gl.drawArrays(gl.POINTS, 0, count);
-                };
-            }
-
-            // Load Database & Sync Data
-            const dbReq = indexedDB.open("hrn_db", 1);
-            dbReq.onsuccess = e => {
-                const db = e.target.result;
-                const tx = db.transaction('background', 'readonly');
-                const req = tx.objectStore('background').get('current_bg');
-                req.onsuccess = () => {
-                    const val = req.result ? req.result.value : null;
-                    const img = new Image();
-                    img.src = (val instanceof Blob) ? URL.createObjectURL(val) : (val || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
-                    img.onload = () => {
-                        $('bg').style.backgroundImage = `url(${img.src})`;
-                        $('bg').classList.add('loaded');
-                        checkFinish();
-                    };
-                };
-            };
-            dbReq.onupgradeneeded = e => e.target.result.createObjectStore('background', {keyPath:'id'});
-
-            syncData(true);
+            } catch(e) { updateProgress(100); checkFinish(); }
         }
 
         function checkFinish() {
-            if(currentProgress >= 100 && isDataLoaded) reveal();
-            else setTimeout(checkFinish, 50);
+            if(currentProgress >= 100) reveal();
+            else setTimeout(checkFinish, 100);
         }
 
         function reveal() {
-            const loader = $('loader');
-            if(loader.style.opacity === "0") return;
-            loader.style.opacity = 0;
-            
+            $('loader').style.opacity = 0;
             setTimeout(() => {
-                loader.style.display = 'none';
+                $('loader').style.display = 'none';
                 lucide.createIcons();
                 const h = window.location.hash.slice(1);
-                
-                if(h && cache[h]) {
-                    handleNavigation(h);
-                } else {
-                    $('ui').classList.add('active');
-                    $('tagline').classList.add('show');
-                    $('tagline').textContent = taglines[Math.floor(Math.random()*taglines.length)];
-                }
-            }, 500);
+                if(h && cache[h]) handleNavigation(h);
+                else { $('ui').classList.add('active'); $('tagline').classList.add('show'); $('tagline').textContent = taglines[Math.floor(Math.random()*taglines.length)]; }
+            }, 600);
         }
 
-        // --- NAVIGATION HANDLER ---
         function handleNavigation(hash) {
             const container = $('container');
-            const frame = $('frame');
-            const ui = $('ui');
-
             if(hash && cache[hash]) {
-                frame.classList.add('loading');
-                setTimeout(() => {
-                    frame.srcdoc = cache[hash];
-                    container.style.display = 'block';
-                    container.classList.add('active');
-                    ui.classList.remove('active'); // Hide home when in subpage
-                    frame.onload = () => frame.classList.remove('loading');
-                }, 150);
+                container.classList.add('active');
+                $('ui').classList.remove('active');
+                switchFrame(cache[hash]);
             } else {
                 container.classList.remove('active');
-                setTimeout(() => { 
-                    container.style.display = 'none'; 
-                    ui.classList.add('active'); 
-                }, 500);
+                setTimeout(() => { $('ui').classList.add('active'); }, 400);
             }
         }
 
-        // --- EVENTS & UTILS ---
         window.onhashchange = () => handleNavigation(window.location.hash.slice(1));
-        
+
+        // --- INIT PARTICLES & DB ---
+        async function init() {
+            const canvas = $('webgl-canvas');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const gl = canvas.getContext('webgl', {alpha: true});
+            if (gl) {
+                const vs = `attribute vec2 p;attribute float s;attribute float o;uniform vec2 r;void main(){gl_Position=vec4((p/r*2.0-1.0)*vec2(1,-1),0,1);gl_PointSize=s;}`;
+                const fs = `precision lowp float;uniform vec3 c;void main(){gl_FragColor=vec4(c,0.4);}`;
+                const sh = (t, s) => { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); return x; };
+                const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs));
+                gl.linkProgram(pr); gl.useProgram(pr);
+                const posB = gl.createBuffer();
+                const clr = localStorage.getItem('hrn_clr') || "#89b4fa";
+                document.documentElement.style.setProperty('--accent', clr);
+                gl.uniform3fv(gl.getUniformLocation(pr, "c"), [parseInt(clr.slice(1,3),16)/255, parseInt(clr.slice(3,5),16)/255, parseInt(clr.slice(5,7),16)/255]);
+                const worker = new Worker(URL.createObjectURL(new Blob([$('particle-worker').textContent], {type:'text/javascript'})));
+                worker.postMessage({cmd:'init', w:canvas.width, h:canvas.height, amount: 150});
+                worker.onmessage = e => {
+                    const {pD} = e.data;
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.uniform2f(gl.getUniformLocation(pr, "r"), canvas.width, canvas.height);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, posB); gl.bufferData(gl.ARRAY_BUFFER, pD, gl.STREAM_DRAW);
+                    const a = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+                    gl.drawArrays(gl.POINTS, 0, 150);
+                };
+            }
+
+            const dbReq = indexedDB.open("hrn_db", 1);
+            dbReq.onsuccess = e => {
+                const tx = e.target.result.transaction('background', 'readonly');
+                const req = tx.objectStore('background').get('current_bg');
+                req.onsuccess = () => {
+                    const img = new Image();
+                    img.src = req.result ? req.result.value : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564';
+                    img.onload = () => { $('bg').style.backgroundImage = `url(${img.src})`; $('bg').classList.add('loaded'); };
+                };
+            };
+            syncData(true);
+        }
+
         setInterval(() => {
             const n = new Date();
             $('clock').textContent = n.toTimeString().split(' ')[0];
@@ -490,12 +245,10 @@
         }, 1000);
 
         window.onload = init;
-
         window.onmessage = e => { 
             if(e.data === 'close') window.location.hash = ''; 
-            if(e.data === 'sync') syncData(); // Hier gebeurt de sync zonder refresh
+            if(e.data === 'sync') syncData(); 
         };
-
         function setHash(h) { window.location.hash = h; }
     </script>
 </body>
