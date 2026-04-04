@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Settings Core</title>
     <style>
         :root {
             --accent: #89b4fa;
@@ -26,7 +27,10 @@
             color: var(--text);
             overflow: hidden;
             height: 100vh;
-            width: 100vw
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #app-root {
@@ -58,30 +62,34 @@
         .core-pane {
             position: relative;
             z-index: 10;
-            width: 92%;
-            max-width: 400px;
-            max-height: 85vh;
+            width: 95%;
+            max-width: 650px; /* Slightly wider for PC comfort */
+            max-height: 95vh;
             background: var(--glass);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 22px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 14px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, .4);
-            overflow-y: auto
+            overflow-y: auto;
         }
 
         .core-pane::-webkit-scrollbar {
-            display: none
+            width: 4px;
+        }
+        .core-pane::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
         }
 
         .nav {
             display: flex;
             justify-content: space-between;
-            align-items: center
+            align-items: center;
         }
 
         h2 {
@@ -93,7 +101,7 @@
         }
 
         label {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
             color: var(--subtext);
             display: block;
@@ -106,8 +114,8 @@
             width: 100%;
             background: rgba(255, 255, 255, .05);
             border: 1px solid var(--border);
-            padding: 10px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 6px;
             color: #fff;
             font-size: 11px;
             outline: 0;
@@ -118,15 +126,35 @@
             border-color: var(--accent)
         }
 
+        /* Layout Grid */
+        .split-row {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr; /* Gives more space to wallpapers */
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .split-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Optimized Grid for 7+ Items */
         .preset-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px
+            grid-template-columns: repeat(4, 1fr); /* 4 items wide on PC */
+            gap: 6px;
+        }
+
+        @media (max-width: 500px) {
+            .preset-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .pre-bg {
             aspect-ratio: 16/9;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
             background-size: cover;
             background-position: center;
@@ -135,18 +163,22 @@
         }
 
         .pre-bg:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
             border-color: var(--accent)
+        }
+
+        /* Cloaking specific grid */
+        #mask-presets {
+            grid-template-columns: repeat(2, 1fr);
         }
 
         .pre-mask {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 5px;
-            padding: 8px;
+            gap: 6px;
+            padding: 6px;
             background: rgba(255, 255, 255, .03);
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             border: 1px solid var(--border);
             transition: .2s
@@ -158,22 +190,25 @@
         }
 
         .pre-mask img {
-            width: 18px;
-            height: 18px
+            width: 14px;
+            height: 14px
         }
 
         .pre-mask span {
-            font-size: 8px;
-            color: var(--subtext);
-            font-weight: 600
+            font-size: 9px;
+            color: var(--text);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .btn-action {
             width: 100%;
             background: rgba(255, 255, 255, .05);
             border: 1px solid var(--border);
-            padding: 10px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 6px;
             color: #fff;
             font-size: 10px;
             font-weight: 600;
@@ -185,21 +220,15 @@
             background: rgba(255, 255, 255, .1)
         }
 
-        .flex-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px
-        }
-
         .slider-wrap {
             width: 100%;
-            height: 35px;
+            height: 30px;
             background: rgba(255, 255, 255, .05);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
-            padding: 0 12px;
+            padding: 0 10px;
             position: relative;
             cursor: ew-resize
         }
@@ -220,8 +249,8 @@
 
         .slider-knob {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: #fff;
             border-radius: 50%;
             left: 0%;
@@ -233,16 +262,16 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px;
+            padding: 10px;
             background: rgba(255, 255, 255, .05);
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid var(--border);
             cursor: pointer
         }
 
         .dot {
-            width: 9px;
-            height: 9px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: rgba(255, 255, 255, .1);
             transition: .3s
@@ -250,7 +279,7 @@
 
         .active .dot {
             background: var(--accent);
-            box-shadow: 0 0 12px var(--accent)
+            box-shadow: 0 0 10px var(--accent)
         }
 
         .hidden-file {
@@ -266,47 +295,52 @@
         <div class="core-pane">
             <div class="nav">
                 <h2>Settings</h2>
-                <div style="cursor:pointer;font-size:20px" id="closeBtn">×</div>
+                <div style="cursor:pointer;font-size:18px" id="closeBtn">×</div>
             </div>
-            <div class="row">
+
+            <div class="split-row">
+                <div>
+                    <label>Wallpaper Presets</label>
+                    <div class="preset-grid" id="bg-presets"></div>
+                </div>
+                <div>
+                    <label>Tab Masking</label>
+                    <div class="preset-grid" id="mask-presets"></div>
+                </div>
+            </div>
+
+            <div class="split-row">
                 <div class="toggle-box" id="nav-toggle">
                     <label style="margin:0;color:#fff;cursor:pointer">Side Navigation</label>
                     <div class="dot"></div>
                 </div>
-            </div>
-            <div class="row">
-                <label>Wallpaper Presets</label>
-                <div class="preset-grid" id="bg-presets"></div>
-            </div>
-            <div class="row">
-                <label>Tab Masking</label>
-                <div class="preset-grid" id="mask-presets"></div>
-            </div>
-            <div class="row flex-group">
-                <div>
-                    <label>Accent</label>
-                    <input type="color" id="clr"
-                        style="width:100%;height:35px;background:0 0;border:1px solid var(--border);border-radius:8px;cursor:pointer;padding:3px">
-                </div>
-                <div>
-                    <label>Custom</label>
-                    <button class="btn-action" id="uploadBtn">Upload</button>
-                    <input type="file" id="bg-file" class="hidden-file" accept="image/*">
-                </div>
-            </div>
-            <div class="row">
-                <label>Remote URL</label>
-                <input type="text" id="bg" placeholder="https://...">
-            </div>
-            <div class="row">
                 <div class="toggle-box" id="part-toggle">
                     <label style="margin:0;color:#fff;cursor:pointer">Background Particles</label>
                     <div class="dot"></div>
                 </div>
             </div>
-            <div class="row flex-group">
+
+            <div class="split-row">
                 <div>
-                    <label>Density</label>
+                    <label>Accent Color</label>
+                    <input type="color" id="clr"
+                        style="width:100%;height:30px;background:0 0;border:1px solid var(--border);border-radius:6px;cursor:pointer;padding:2px">
+                </div>
+                <div>
+                    <label>Local Upload</label>
+                    <button class="btn-action" id="uploadBtn" style="height:30px">Select Image</button>
+                    <input type="file" id="bg-file" class="hidden-file" accept="image/*">
+                </div>
+            </div>
+
+            <div class="row">
+                <label>Remote Image URL</label>
+                <input type="text" id="bg" placeholder="https://example.com/image.png">
+            </div>
+
+            <div class="split-row">
+                <div>
+                    <label>Particle Density</label>
                     <div class="slider-wrap" id="slider-int" data-min="0.1" data-max="4.0" data-step="0.1">
                         <div class="slider-track">
                             <div class="slider-fill"></div>
@@ -315,7 +349,7 @@
                     </div>
                 </div>
                 <div>
-                    <label>Opacity</label>
+                    <label>Glass Opacity</label>
                     <div class="slider-wrap" id="slider-op" data-min="0.1" data-max="1" data-step="0.05">
                         <div class="slider-track">
                             <div class="slider-fill"></div>
@@ -324,22 +358,25 @@
                     </div>
                 </div>
             </div>
-            <div class="row flex-group">
+
+            <div class="split-row">
                 <div>
-                    <label>Title</label>
+                    <label>Page Title</label>
                     <input type="text" id="title">
                 </div>
                 <div>
-                    <label>Favicon</label>
+                    <label>Favicon URL</label>
                     <input type="text" id="fav">
                 </div>
             </div>
-            <div class="row flex-group">
-                <button class="btn-action" id="resetBgBtn" style="color:#f38ba8">Reset BG</button>
-                <button class="btn-action" id="resetAllBtn" style="color:#f38ba8">Purge All</button>
+
+            <div class="split-row">
+                <button class="btn-action" id="resetBgBtn" style="color:#f38ba8; border-color: rgba(243,139,168,0.15)">Reset BG</button>
+                <button class="btn-action" id="resetAllBtn" style="color:#f38ba8; border-color: rgba(243,139,168,0.15)">Purge All</button>
             </div>
         </div>
     </div>
+
     <script>
         (async () => {
             const syncMessage = () => window.parent.postMessage("sync", "*");
@@ -351,7 +388,7 @@
                 op: .8,
                 int: 1.1,
                 fav: "",
-                part: !0
+                part: true
             };
 
             const bgPresets = [
@@ -433,7 +470,6 @@
                 syncMessage();
             }
 
-            // Render BG Presets
             const bgContainer = document.getElementById("bg-presets");
             bgPresets.forEach((item) => {
                 const div = document.createElement("div");
@@ -443,7 +479,6 @@
                 bgContainer.appendChild(div);
             });
 
-            // Render Mask Presets
             const maskContainer = document.getElementById("mask-presets");
             maskPresets.forEach((item) => {
                 const div = document.createElement("div");
@@ -463,6 +498,7 @@
 
             function updateSliderUI(id, val) {
                 const el = document.getElementById(id);
+                if(!el) return;
                 const min = parseFloat(el.dataset.min);
                 const max = parseFloat(el.dataset.max);
                 const pct = (val - min) / (max - min) * 100;
@@ -475,7 +511,7 @@
                 const min = parseFloat(el.dataset.min);
                 const max = parseFloat(el.dataset.max);
                 const step = parseFloat(el.dataset.step);
-                let dragging = !1;
+                let dragging = false;
 
                 const update = (e) => {
                     const rect = el.getBoundingClientRect();
@@ -488,12 +524,12 @@
                     syncMessage();
                 };
 
-                el.onmousedown = (e) => { dragging = !0; update(e); };
+                el.onmousedown = (e) => { dragging = true; update(e); };
                 window.onmousemove = (e) => { if (dragging) update(e); };
-                window.onmouseup = () => dragging = !1;
-                el.ontouchstart = (e) => { dragging = !0; update(e); };
+                window.onmouseup = () => dragging = false;
+                el.ontouchstart = (e) => { dragging = true; update(e); };
                 window.ontouchmove = (e) => { if (dragging) update(e); };
-                window.ontouchend = () => dragging = !1;
+                window.ontouchend = () => dragging = false;
 
                 const saved = localStorage.getItem("hrn_" + key) || (id.includes("int") ? 1.1 : .8);
                 updateSliderUI(id, parseFloat(saved));
@@ -541,8 +577,10 @@
 
             document.getElementById("resetBgBtn").onclick = () => setBackground(defaultBg);
             document.getElementById("resetAllBtn").onclick = () => {
-                localStorage.clear();
-                location.reload();
+                if(confirm("Purge all data?")) {
+                    localStorage.clear();
+                    location.reload();
+                }
             };
 
             document.getElementById("closeBtn").onclick = () => window.parent.postMessage("close", "*");
