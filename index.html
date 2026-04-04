@@ -19,44 +19,49 @@
             background-size: cover; background-position: center;
             opacity: 0; filter: brightness(.4) blur(60px);
             transform: scale(1.25); will-change: transform, filter, opacity;
-            transition: opacity 2.5s ease, filter 3.2s cubic-bezier(0.16, 1, 0.3, 1), transform 3.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 2s ease, filter 2.5s cubic-bezier(0.16, 1, 0.3, 1), transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .ambient-bg.loaded { opacity: 1; filter: brightness(.6) blur(0px); transform: scale(1); }
         .overlay-dim{position:fixed;inset:0;z-index:2;background:rgba(0,0,0,.2);pointer-events:none}
-
         #webgl-canvas{position:fixed;inset:0;z-index:3;pointer-events:none}
 
         /* --- LOADER --- */
-        #loader{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity 1s ease}
-        .load-line{width:240px;height:2px;background:rgba(255,255,255,.05);position:relative;overflow:hidden;border-radius:10px}
-        #progress{position:absolute;height:100%;width:0%;background:var(--accent);transition:width .3s ease;box-shadow:0 0 20px var(--accent)}
+        #loader{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s ease}
+        .load-line{width:240px;height:2px;background:rgba(255,255,255,.05);position:relative;overflow:hidden;border-radius:10px;margin-bottom:15px}
+        #progress{position:absolute;height:100%;width:0%;background:var(--accent);transition:width 0.2s ease-out;box-shadow:0 0 20px var(--accent)}
+        #load-perc{font-size:10px;font-weight:900;letter-spacing:2px;opacity:0;transition:opacity 0.3s ease}
 
-        /* --- UI SPACING --- */
-        .wrapper{position:relative;height:100dvh;width:100%;z-index:10;opacity:0;transition:1.8s cubic-bezier(0.16, 1, 0.3, 1)}
-        .wrapper.active{opacity:1}
+        /* --- UI WRAPPER --- */
+        .wrapper{position:relative;height:100dvh;width:100%;z-index:10;opacity:0;display:none;transition:1.5s cubic-bezier(0.16, 1, 0.3, 1)}
+        .wrapper.active{opacity:1;display:block}
         
         .header{position:absolute;top:45px;width:100%;display:flex;justify-content:center}
         .status-pill{background:rgba(0,0,0,.45);border:1px solid var(--ui-border);padding:12px 32px;border-radius:100px;backdrop-filter:blur(15px);font-size:10px;font-weight:900;letter-spacing:3px;display:flex;gap:35px}
         
         .brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:100%;pointer-events:none}
         .logo{font-size:clamp(6rem, 25vw, 13rem);font-weight:900;letter-spacing:-.06em;line-height:.8;background:linear-gradient(180deg,#fff 40%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:.7}
-        .tagline{font-size:11px;font-weight:600;letter-spacing:10px;margin-top:40px;opacity:0;transform:translateY(20px);transition:1.5s ease 0.6s}
+        .tagline{font-size:11px;font-weight:600;letter-spacing:10px;margin-top:40px;opacity:0;transform:translateY(20px);transition:1s ease}
         .tagline.show{opacity:.9;transform:translateY(0)}
 
-        .btn{width:68px;height:68px;border-radius:24px;background:rgba(0,0,0,.4);border:1px solid var(--ui-border);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.4s cubic-bezier(0.16, 1, 0.3, 1);backdrop-filter:blur(20px);pointer-events:all}
-        .btn:hover{background:rgba(255,255,255,.1);transform:scale(1.12) translateY(-4px);border-color:rgba(255,255,255,.3);box-shadow:0 20px 40px rgba(0,0,0,0.4)}
-        .btn svg{width:24px;height:24px}
+        .btn{width:68px;height:68px;border-radius:24px;background:rgba(0,0,0,.4);border:1px solid var(--ui-border);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.3s cubic-bezier(0.16, 1, 0.3, 1);backdrop-filter:blur(20px)}
+        .btn:hover{background:rgba(255,255,255,.1);transform:scale(1.1) translateY(-2px);border-color:rgba(255,255,255,.3)}
         
         .side-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:25px;padding:0 60px;z-index:20}
         .nav-left{left:0} .nav-right{right:0}
 
-        #container{position:fixed;inset:0;z-index:1000;opacity:0;visibility:hidden;transition:0.7s cubic-bezier(0.16, 1, 0.3, 1);backdrop-filter:blur(30px);background:rgba(0,0,0,0.5)}
+        /* --- CONTAINER --- */
+        #container{position:fixed;inset:0;z-index:1000;opacity:0;visibility:hidden;transition:0.5s cubic-bezier(0.16, 1, 0.3, 1);backdrop-filter:blur(30px);background:rgba(0,0,0,0.6)}
         #container.active{opacity:1;visibility:visible}
-        iframe{width:100%;height:100%;border:none}
+        iframe{width:100%;height:100%;border:none;transition:opacity 0.3s ease}
+        iframe.loading{opacity:0}
     </style>
 </head>
 <body>
-    <div id="loader"><div class="load-line"><div id="progress"></div></div></div>
+    <div id="loader">
+        <div class="load-line"><div id="progress"></div></div>
+        <div id="load-perc">0%</div>
+    </div>
+    
     <div class="ambient-bg" id="bg"></div>
     <div class="overlay-dim"></div>
     <canvas id="webgl-canvas"></canvas>
@@ -76,6 +81,7 @@
             <div class="btn" onclick="setHash('add')"><i data-lucide="plus"></i></div>
         </div>
     </div>
+
     <div id="container"><iframe id="frame"></iframe></div>
 
     <script id="particle-worker" type="application/javascript">
@@ -86,8 +92,8 @@
                 c = amount;
                 p = Array.from({length: c}, () => ({
                     x: Math.random() * w, y: Math.random() * h,
-                    vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
-                    s: Math.random() * 2.5 + 2, o: opacity * (Math.random() * 0.5 + 0.5)
+                    vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+                    s: Math.random() * 2.5 + 1.5, o: opacity * (Math.random() * 0.5 + 0.5)
                 }));
                 const u = () => {
                     const pD = new Float32Array(c * 2), sD = new Float32Array(c), oD = new Float32Array(c);
@@ -106,11 +112,24 @@
         const $ = id => document.getElementById(id);
         const taglines = ["YOU ARE THE AURA","LEGEND IN MAKING","POWER WITHIN YOU","OWN THE GAME","RISE ABOVE ALL"];
         let cache = {}, gl, prog, posB, szB, opB, count;
+        let currentProgress = 0;
+
+        function updateProgress(target) {
+            if(target > 0) $('load-perc').style.opacity = 1;
+            const step = () => {
+                if (currentProgress < target) {
+                    currentProgress += (target - currentProgress) * 0.1 + 1;
+                    if(currentProgress > target) currentProgress = target;
+                    $('progress').style.width = currentProgress + '%';
+                    $('load-perc').textContent = Math.floor(currentProgress) + '%';
+                    requestAnimationFrame(step);
+                }
+            }
+            requestAnimationFrame(step);
+        }
 
         async function init() {
-            const safe = setTimeout(() => reveal(), 6000);
-            
-            // 1. Particle System
+            // Particles setup
             const canvas = $('webgl-canvas');
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             gl = canvas.getContext('webgl', {alpha: true});
@@ -139,25 +158,25 @@
                 };
             }
 
-            // 2. Fetch pages.txt with Progress
-            lucide.createIcons();
+            // Fetch pages.txt
             try {
                 const response = await fetch('./pages.txt');
                 const reader = response.body.getReader();
-                const total = +response.headers.get('Content-Length') || 100000; // Fallback 100kb
+                const total = +response.headers.get('Content-Length') || 100000;
                 let received = 0; let chunks = [];
                 while(true) {
                     const {done, value} = await reader.read();
                     if(done) break;
                     chunks.push(value); received += value.length;
-                    $('progress').style.width = (received / total * 100) + '%';
+                    updateProgress(Math.min(95, Math.floor((received / total) * 100)));
                 }
                 const text = new TextDecoder().decode(new Uint8Array(chunks.reduce((a,c) => [...a, ...c], [])));
                 const regex = /\/:(\w+):\/\s*([\s\S]*?)(?=\/:\w+:\/|$)/g;
                 let m; while ((m = regex.exec(text)) !== null) cache[m[1]] = m[2].trim();
-            } catch(e) { console.error("Loader error"); }
+                updateProgress(100);
+            } catch(e) { updateProgress(100); }
 
-            // 3. Background Database & Reveal
+            // BG Database & Auto-reveal logic
             const dbReq = indexedDB.open("hrn_db", 1);
             dbReq.onsuccess = e => {
                 const db = e.target.result;
@@ -169,44 +188,57 @@
                     img.src = (val instanceof Blob) ? URL.createObjectURL(val) : (val || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
                     img.onload = () => {
                         $('bg').style.backgroundImage = `url(${img.src})`;
-                        setTimeout(() => {
-                            $('bg').classList.add('loaded');
-                            setTimeout(reveal, 2500); // Wacht op de blur transitie
-                        }, 200);
+                        $('bg').classList.add('loaded');
+                        checkFinish();
                     };
-                    img.onerror = () => reveal();
                 };
-                req.onerror = () => reveal();
             };
             dbReq.onupgradeneeded = e => e.target.result.createObjectStore('background', {keyPath:'id'});
+        }
 
-            function reveal() {
-                clearTimeout(safe);
-                if($('loader').style.opacity === "0") return;
-                $('loader').style.opacity = 0;
-                setTimeout(() => {
-                    $('loader').style.display = 'none';
+        function checkFinish() {
+            if(currentProgress >= 100) reveal();
+            else setTimeout(checkFinish, 100);
+        }
+
+        function reveal() {
+            if($('loader').style.opacity === "0") return;
+            $('loader').style.opacity = 0;
+            
+            setTimeout(() => {
+                $('loader').style.display = 'none';
+                lucide.createIcons();
+                const h = window.location.hash.slice(1);
+                if(h && cache[h]) handleNavigation(h);
+                else {
                     $('ui').classList.add('active');
                     $('tagline').classList.add('show');
                     $('tagline').textContent = taglines[Math.floor(Math.random()*taglines.length)];
-                    if(window.location.hash) window.onhashchange();
-                }, 1000);
+                }
+            }, 500);
+        }
+
+        function handleNavigation(hash) {
+            const container = $('container');
+            const frame = $('frame');
+            if(hash && cache[hash]) {
+                frame.classList.add('loading');
+                setTimeout(() => {
+                    frame.srcdoc = cache[hash];
+                    container.style.display = 'block';
+                    container.classList.add('active');
+                    frame.onload = () => frame.classList.remove('loading');
+                }, 150);
+            } else {
+                container.classList.remove('active');
+                setTimeout(() => { 
+                    container.style.display = 'none'; 
+                    $('ui').classList.add('active'); 
+                }, 500);
             }
         }
 
-        window.onhashchange = () => {
-            const h = window.location.hash.slice(1);
-            const c = $('container');
-            if(h && cache[h]) {
-                $('frame').srcdoc = cache[h];
-                c.style.display = 'block';
-                setTimeout(() => c.classList.add('active'), 10);
-            } else {
-                c.classList.remove('active');
-                setTimeout(() => { if(!window.location.hash) c.style.display='none'; }, 700);
-            }
-        };
-
+        window.onhashchange = () => handleNavigation(window.location.hash.slice(1));
         setInterval(() => {
             const n = new Date();
             $('clock').textContent = n.toTimeString().split(' ')[0];
@@ -214,7 +246,10 @@
         }, 1000);
 
         window.onload = init;
-        window.onmessage = e => { if(e.data === 'close') window.location.hash = ''; if(e.data === 'sync') location.reload(); };
+        window.onmessage = e => { 
+            if(e.data === 'close') window.location.hash = ''; 
+            if(e.data === 'sync') location.reload(); 
+        };
         function setHash(h) { window.location.hash = h; }
     </script>
 </body>
