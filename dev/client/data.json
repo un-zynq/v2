@@ -1,0 +1,85 @@
+{
+  "groups": [
+    {
+      "title": "Introduction",
+      "items": [
+        {
+          "id": "home",
+          "label": "About HRN",
+          "icon": "home",
+          "badge": "v7.3",
+          "content": "# HRN Core v7.3\n\nThe `HRN` class is a high-performance, zero-UI data engine built for handling large game libraries (528+ entries).\n\nIt focuses on speed, caching, and clean data access without interfering with your UI.\n\n### Core Features\n\n* **Pure Data Layer**: No UI logic, just clean structured data.\n* **Smart Caching**: Uses Cache API for instant reloads.\n* **Flattened Data**: Nested JSON → simple array.\n* **Favorites & History**: Built-in localStorage persistence.\n* **Fast Search**: Optimized filtering + ranking.\n\n### Installation\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.3.js\"></script>\n```\n\n### Basic Usage\n\n```javascript\nconst hrn = new HRN();\nawait hrn.load();\n\nconsole.log(hrn.all());\n```"
+        },
+        {
+          "id": "quickstart",
+          "label": "Quick Start",
+          "icon": "play-circle",
+          "badge": "Start here",
+          "content": "# Quick Start\n\n### 1. Initialize\n\n```javascript\nconst hrn = new HRN();\n```\n\n### 2. Load Data\n\n```javascript\nawait hrn.load();\n```\n\n### 3. Get All Games\n\n```javascript\nconst games = hrn.all();\n```\n\n### 4. Search\n\n```javascript\nconst results = hrn.search(\"minecraft\");\n```\n\n### 5. Random Game\n\n```javascript\nconst game = hrn.random();\n```"
+        }
+      ]
+    },
+    {
+      "title": "Core API",
+      "items": [
+        {
+          "id": "load",
+          "label": "load()",
+          "icon": "download",
+          "content": "# load()\n\nFetches and caches the game database.\n\n### Behavior\n\n* Uses Cache API (`hrn-v7-cache`)\n* Loads instantly if cached\n* Updates in background\n\n```javascript\nawait hrn.load();\n```\n\n### Returns\n\n`Promise<Array>` → parsed game list"
+        },
+        {
+          "id": "data-methods",
+          "label": "Data Methods",
+          "icon": "database",
+          "content": "# Data Methods\n\n### all()\nReturns all games.\n\n```javascript\nhrn.all();\n```\n\n### get(alias)\nGet a single game.\n\n```javascript\nhrn.get(\"minecraft\");\n```\n\n### search(query)\nSearch by name or alias.\n\n```javascript\nhrn.search(\"car\");\n```\n\n### filter(key, value)\nFilter by property.\n\n```javascript\nhrn.filter(\"group\", \"arcade\");\n```\n\n### groups()\nGet all unique groups.\n\n```javascript\nhrn.groups();\n```"
+        },
+        {
+          "id": "random",
+          "label": "Random & Stats",
+          "icon": "shuffle",
+          "content": "# Random & Stats\n\n### random(n)\nGet random games.\n\n```javascript\nhrn.random();\nhrn.random(5);\n```\n\n### stats()\nBasic stats.\n\n```javascript\nhrn.stats();\n```\n\n### Returns\n\n```json\n{\n  \"count\": 528,\n  \"groups\": 12\n}\n```"
+        }
+      ]
+    },
+    {
+      "title": "Metadata",
+      "items": [
+        {
+          "id": "meta",
+          "label": "getMeta()",
+          "icon": "tag",
+          "content": "# getMeta(alias)\n\nReturns metadata for SEO or previews.\n\n```javascript\nhrn.getMeta(\"minecraft\");\n```\n\n### Output\n\n```json\n{\n  \"title\": \"Minecraft | HRN\",\n  \"image\": \"cdn-url\",\n  \"group\": \"sandbox\"\n}\n```"
+        }
+      ]
+    },
+    {
+      "title": "Persistence",
+      "items": [
+        {
+          "id": "favorites",
+          "label": "Favorites",
+          "icon": "heart",
+          "content": "# Favorites\n\nStored in `localStorage` under `hrn_f`.\n\n### toggleFav(alias)\n\n```javascript\nhrn.toggleFav(\"minecraft\");\n```\n\n### getFavs()\n\n```javascript\nhrn.getFavs();\n```"
+        },
+        {
+          "id": "history",
+          "label": "History",
+          "icon": "clock",
+          "content": "# History\n\nStored in `localStorage` under `hrn_h`.\n\n### logHistory(alias)\n\n```javascript\nhrn.logHistory(\"minecraft\");\n```\n\n### getHistory()\n\n```javascript\nhrn.getHistory();\n```\n\n### Notes\n\n* Max 20 entries\n* Most recent first"
+        }
+      ]
+    },
+    {
+      "title": "Data Structure",
+      "items": [
+        {
+          "id": "game-object",
+          "label": "Game Object",
+          "icon": "box",
+          "content": "# Game Object\n\nEach game is normalized into this structure:\n\n```json\n{\n  \"name\": \"Game Name\",\n  \"alias\": \"game-id\",\n  \"group\": \"category\",\n  \"url\": \"category/game-id\",\n  \"splash\": \"cdn-url.webp\",\n  \"rank\": 0,\n  \"isFav\": false\n}\n```\n\n### Notes\n\n* `alias` comes from JSON key\n* `url` is auto-generated\n* `splash` uses CDN path\n* `isFav` is dynamic"
+        }
+      ]
+    }
+  ]
+}
