@@ -5,6 +5,7 @@ export class HRN {
     this.data = [];
     this.favs = JSON.parse(localStorage.getItem("hrn_f")) || [];
     this.h = JSON.parse(localStorage.getItem("hrn_h")) || [];
+    this.activeGame = null;
   }
 
   async load() {
@@ -54,9 +55,14 @@ export class HRN {
 
   fav(a) {
     const i = this.favs.indexOf(a);
-    i === -1 ? this.favs.push(a) : this.favs.splice(i, 1);
+    if (i === -1) {
+      this.favs.push(a);
+    } else {
+      this.favs.splice(i, 1);
+    }
     localStorage.setItem("hrn_f", JSON.stringify(this.favs));
-    this.data.forEach(g => { if(g.alias === a) g.isFav = !i===-1; });
+    const g = this.get(a);
+    if (g) g.isFav = i === -1;
     return this.getFavs();
   }
 
@@ -94,5 +100,69 @@ export class HRN {
     localStorage.removeItem("hrn_h");
     this.favs = [];
     this.h = [];
+  }
+
+  launch(a, target) {
+    const g = this.get(a);
+    if (!g) return;
+    this.log(a);
+    this.activeGame = g;
+    const el = typeof target === 'string' ? document.getElementById(target) : target;
+    if (!el) return;
+    
+    el.innerHTML = `
+      <div id="hrn-player" style="position:relative;width:100%;height:100%;background:#000;overflow:hidden;">
+        <div id="hrn-splash" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:url('${g.splash}') center/cover no-repeat;z-index:2;transition:opacity .5s;">
+          <div style="background:rgba(0,0,0,0.6);padding:2rem;border-radius:1rem;text-align:center;backdrop-filter:blur(5px);color:#fff;">
+            <h2 style="margin:0 0 1rem 0;font-family:sans-serif;">${g.name}</h2>
+            <div style="width:50px;height:50px;border:5px solid #fff;border-top-color:transparent;border-radius:50%;animation:hrn-spin 1s linear infinite;"></div>
+          </div>
+        </div>
+        <iframe id="hrn-frame" src="${g.url}" style="width:100%;height:100%;border:none;opacity:0;transition:opacity .5s;" allow="autoplay;fullscreen;keyboard"></iframe>
+      </div>
+      <style>
+        @keyframes hrn-spin { to { transform: rotate(360deg); } }
+      </style>
+    `;
+
+    const fr = el.querySelector('#hrn-frame');
+    const sp = el.querySelector('#hrn-splash');
+    
+    fr.onload = () => {
+      setTimeout(() => {
+        sp.style.opacity = '0';
+        fr.style.opacity = '1';
+        setTimeout(() => sp.remove(), 500);
+      }, 1500);
+    };
+  }
+
+  injectMeta(a) {
+    const g = this.get(a);
+    if (!g) return;
+    document.title = `${g.name} - HRN Engine`;
+    const meta = {
+      "description": `Speel ${g.name} op de HRN portal.`,
+      "og:title": g.name,
+      "og:image": g.splash,
+      "og:type": "website"
+    };
+    Object.entries(meta).forEach(([k, v]) => {
+      let m = document.querySelector(`meta[name="${k}"], meta[property="${k}"]`);
+      if (!m) {
+        m = document.createElement('meta');
+        if (k.startsWith('og:')) m.setAttribute('property', k);
+        else m.setAttribute('name', k);
+        document.head.appendChild(m);
+      }
+      m.content = v;
+    });
+  }
+
+  preload(n = 5) {
+    this.data.slice(0, n).forEach(g => {
+      const img = new Image();
+      img.src = g.splash;
+    });
   }
 }
