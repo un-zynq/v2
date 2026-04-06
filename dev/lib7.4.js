@@ -1,10 +1,6 @@
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) define([], factory);
-    else if (typeof module === 'object' && module.exports) module.exports = factory();
-    else root.HRN = factory();
-}(typeof self !== 'undefined' ? self : this, function () {
-    'use strict';
+'use strict';
 
+window.HRN = (function () {
     class HRN {
         constructor() {
             this.config = {
@@ -17,12 +13,16 @@
             this.favs = this._initStorage('hrn_f', true);
             this.history = this._initStorage('hrn_h', false);
             
+            // Moderne browser checks
             this.isModern = typeof Map !== 'undefined' && typeof Intl !== 'undefined';
             this.sorter = this.isModern ? new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }) : null;
         }
 
+        /**
+         * Laadt de database met Cache-First strategie (Apex-speed)
+         */
         async load() {
-            const useCache = typeof window !== 'undefined' && !!window.caches;
+            const useCache = 'caches' in window;
             
             try {
                 if (useCache) {
@@ -32,6 +32,7 @@
                     if (match) {
                         const cachedData = await match.json();
                         this._parse(cachedData);
+                        // Update cache op de achtergrond
                         this._fetchAndCache(storage).catch(() => {});
                         return this.data;
                     }
@@ -40,6 +41,7 @@
                 
                 return await this._fetchStandard();
             } catch (e) {
+                console.error("HRN Load Error:", e);
                 return [];
             }
         }
@@ -48,24 +50,24 @@
             const res = await fetch(this.config.src);
             const json = await res.json();
             this._parse(json);
-            if (storage) storage.put(this.config.src, new Response(JSON.stringify(json)));
+            storage.put(this.config.src, new Response(JSON.stringify(json)));
             return this.data;
         }
 
         async _fetchStandard() {
-            if (typeof fetch === 'function') {
-                const r = await fetch(this.config.src);
-                const j = await r.json();
-                return this._parse(j);
-            }
-            return new Promise((res) => this._loadXHR(res));
+            const r = await fetch(this.config.src);
+            const j = await r.json();
+            return this._parse(j);
         }
 
+        /**
+         * Verwerkt de JSON shards naar een platte, gesorteerde lijst
+         */
         _parse(j) {
             if (!Array.isArray(j)) return this.data;
 
             const list = [];
-            const map = this.isModern ? new Map() : {};
+            const map = new Map();
 
             for (let i = 0; i < j.length; i++) {
                 const shard = j[i];
@@ -79,26 +81,25 @@
                             alias: key,
                             url: group + "/" + key,
                             splash: this.config.cdn + "/" + group + "/" + key + ".webp",
-                            isFav: this.isModern ? this.favs.has(key) : (this.favs.indexOf(key) !== -1)
+                            isFav: this.favs.has(key)
                         };
                         
                         list.push(game);
-                        if (this.isModern) map.set(key, game); else map[key] = game;
+                        map.set(key, game);
                     }
                 }
             }
 
-            this.data = list.sort((a, b) => 
-                this.isModern ? this.sorter.compare(a.name, b.name) : a.name.localeCompare(b.name)
-            );
-
+            // Sorteer A-Z
+            this.data = list.sort((a, b) => this.sorter.compare(a.name, b.name));
             this._map = map;
             return this.data;
         }
 
+        // --- DATA API ---
+
         get(alias) {
-            if (!alias) return null;
-            return this.isModern ? this._map.get(alias) : this._map[alias] || null;
+            return this._map.get(alias) || null;
         }
 
         all() {
@@ -114,26 +115,25 @@
         }
 
         random(n = 1) {
-            const d = this.data;
-            if (d.length === 0) return null;
-            if (n === 1) return d[(Math.random() * d.length) | 0];
-            return [...d].sort(() => 0.5 - Math.random()).slice(0, n);
+            if (this.data.length === 0) return null;
+            if (n === 1) return this.data[(Math.random() * this.data.length) | 0];
+            return [...this.data].sort(() => 0.5 - Math.random()).slice(0, n);
         }
+
+        // --- STORAGE & PERSISTENCE ---
 
         toggleFav(alias) {
             const g = this.get(alias);
             if (!g) return;
 
-            if (this.isModern) {
-                this.favs.has(alias) ? this.favs.delete(alias) : this.favs.add(alias);
-                g.isFav = this.favs.has(alias);
-                this._sync('hrn_f', Array.from(this.favs));
+            if (this.favs.has(alias)) {
+                this.favs.delete(alias);
             } else {
-                const i = this.favs.indexOf(alias);
-                if (i === -1) this.favs.push(alias); else this.favs.splice(i, 1);
-                g.isFav = i === -1;
-                this._sync('hrn_f', this.favs);
+                this.favs.add(alias);
             }
+            
+            g.isFav = this.favs.has(alias);
+            localStorage.setItem('hrn_f', JSON.stringify(Array.from(this.favs)));
             return g.isFav;
         }
 
@@ -143,7 +143,7 @@
 
         logHistory(alias) {
             this.history = [alias, ...this.history.filter(x => x !== alias)].slice(0, 30);
-            this._sync('hrn_h', this.history);
+            localStorage.setItem('hrn_h', JSON.stringify(this.history));
         }
 
         getHistory() {
@@ -152,32 +152,14 @@
 
         _initStorage(key, asSet) {
             try {
-                const s = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
+                const s = localStorage.getItem(key);
                 const d = s ? JSON.parse(s) : [];
-                return (asSet && this.isModern) ? new Set(d) : d;
+                return asSet ? new Set(d) : d;
             } catch (e) {
                 return asSet ? new Set() : [];
             }
         }
-
-        _sync(key, val) {
-            try { 
-                if (typeof localStorage !== 'undefined') localStorage.setItem(key, JSON.stringify(val)); 
-            } catch (e) {}
-        }
-
-        _loadXHR(res) {
-            if (typeof XMLHttpRequest === 'undefined') return res([]);
-            const x = new XMLHttpRequest();
-            x.open("GET", this.config.src, true);
-            x.onload = () => {
-                try { res(this._parse(JSON.parse(x.responseText))); } 
-                catch (e) { res([]); }
-            };
-            x.onerror = () => res([]);
-            x.send();
-        }
     }
 
     return new HRN();
-}));
+})();
