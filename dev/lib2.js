@@ -11,25 +11,25 @@ export class HRN {
     const res = await fetch(this.url);
     const json = await res.json();
 
-    // flatten alles naar 1 lijst
     const games = [];
 
-    const groups = json[0]; // g1 - g5
+    // 🔥 FIX: pak ALLE groepen (g1–g5)
+    json.forEach(entry => {
+      for (const group in entry) {
+        const groupData = entry[group];
 
-    for (const groupName in groups) {
-      const group = groups[groupName];
+        for (const key in groupData) {
+          const game = groupData[key];
 
-      for (const key in group) {
-        const game = group[key];
-
-        games.push({
-          name: game.name,
-          alias: game.alias,
-          group: groupName,
-          splash: `${this.cdn}/${groupName}/${game.alias}.webp`
-        });
+          games.push({
+            name: game.name,
+            alias: game.alias,
+            group: group,
+            splash: `${this.cdn}/${group}/${game.alias}.webp`
+          });
+        }
       }
-    }
+    });
 
     this.cache = games;
     return games;
@@ -41,7 +41,12 @@ export class HRN {
 
   async getGame(alias) {
     const games = await this._fetchData();
-    return games.find(g => g.alias === alias);
+    return games.find(g => g.alias === alias) || null;
+  }
+
+  async getByGroup(group) {
+    const games = await this._fetchData();
+    return games.filter(g => g.group === group);
   }
 
   async search(query) {
@@ -51,8 +56,8 @@ export class HRN {
     );
   }
 
-  async getByGroup(group) {
+  async getRandomGame() {
     const games = await this._fetchData();
-    return games.filter(g => g.group === group);
+    return games[Math.floor(Math.random() * games.length)];
   }
 }
