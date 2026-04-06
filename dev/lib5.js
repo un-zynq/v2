@@ -17,6 +17,7 @@ export class HRN {
           Object.values(items).map(i => ({
             ...i,
             group: g,
+            url: `${g}/${i.alias}`,
             splash: `${this.cdn}/${g}/${i.alias}.webp`,
             isFav: this.favs.includes(i.alias)
           }))
