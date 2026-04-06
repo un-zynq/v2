@@ -1,8 +1,3 @@
-/**
- * HRN Core v7.9 - The "Apex" Omni-SDK
- * Architecture: Functional UMD Singleton with Lazy-Indexing
- * Performance: O(1) Access, O(log n) Search, Zero-Copy Parsing
- */
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) define([], factory);
     else if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -14,26 +9,20 @@
         constructor() {
             this.config = {
                 src: "https://un-zynq.github.io/games2.json",
-                cdn: "https://cdn.jsdelivr.net/gh/un-zynq/splash-images",
-                ver: "7.9.0"
+                cdn: "https://cdn.jsdelivr.net/gh/un-zynq/splash-images"
             };
 
             this.data = [];
             this._map = new Map();
-            this._idx = ""; // Pre-computed search string voor bliksemsnel zoeken
             this.favs = this._initStorage('hrn_f', true);
             this.history = this._initStorage('hrn_h', false);
             
-            // Performance Locks
-            this.isModern = typeof Map !== 'undefined' && 'compare' in new Intl.Collator();
-            this.sorter = this.isModern ? new Intl.Collator(undefined, { numeric: true }) : null;
+            this.isModern = typeof Map !== 'undefined' && typeof Intl !== 'undefined';
+            this.sorter = this.isModern ? new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }) : null;
         }
 
-        /**
-         * Orchestrator: Laadt data met een 'Race & Revalidate' strategie.
-         */
         async load() {
-            const useCache = typeof window !== 'undefined' && 'caches' in window;
+            const useCache = typeof window !== 'undefined' && !!window.caches;
             
             try {
                 if (useCache) {
@@ -41,9 +30,8 @@
                     const match = await storage.match(this.config.src);
                     
                     if (match) {
-                        const fastData = await match.json();
-                        this._parse(fastData);
-                        // Background refresh om de UI niet te blokkeren
+                        const cachedData = await match.json();
+                        this._parse(cachedData);
                         this._fetchAndCache(storage).catch(() => {});
                         return this.data;
                     }
@@ -52,7 +40,6 @@
                 
                 return await this._fetchStandard();
             } catch (e) {
-                console.warn("HRN: Falling back to empty state.");
                 return [];
             }
         }
@@ -68,68 +55,59 @@
         async _fetchStandard() {
             if (typeof fetch === 'function') {
                 const r = await fetch(this.config.src);
-                return this._parse(await r.json());
+                const j = await r.json();
+                return this._parse(j);
             }
             return new Promise((res) => this._loadXHR(res));
         }
 
-        /**
-         * The Engine: Single-pass transformation met Index-building.
-         */
         _parse(j) {
             if (!Array.isArray(j)) return this.data;
 
             const list = [];
-            const map = new Map();
-            let searchBlob = "";
+            const map = this.isModern ? new Map() : {};
 
-            // Single loop voor maximale CPU-cache efficiëntie
-            for (let i = 0, len = j.length; i < len; i++) {
+            for (let i = 0; i < j.length; i++) {
                 const shard = j[i];
                 for (const group in shard) {
                     const games = shard[group];
                     for (const key in games) {
                         const raw = games[key];
+                        const { rank, ...cleanInfo } = raw;
                         const game = {
-                            name: raw.name || key,
+                            ...cleanInfo,
                             alias: key,
-                            url: `${group}/${key}`,
-                            splash: `${this.config.cdn}/${group}/${key}.webp`,
+                            url: group + "/" + key,
+                            splash: this.config.cdn + "/" + group + "/" + key + ".webp",
                             isFav: this.isModern ? this.favs.has(key) : (this.favs.indexOf(key) !== -1)
                         };
                         
                         list.push(game);
-                        map.set(key, game);
-                        // Bouw een doorzoekbare 'blob' voor regex-matching
-                        searchBlob += `${key} ${game.name.toLowerCase()} |`;
+                        if (this.isModern) map.set(key, game); else map[key] = game;
                     }
                 }
             }
 
-            // Sorteer direct (A-Z)
-            this.data = this.isModern 
-                ? list.sort((a, b) => this.sorter.compare(a.name, b.name))
-                : list.sort((a, b) => a.name.localeCompare(b.name));
+            this.data = list.sort((a, b) => 
+                this.isModern ? this.sorter.compare(a.name, b.name) : a.name.localeCompare(b.name)
+            );
 
             this._map = map;
-            this._idx = searchBlob;
             return this.data;
         }
 
-        // --- ULTRA-FAST API ---
-
-        /** * O(1) Constant Time Lookup 
-         */
         get(alias) {
-            return this._map.get(alias) || null;
+            if (!alias) return null;
+            return this.isModern ? this._map.get(alias) : this._map[alias] || null;
         }
 
-        /** * Search via High-Speed Indexing 
-         */
+        all() {
+            return this.data;
+        }
+
         search(q) {
-            if (!q || q.length < 2) return this.data;
+            if (!q) return this.data;
             const s = q.toLowerCase();
-            // Filtert direct de gesorteerde lijst
             return this.data.filter(g => 
                 g.alias.includes(s) || g.name.toLowerCase().includes(s)
             );
@@ -137,11 +115,10 @@
 
         random(n = 1) {
             const d = this.data;
+            if (d.length === 0) return null;
             if (n === 1) return d[(Math.random() * d.length) | 0];
             return [...d].sort(() => 0.5 - Math.random()).slice(0, n);
         }
-
-        // --- PERSISTENCE LAYER ---
 
         toggleFav(alias) {
             const g = this.get(alias);
@@ -153,7 +130,7 @@
                 this._sync('hrn_f', Array.from(this.favs));
             } else {
                 const i = this.favs.indexOf(alias);
-                i === -1 ? this.favs.push(alias) : this.favs.splice(i, 1);
+                if (i === -1) this.favs.push(alias); else this.favs.splice(i, 1);
                 g.isFav = i === -1;
                 this._sync('hrn_f', this.favs);
             }
@@ -173,11 +150,10 @@
             return this.history.map(a => this.get(a)).filter(Boolean);
         }
 
-        // --- SYSTEM HELPERS ---
-
         _initStorage(key, asSet) {
             try {
-                const d = JSON.parse(localStorage.getItem(key)) || [];
+                const s = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
+                const d = s ? JSON.parse(s) : [];
                 return (asSet && this.isModern) ? new Set(d) : d;
             } catch (e) {
                 return asSet ? new Set() : [];
@@ -185,17 +161,23 @@
         }
 
         _sync(key, val) {
-            try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+            try { 
+                if (typeof localStorage !== 'undefined') localStorage.setItem(key, JSON.stringify(val)); 
+            } catch (e) {}
         }
 
         _loadXHR(res) {
+            if (typeof XMLHttpRequest === 'undefined') return res([]);
             const x = new XMLHttpRequest();
             x.open("GET", this.config.src, true);
-            x.onload = () => res(this._parse(JSON.parse(x.responseText)));
+            x.onload = () => {
+                try { res(this._parse(JSON.parse(x.responseText))); } 
+                catch (e) { res([]); }
+            };
             x.onerror = () => res([]);
             x.send();
         }
     }
 
-    return new HRN(); // Singleton Export
+    return new HRN();
 }));
