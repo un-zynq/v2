@@ -1,7 +1,7 @@
 /**
- * HRN Core v7.0 - Data Driven Game Engine
- * Developed by The HyperRush Network
- * Focus: Data integrity, Performance, 528 Games Scale
+ * HRN Core v7.3 - Pure Data SDK
+ * Managed by The HyperRush Network
+ * Focus: 528 Games, Zero UI-Interference, Performance.
  */
 export class HRN {
   constructor() {
@@ -10,12 +10,10 @@ export class HRN {
     this.data = [];
     this.favs = JSON.parse(localStorage.getItem("hrn_f")) || [];
     this.history = JSON.parse(localStorage.getItem("hrn_h")) || [];
-    this.active = null;
   }
 
   /**
-   * Laadt de 528 games met Stale-While-Revalidate caching.
-   * Returnt de volledige geparseerde array.
+   * Laadt de database en parseert deze naar een platte array.
    */
   async load() {
     try {
@@ -24,7 +22,7 @@ export class HRN {
       
       if (cached) {
         this._parse(await cached.json());
-        // Background update
+        // Background update voor de volgende keer
         fetch(this.source).then(r => r.json()).then(j => {
           this._parse(j);
           cache.put(this.source, new Response(JSON.stringify(j)));
@@ -37,13 +35,13 @@ export class HRN {
       }
       return this.data;
     } catch (e) {
-      console.error("HRN Load Error:", e);
+      console.error("HRN Engine Load Error:", e);
       return [];
     }
   }
 
   /**
-   * Private method: Transformeert de gestripte JSON naar bruikbare objecten.
+   * Interne parser die de object-keys gebruikt als alias/ID.
    */
   _parse(j) {
     this.data = j.flatMap(shard => 
@@ -52,6 +50,7 @@ export class HRN {
           ...info,
           alias: key,
           group: group,
+          // De relatieve URL: 'groep/alias'
           url: `${group}/${key}`,
           splash: `${this.cdn}/${group}/${key}.webp`,
           isFav: this.favs.includes(key),
@@ -61,11 +60,15 @@ export class HRN {
     );
   }
 
-  // --- DATA QUERIES ---
+  // --- DATA RETRIEVAL ---
 
-  all() { return [...this.data]; }
+  all() { 
+    return [...this.data]; 
+  }
 
-  get(alias) { return this.data.find(g => g.alias === alias) || null; }
+  get(alias) { 
+    return this.data.find(g => g.alias === alias) || null; 
+  }
 
   search(query) {
     const s = query.toLowerCase();
@@ -74,16 +77,35 @@ export class HRN {
     ).sort((a, b) => b.rank - a.rank);
   }
 
-  filter(key, value) { return this.data.filter(g => g[key] === value); }
+  filter(key, value) { 
+    return this.data.filter(g => g[key] === value); 
+  }
 
-  groups() { return [...new Set(this.data.map(g => g.group))].sort(); }
+  groups() { 
+    return [...new Set(this.data.map(g => g.group))].sort(); 
+  }
+
+  // --- UTILS ---
 
   random(n = 1) {
     const s = [...this.data].sort(() => 0.5 - Math.random());
     return n === 1 ? s[0] : s.slice(0, n);
   }
 
-  // --- STATE MANAGEMENT ---
+  /**
+   * Returnt metadata object voor SEO/Titels.
+   */
+  getMeta(alias) {
+    const g = this.get(alias);
+    if (!g) return null;
+    return {
+      title: `${g.name} | HRN`,
+      image: g.splash,
+      group: g.group
+    };
+  }
+
+  // --- PERSISTENCE ---
 
   toggleFav(alias) {
     const idx = this.favs.indexOf(alias);
@@ -93,56 +115,26 @@ export class HRN {
     localStorage.setItem("hrn_f", JSON.stringify(this.favs));
     const g = this.get(alias);
     if (g) g.isFav = (idx === -1);
-    return g;
+    return this.data.filter(x => this.favs.includes(x.alias));
   }
-
-  getFavs() { return this.data.filter(g => this.favs.includes(g.alias)); }
 
   logHistory(alias) {
     this.history = [alias, ...this.history.filter(x => x !== alias)].slice(0, 20);
     localStorage.setItem("hrn_h", JSON.stringify(this.history));
   }
 
+  getFavs() { 
+    return this.data.filter(g => this.favs.includes(g.alias)); 
+  }
+
   getHistory() { 
     return this.history.map(a => this.get(a)).filter(Boolean); 
   }
 
-  // --- ENGINE / RUNTIME ---
-
-  /**
-   * Bereidt de game voor om te spelen.
-   * Returnt een object met de nodige info, maar bouwt GEEN HTML.
-   */
-  boot(alias) {
-    const game = this.get(alias);
-    if (!game) return null;
-    this.logHistory(alias);
-    this.active = game;
-    return {
-      ...game,
-      timestamp: Date.now()
-    };
-  }
-
-  /**
-   * Handige helper voor meta-tags, puur data-driven.
-   */
-  getMeta(alias) {
-    const g = this.get(alias);
-    if (!g) return null;
-    return {
-      title: `${g.name} | HRN Core`,
-      description: `Play ${g.name} on the HyperRush Network.`,
-      image: g.splash,
-      url: window.location.href
-    };
-  }
-
   stats() {
     return {
-      total: this.data.length,
-      groups: this.groups(),
-      lastUpdated: new Date().toISOString()
+      count: this.data.length,
+      groups: this.groups().length
     };
   }
 }
