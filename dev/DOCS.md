@@ -131,11 +131,3 @@ Sorting is performed using `Intl.Collator` with `{ numeric: true }`, enabling na
 HRN implements a **Stale-While-Revalidate** strategy:
 - Delivers data from cache for instant loading
 - Updates storage in the background via network requests
-
-### Configuration & Sources
-
-- **Thumbnail CDN**: `https://cdn.jsdelivr.net/gh/un-zynq/thumbnails`
-- **Data Source**: `https://un-zynq.github.io/games2.json`
-- **localStorage Keys**:
-  - `hrn_f` — Favorites
-  - `hrn_h` — History
