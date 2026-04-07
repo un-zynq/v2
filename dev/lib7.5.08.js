@@ -1,6 +1,6 @@
 /**
- * HRN Library v7.5.04
- * Nu met instelbare opstart-filtering en method chaining.
+ * HRN Library v7.5.08
+ * Super perfecte hardware detectie + Chaining + Startup Modes
  */
 "use strict";
 
@@ -13,28 +13,25 @@ class HRN {
         this._all = [];
         this._filtered = [];
         this._favs = this._initStorage();
-        this.deviceType = 2;
+        this.deviceType = 2; 
     }
 
     /**
-     * @param {Object} options 
-     * @param {boolean} options.onlySupported - Indien true, filtert hij direct op ondersteunde devices.
+     * Initialiseert de bibliotheek.
+     * @param {Object} options - { mode: 'all' | 'supported' | 'favs' }
      */
-    async init(options = { onlySupported: false }) {
+    async init(options = { mode: 'all' }) {
         await this._runSmartDetection();
         await this._loadData();
         
-        // Keuze: start ik met alles, of filter ik direct?
-        if (options.onlySupported) {
-            this.onlySupported();
-        } else {
-            this._filtered = [...this._all];
-        }
+        if (options.mode === 'supported') this.onlySupported();
+        else if (options.mode === 'favs') this.onlyFavs();
+        else this.reset();
         
         return this;
     }
 
-    // --- De "Slimme" Device Detectie (Originele logica) ---
+    // --- De Originele Slimme Detectie ---
     async _runSmartDetection() {
         const b = navigator, c = window.screen, d = b.userAgent, e = b.maxTouchPoints || 0;
         const f = window.matchMedia("(pointer: fine)").matches, g = window.matchMedia("(hover: hover)").matches;
@@ -84,7 +81,7 @@ class HRN {
                 }
             }
             this._all = arr.sort((a, b) => a.name.localeCompare(b.name));
-        } catch (e) { console.error("HRN Error:", e); }
+        } catch (e) { console.error("HRN v7.5.08 Load Error:", e); }
     }
 
     // --- Chaining API ---
@@ -95,7 +92,7 @@ class HRN {
     }
 
     onlyFavs() {
-        this._filtered = this._filtered.filter(g => g.isFav);
+        this._filtered = this._all.filter(g => g.isFav);
         return this;
     }
 
@@ -111,7 +108,7 @@ class HRN {
 
     get list() { return this._filtered; }
 
-    // --- Helpers ---
+    // --- Fav Logic ---
     isFav(alias) { return this._favs.has(alias); }
     toggleFav(alias) {
         this._favs.has(alias) ? this._favs.delete(alias) : this._favs.add(alias);
