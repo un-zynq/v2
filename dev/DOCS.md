@@ -1,13 +1,18 @@
 # HRN Engine v7.4.2 Documentation
 
-The HRN Engine is a specialized JavaScript library designed for managing, filtering, and caching large-scale game collections. It utilizes the Cache API for persistence and Map structures for high-performance data retrieval.
+The **HRN Engine** is a high-performance JavaScript library designed for managing, filtering, and caching large-scale game collections. It leverages the Cache API for persistence and optimized Map structures for fast data retrieval.
 
 ---
 
-## Initialization
+## Installation & Initialization
 
-Load the library via the following CDN link:
-`https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.4.2.js`
+Load the library via CDN:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.4.2.js"></script>
+```
+
+Initialize the engine:
 
 ```javascript
 await window.HRN.load();
@@ -15,85 +20,122 @@ await window.HRN.load();
 
 ---
 
-## Core API Methods
+## Core API
 
-### load()
-Initializes the engine and populates the data set.
-* **Logic:** Checks the Cache API for existing data. If found, it parses the cache for immediate use and triggers a background fetch to update the storage. If no cache exists, it performs a standard fetch.
-* **Returns:** `Promise<Array>` (The sorted list of game objects).
+### `HRN.load()`
 
-### all()
-Accesses the current data set stored in memory.
-* **Returns:** `Array`
+Initializes the engine and loads the game collection.
 
-### get(alias)
-Retrieves a specific game object by its unique identifier.
-* **Parameters:** `alias` (String)
-* **Returns:** `Object` or `null`.
+**Behavior:**
+- Checks the Cache API for existing data.
+- On cache hit: parses cached data immediately and triggers a background fetch to update storage (Stale-While-Revalidate).
+- On cache miss: performs a standard fetch.
 
-### search(query)
-Filters the collection based on the alias or the display name.
-* **Parameters:** `q` (String)
-* **Returns:** `Array`
+**Returns:** `Promise<Array>` — The sorted array of game objects.
+
+### `HRN.all()`
+
+Returns the complete dataset currently held in memory.
+
+**Returns:** `Array`
+
+### `HRN.get(alias)`
+
+Retrieves a specific game object by its unique alias.
+
+**Parameters:**
+- `alias` (String)
+
+**Returns:** `Object | null`
+
+### `HRN.search(query)`
+
+Searches the collection by alias or name (partial match).
+
+**Parameters:**
+- `query` (String)
+
+**Returns:** `Array`
 
 ---
 
-## Utility Functions
+## Utility Methods
 
-### random(n)
-Selects random entries from the library.
-* **Parameters:** `n` (Number, default = 1)
-* **Returns:** `Object` (if n=1) or `Array` (if n > 1).
+### `HRN.random(n = 1)`
 
-### logHistory(alias)
-Stores a game identifier in the local history. Limits the history to the last 30 unique entries.
-* **Parameters:** `alias` (String)
+Selects random game(s) from the collection.
 
-### getHistory()
-Retrieves the game objects from the history list, ordered from most recent to oldest.
-* **Returns:** `Array`
+**Parameters:**
+- `n` (Number) — Number of items to return (default: 1)
+
+**Returns:** `Object` (when `n = 1`) or `Array` (when `n > 1`)
+
+### `HRN.logHistory(alias)`
+
+Adds a game to the viewing history. History is limited to the last 30 unique entries and stored locally.
+
+**Parameters:**
+- `alias` (String)
+
+### `HRN.getHistory()`
+
+Returns the history as game objects, ordered from most recent to oldest.
+
+**Returns:** `Array`
 
 ---
 
 ## Favorites Management
 
-Persistence is handled automatically via `localStorage`.
+Favorites are automatically persisted using `localStorage`.
 
-| Method | Description |
-| :--- | :--- |
-| `toggleFav(alias)` | Adds or removes a game from the favorites set. Returns `Boolean`. |
-| `getFavs()` | Returns an array of all game objects marked as favorites. |
+| Method                  | Description                                              | Returns                  |
+|-------------------------|----------------------------------------------------------|--------------------------|
+| `HRN.toggleFav(alias)`  | Toggles a game’s favorite status                         | `Boolean` (new status)   |
+| `HRN.getFavs()`         | Returns all games marked as favorites                    | `Array`                  |
 
 ---
 
 ## Data Structure
 
-Each game object contains the following standard properties:
+Each game object contains the following properties:
 
 ```json
 {
-    "name": "String",
-    "alias": "String",
-    "url": "String (path/alias)",
-    "splash": "String (URL to .webp, 4/3)",
-    "isFav": "Boolean"
+  "name": "string",
+  "alias": "string",
+  "url": "string",
+  "splash": "string",
+  "isFav": "boolean"
 }
 ```
+
+**Field Descriptions:**
+- `name`   — Display name of the game
+- `alias`  — Unique identifier
+- `url`    — Path or alias to the game
+- `splash` — URL to a 4:3 `.webp` thumbnail image
+- `isFav`  — Dynamically managed by the engine
 
 ---
 
 ## Technical Specifications
 
-### Sharding
-The engine is designed to parse data structured in shards to prevent main-thread blocking during large JSON operations. The `_parse` method flattens these shards into a single searchable array.
+### Sharding & Performance
+To prevent main-thread blocking with large datasets, the engine supports **sharded** JSON files. The internal `_parse` method flattens these shards into a single searchable array.
 
 ### Sorting
-Sorting is implemented using `Intl.Collator` with the `numeric` property enabled. This ensures natural alphanumeric sorting (e.g., "Game 2" precedes "Game 10").
+Sorting is performed using `Intl.Collator` with `{ numeric: true }`, enabling natural alphanumeric ordering (e.g., "Game 2" before "Game 10").
 
 ### Caching Strategy
-HRN employs a "Stale-While-Revalidate" strategy. It prioritizes the `caches` API for near-instant load times while ensuring data remains up-to-date through background network requests.
+HRN implements a **Stale-While-Revalidate** strategy:
+- Delivers data from cache for instant loading
+- Updates storage in the background via network requests
 
-### Configuration
-* **Thumbnail CDN:** `https://cdn.jsdelivr.net/gh/un-zynq/thumbnails`
-* **Data Source:** `https://un-zynq.github.io/games2.json`
-* **Storage Keys:** `hrn_f` (Favorites), `hrn_h` (History)
+### Configuration & Sources
+
+- **Thumbnail CDN**: `https://cdn.jsdelivr.net/gh/un-zynq/thumbnails`
+- **Data Source**: `https://un-zynq.github.io/games2.json`
+- **localStorage Keys**:
+  - `hrn_f` — Favorites
+  - `hrn_h` — History
