@@ -75,7 +75,7 @@ Each game object contains the following standard properties:
     "name": "String",
     "alias": "String",
     "url": "String (path/alias)",
-    "splash": "String (URL to .webp)",
+    "splash": "String (URL to .webp, 4/3)",
     "isFav": "Boolean"
 }
 ```
