@@ -1,6 +1,6 @@
 /**
- * HRN Library v7.5.08
- * Super perfecte hardware detectie + Chaining + Startup Modes
+ * HRN Library v7.5.09
+ * Geavanceerde Initialisatie + Deep State Control
  */
 "use strict";
 
@@ -17,21 +17,37 @@ class HRN {
     }
 
     /**
-     * Initialiseert de bibliotheek.
-     * @param {Object} options - { mode: 'all' | 'supported' | 'favs' }
+     * @param {Object} options - Uitgebreide configuratie
+     * @param {string} options.mode - 'all' | 'supported' | 'favs'
+     * @param {string} options.search - Direct filteren op zoekterm bij start
+     * @param {string} options.sort - 'name' | 'alias' | 'newest'
+     * @param {string} options.src - Overschrijf de standaard JSON bron
+     * @param {string} options.cdn - Overschrijf de standaard Thumbnails bron
      */
-    async init(options = { mode: 'all' }) {
+    async init(options = {}) {
+        const settings = {
+            mode: 'all',
+            search: '',
+            sort: 'name',
+            ...options
+        };
+
+        // Overschrijf config indien meegegeven
+        if (settings.src) this.config.src = settings.src;
+        if (settings.cdn) this.config.cdn = settings.cdn;
+
         await this._runSmartDetection();
-        await this._loadData();
+        await this._loadData(settings.sort);
         
-        if (options.mode === 'supported') this.onlySupported();
-        else if (options.mode === 'favs') this.onlyFavs();
-        else this.reset();
+        // Verwerk initiële filters
+        this.search(settings.search);
+
+        if (settings.mode === 'supported') this.onlySupported();
+        else if (settings.mode === 'favs') this.onlyFavs();
         
         return this;
     }
 
-    // --- De Originele Slimme Detectie ---
     async _runSmartDetection() {
         const b = navigator, c = window.screen, d = b.userAgent, e = b.maxTouchPoints || 0;
         const f = window.matchMedia("(pointer: fine)").matches, g = window.matchMedia("(hover: hover)").matches;
@@ -47,19 +63,12 @@ class HRN {
         if (/Android|iPhone|iPad|iPod/i.test(d)) m += 20;
         if (/Adreno|Mali|PowerVR|Apple GPU/i.test(k)) m += 25;
 
-        if (l > m) {
-            this.deviceType = (e > 0) ? 1 : 2;
-        } else {
-            if (b.platform === 'MacIntel' && e > 1) {
-                this.deviceType = 4;
-            } else {
-                const o = (c.width >= 1024 || c.height >= 1024 || (c.width >= 768 && e > 1));
-                this.deviceType = o ? 4 : 3;
-            }
-        }
+        if (l > m) this.deviceType = (e > 0) ? 1 : 2;
+        else if (b.platform === 'MacIntel' && e > 1) this.deviceType = 4;
+        else this.deviceType = (c.width >= 1024 || c.height >= 1024 || (c.width >= 768 && e > 1)) ? 4 : 3;
     }
 
-    async _loadData() {
+    async _loadData(sortKey) {
         try {
             const res = await fetch(this.config.src);
             const json = await res.json();
@@ -80,11 +89,11 @@ class HRN {
                     }
                 }
             }
-            this._all = arr.sort((a, b) => a.name.localeCompare(b.name));
-        } catch (e) { console.error("HRN v7.5.08 Load Error:", e); }
+            // Sorteren op basis van de gekozen init-optie
+            this._all = arr.sort((a, b) => (a[sortKey] || '').localeCompare(b[sortKey] || ''));
+        } catch (e) { console.error("HRN v7.5.09 Load Error:", e); }
     }
 
-    // --- Chaining API ---
     search(q) {
         const term = q?.toLowerCase().trim();
         this._filtered = term ? this._all.filter(g => g.name.toLowerCase().includes(term) || g.alias.toLowerCase().includes(term)) : [...this._all];
@@ -92,12 +101,12 @@ class HRN {
     }
 
     onlyFavs() {
-        this._filtered = this._all.filter(g => g.isFav);
+        this._filtered = this._filtered.filter(g => g.isFav);
         return this;
     }
 
     onlySupported() {
-        this._filtered = this._all.filter(g => g.isSupported);
+        this._filtered = this._filtered.filter(g => g.isSupported);
         return this;
     }
 
@@ -108,7 +117,6 @@ class HRN {
 
     get list() { return this._filtered; }
 
-    // --- Fav Logic ---
     isFav(alias) { return this._favs.has(alias); }
     toggleFav(alias) {
         this._favs.has(alias) ? this._favs.delete(alias) : this._favs.add(alias);
