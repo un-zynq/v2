@@ -5,7 +5,7 @@ window.HRN = (function () {
         constructor() {
             this.config = {
                 src: "https://un-zynq.github.io/games2.json",
-                cdn: "https://cdn.jsdelivr.net/gh/un-zynq/splash-images"
+                cdn: "https://cdn.jsdelivr.net/gh/un-zynq/thumbnails"
             };
 
             this.data = [];
@@ -13,14 +13,10 @@ window.HRN = (function () {
             this.favs = this._initStorage('hrn_f', true);
             this.history = this._initStorage('hrn_h', false);
             
-            // Moderne browser checks
             this.isModern = typeof Map !== 'undefined' && typeof Intl !== 'undefined';
             this.sorter = this.isModern ? new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }) : null;
         }
 
-        /**
-         * Laadt de database met Cache-First strategie (Apex-speed)
-         */
         async load() {
             const useCache = 'caches' in window;
             
@@ -32,7 +28,6 @@ window.HRN = (function () {
                     if (match) {
                         const cachedData = await match.json();
                         this._parse(cachedData);
-                        // Update cache op de achtergrond
                         this._fetchAndCache(storage).catch(() => {});
                         return this.data;
                     }
@@ -60,9 +55,7 @@ window.HRN = (function () {
             return this._parse(j);
         }
 
-        /**
-         * Verwerkt de JSON shards naar een platte, gesorteerde lijst
-         */
+
         _parse(j) {
             if (!Array.isArray(j)) return this.data;
 
@@ -90,13 +83,11 @@ window.HRN = (function () {
                 }
             }
 
-            // Sorteer A-Z
             this.data = list.sort((a, b) => this.sorter.compare(a.name, b.name));
             this._map = map;
             return this.data;
         }
 
-        // --- DATA API ---
 
         get(alias) {
             return this._map.get(alias) || null;
@@ -120,7 +111,6 @@ window.HRN = (function () {
             return [...this.data].sort(() => 0.5 - Math.random()).slice(0, n);
         }
 
-        // --- STORAGE & PERSISTENCE ---
 
         toggleFav(alias) {
             const g = this.get(alias);
