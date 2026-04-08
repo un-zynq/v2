@@ -5,7 +5,7 @@ window.HRN = (function () {
         constructor() {
             this.config = {
                 src: "https://un-zynq.github.io/games2.json",
-                cdn: "https://cdn.jsdelivr.net/gh/un-zynq/thumbnails@7aed1c0153db7a46e24f63e25f0925a99166a689"
+                cdn: "https://cdn.jsdelivr.net/gh/un-zynq/thumbnails"
             };
 
             this.data = [];
