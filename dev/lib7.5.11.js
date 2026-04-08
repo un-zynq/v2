@@ -1,172 +1,176 @@
-/**
- * HRN Library v8.1.0
- * Modernized but keeping the classic "Smart Detection" scoring logic.
- */
 "use strict";
 
-class HRN {
-    constructor() {
-        this.config = {
-            src: "https://un-zynq.github.io/games2.json",
-            cdn: "https://cdn.jsdelivr.net/gh/un-zynq/thumbnails"
-        };
-        this._all = [];
-        this._filtered = [];
-        this._favs = this._initStorage();
-        this.deviceType = 2; 
+class HRN_Core {
+  constructor() {
+    this.config = {
+      src: "https://un-zynq.github.io/games2.json",
+      cdn: "https://cdn.jsdelivr.net/gh/un-zynq/thumbnails",
+    };
+
+    this.all = [];
+    this.filtered = [];
+    this.favorites = this._initStorage();
+    this.deviceType = 2;
+  }
+
+  async init(options = {}) {
+    const {
+      mode = "all",
+      search = "",
+      sort = "name",
+      src = this.config.src,
+      cdn = this.config.cdn,
+    } = options;
+
+    this.config.src = src;
+    this.config.cdn = cdn;
+
+    this._detectDevice();
+    await this._loadData(sort);
+
+    if (search) this.search(search);
+    if (mode === "supported") this.filterSupported();
+    if (mode === "favs") this.filterFavorites();
+
+    return this;
+  }
+
+  _detectDevice() {
+    const n = navigator;
+    const ua = n.userAgent;
+    const touchPoints = n.maxTouchPoints || 0;
+    const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
+    const hasHover = window.matchMedia("(hover: hover)").matches;
+
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    const debugInfo = gl?.getExtension("WEBGL_debug_renderer_info");
+    const renderer = debugInfo
+      ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+      : "";
+
+    let scores = { desktop: 0, mobile: 0 };
+
+    if (/Win|Mac|Linux/i.test(ua)) scores.desktop += 15;
+    if (ua.includes("x64") || ua.includes("wow64")) scores.desktop += 10;
+    if (hasFinePointer && hasHover) scores.desktop += 20;
+    if (/Intel|Nvidia|AMD|Direct3D|GeForce/i.test(renderer))
+      scores.desktop += 25;
+
+    if (/Android|iPhone|iPad|iPod/i.test(ua)) scores.mobile += 20;
+    if (/Adreno|Mali|PowerVR|Apple GPU/i.test(renderer)) scores.mobile += 25;
+
+    if (scores.desktop > scores.mobile) {
+      this.deviceType = touchPoints > 0 ? 1 : 2;
+    } else if (/Macintosh/i.test(ua) && touchPoints > 1) {
+      this.deviceType = 4;
+    } else {
+      const isLarge =
+        window.screen.width >= 1024 ||
+        (window.screen.width >= 768 && touchPoints > 1);
+      this.deviceType = isLarge ? 4 : 3;
     }
+  }
 
-    /**
-     * @param {Object} options - Configuratie voor mode, search, sort, src en cdn
-     */
-    async init(options = {}) {
-        const {
-            mode = 'all',
-            search = '',
-            sort = 'name',
-            src = this.config.src,
-            cdn = this.config.cdn
-        } = options;
+  async _loadData(sortKey) {
+    try {
+      const response = await fetch(this.config.src);
+      const data = await response.json();
+      const library = [];
 
-        this.config.src = src;
-        this.config.cdn = cdn;
+      data.forEach((category) => {
+        Object.entries(category).forEach(([base, games]) => {
+          Object.entries(games).forEach(([alias, meta]) => {
+            library.push({
+              name: meta.name || alias,
+              category: meta.category || undefined,
+              alias: alias,
+              url: `${base}/${alias}`,
+              thumb: `${this.config.cdn}/${base}/${alias}.webp`,
+              devices: meta.devices
+                ? String(meta.devices).split(",").map(Number)
+                : null,
+              get isSupported() {
+                return this.devices?.includes(window.HRN.deviceType) ?? true;
+              },
+              get isFavorite() {
+                return window.HRN.isFavorite(this.alias);
+              },
+            });
+          });
+        });
+      });
 
-        this._runSmartDetection(); // De klassieke logica
-        await this._loadData(sort);
-        
-        this.search(search);
-
-        if (mode === 'supported') this.onlySupported();
-        else if (mode === 'favs') this.onlyFavs();
-        
-        return this;
+      this.all = library.sort((a, b) =>
+        (a[sortKey] || "").localeCompare(b[sortKey] || ""),
+      );
+      this.filtered = [...this.all];
+    } catch (err) {
+      console.error("HRN Core Error:", err);
     }
+  }
 
-    /**
-     * De originele "Smart Detection" logica in een moderne functie
-     */
-    _runSmartDetection() {
-        const n = navigator;
-        const screen = window.screen;
-        const ua = n.userAgent;
-        const touchPoints = n.maxTouchPoints || 0;
-        
-        // Check voor pointer en hover (moderne CSS-in-JS check)
-        const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
-        const hasHover = window.matchMedia("(hover: hover)").matches;
+  search(query) {
+    const q = query?.toLowerCase().trim();
+    this.filtered = q
+      ? this.all.filter(
+          (g) =>
+            g.name.toLowerCase().includes(q) ||
+            g.alias.toLowerCase().includes(q),
+        )
+      : [...this.all];
+    return this;
+  }
 
-        // WebGL Renderer check (de GPU check uit je oude code)
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        const debugInfo = gl?.getExtension('WEBGL_debug_renderer_info');
-        const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "";
+  filterFavorites() {
+    this.filtered = this.filtered.filter((g) => g.isFavorite);
+    return this;
+  }
 
-        let desktopScore = 0;
-        let mobileScore = 0;
+  filterSupported() {
+    this.filtered = this.filtered.filter((g) => g.isSupported);
+    return this;
+  }
 
-        // Platform & UA Checks
-        if (/Win|Mac|Linux/i.test(n.platform)) desktopScore += 15;
-        if (ua.includes('x64') || ua.includes('wow64')) desktopScore += 10;
-        if (hasFinePointer && hasHover) desktopScore += 20;
-        
-        // GPU Score (Desktop)
-        if (/Intel|Nvidia|AMD|Direct3D|GeForce/i.test(renderer)) desktopScore += 25;
+  reset() {
+    this.filtered = [...this.all];
+    return this;
+  }
 
-        // Mobile Checks
-        if (/Android|iPhone|iPad|iPod/i.test(ua)) mobileScore += 20;
-        
-        // GPU Score (Mobile)
-        if (/Adreno|Mali|PowerVR|Apple GPU/i.test(renderer)) mobileScore += 25;
+  get list() {
+    return this.filtered;
+  }
 
-        // De definitieve berekening (Type bepaling)
-        if (desktopScore > mobileScore) {
-            this.deviceType = (touchPoints > 0) ? 1 : 2; // 1 = Touch Laptop, 2 = Desktop
-        } else if (n.platform === 'MacIntel' && touchPoints > 1) {
-            this.deviceType = 4; // iPad Pro (Desktop Mode)
-        } else {
-            // Tablet of Mobiel op basis van resolutie
-            const isLargeScreen = screen.width >= 1024 || screen.height >= 1024 || (screen.width >= 768 && touchPoints > 1);
-            this.deviceType = isLargeScreen ? 4 : 3; // 4 = Tablet, 3 = Mobiel
-        }
+  isFavorite(alias) {
+    return this.favorites.has(alias);
+  }
+
+  toggleFavorite(alias) {
+    this.favorites.has(alias)
+      ? this.favorites.delete(alias)
+      : this.favorites.add(alias);
+    localStorage.setItem("hrn_favs", JSON.stringify([...this.favorites]));
+    return this;
+  }
+
+  _initStorage() {
+    try {
+      const data = localStorage.getItem("hrn_favs");
+      return new Set(data ? JSON.parse(data) : []);
+    } catch {
+      return new Set();
     }
-
-    async _loadData(sortKey) {
-        try {
-            const res = await fetch(this.config.src);
-            const json = await res.json();
-            const arr = [];
-
-            for (const category of json) {
-                for (const [base, games] of Object.entries(category)) {
-                    for (const [alias, data] of Object.entries(games)) {
-                        arr.push({
-                            name: data.name || alias,
-                            alias: alias,
-                            url: `${base}/${alias}`,
-                            splash: `${this.config.cdn}/${base}/${alias}.webp`,
-                            devices: data.devices ? String(data.devices).split(",").map(Number) : null,
-                            get isSupported() { 
-                                return this.devices?.includes(window.HRN.deviceType) ?? false; 
-                            },
-                            get isFav() { 
-                                return window.HRN.isFav(this.alias); 
-                            }
-                        });
-                    }
-                }
-            }
-            
-            this._all = arr.sort((a, b) => (a[sortKey] || '').localeCompare(b[sortKey] || ''));
-            this._filtered = [...this._all];
-        } catch (e) { 
-            console.error("HRN v8.1.0 Load Error:", e); 
-        }
-    }
-
-    search(q) {
-        const term = q?.toLowerCase().trim();
-        this._filtered = term 
-            ? this._all.filter(g => g.name.toLowerCase().includes(term) || g.alias.toLowerCase().includes(term)) 
-            : [...this._all];
-        return this;
-    }
-
-    onlyFavs() {
-        this._filtered = this._filtered.filter(g => g.isFav);
-        return this;
-    }
-
-    onlySupported() {
-        this._filtered = this._filtered.filter(g => g.isSupported);
-        return this;
-    }
-
-    reset() {
-        this._filtered = [...this._all];
-        return this;
-    }
-
-    get list() { return this._filtered; }
-
-    isFav(alias) { return this._favs.has(alias); }
-
-    toggleFav(alias) {
-        this._favs.has(alias) ? this._favs.delete(alias) : this._favs.add(alias);
-        localStorage.setItem("hrn_f", JSON.stringify([...this._favs]));
-        return this;
-    }
-
-    _initStorage() {
-        try {
-            const raw = localStorage.getItem("hrn_f");
-            return new Set(raw ? JSON.parse(raw) : []);
-        } catch (e) {
-            return new Set();
-        }
-    }
+  }
 }
 
-// Global instance & Export
-const hrnInstance = new HRN();
-window.HRN = hrnInstance;
-export default hrnInstance;
+const HRN = new HRN_Core();
+
+if (typeof exports === "object" && typeof module !== "undefined") {
+  module.exports = HRN;
+} else if (typeof define === "function" && define.amd) {
+  define([], () => HRN);
+}
+
+window.HRN = HRN;
+export default HRN;
