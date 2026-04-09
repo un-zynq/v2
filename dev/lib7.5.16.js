@@ -143,22 +143,13 @@ class HRN_Core {
   }
 }
 
+// Global binding
 const HRN = new HRN_Core();
+window.HRN = HRN;
 
-// 1. Zorg dat hij altijd op window staat voor normale scripts
-if (typeof window !== 'undefined') {
-    window.HRN = HRN;
-}
-
-// 2. Universal exports
+// CommonJS/AMD support (Safe for browsers)
 if (typeof exports === "object" && typeof module !== "undefined") {
-    module.exports = HRN;
+  module.exports = HRN;
 } else if (typeof define === "function" && define.amd) {
-    define([], () => HRN);
+  define([], () => HRN);
 }
-
-/** * DE FIX: 
- * We gebruiken een 'conditional export' die alleen werkt in module-omgevingen.
- * Dit is de enige syntax die browsers niet laat crashen in normale scripts.
- */
-export { HRN as default };
