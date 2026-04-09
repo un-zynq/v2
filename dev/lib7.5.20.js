@@ -77,13 +77,13 @@ class HRN_Core {
           Object.entries(games).forEach(([alias, meta]) => {
             library.push({
               name: meta.name || alias,
-              category: meta.category || undefined,
+              category: meta.category || "Other",
               alias: alias,
               url: `${base}/${alias}`,
               thumb: `${this.config.cdn}/${base}/${alias}.webp`,
               devices: meta.devices ? String(meta.devices).split(",").map(Number) : null,
               get isSupported() {
-                return this.devices?.includes(window.HRN.deviceType) ?? true;
+                return this.devices ? this.devices.includes(window.HRN.deviceType) : true;
               },
               get isFavorite() {
                 return window.HRN.isFavorite(this.alias);
@@ -102,20 +102,29 @@ class HRN_Core {
 
   search(query) {
     const q = query?.toLowerCase().trim();
-    this.filtered = q ? this.all.filter((g) => g.name.toLowerCase().includes(q) || g.alias.toLowerCase().includes(q)) : [...this.all];
+    if (!q) {
+      this.filtered = [...this.all];
+    } else {
+      this.filtered = this.all.filter((g) => 
+        g.name.toLowerCase().includes(q) || 
+        g.alias.toLowerCase().includes(q) ||
+        (g.category && g.category.toLowerCase().includes(q))
+      );
+    }
     this.trigger("filter", this.filtered);
     return this;
   }
 
-random(limit = 1) {
-    const source = this.filtered.length > 0 ? this.filtered : this.all;
-    if (source.length === 0) {
-      this.filtered = [];
-      return this;
-    }
-    const shuffled = [...source].sort(() => 0.5 - Math.random());
-    this.filtered = shuffled.slice(0, limit);
+  random(limit = 1) {
+    const source = [...this.filtered];
+    if (source.length === 0) return this;
     
+    for (let i = source.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [source[i], source[j]] = [source[j], source[i]];
+    }
+    
+    this.filtered = source.slice(0, limit);
     this.trigger("filter", this.filtered);
     return this;
   }
@@ -164,7 +173,11 @@ random(limit = 1) {
   }
 
   toggleFavorite(alias) {
-    this.favorites.has(alias) ? this.favorites.delete(alias) : this.favorites.add(alias);
+    if (this.favorites.has(alias)) {
+      this.favorites.delete(alias);
+    } else {
+      this.favorites.add(alias);
+    }
     localStorage.setItem("hrn_favs", JSON.stringify([...this.favorites]));
     this.trigger("favoriteUpdate", alias);
     return this;
