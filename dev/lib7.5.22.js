@@ -10,6 +10,7 @@ class HRN_Core {
     this.filtered = [];
     this.favorites = this._initStorage();
     this.deviceType = 2;
+    this.history = [];
   }
 
   async init(options = {}) {
@@ -44,7 +45,6 @@ class HRN_Core {
     const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
     const debugInfo = gl?.getExtension("WEBGL_debug_renderer_info");
     const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "";
-
     let scores = { desktop: 0, mobile: 0 };
 
     if (/Win|Mac|Linux/i.test(ua)) scores.desktop += 15;
@@ -100,7 +100,9 @@ class HRN_Core {
 
   search(query) {
     const q = query?.toLowerCase().trim();
-    this.filtered = q ? this.all.filter((g) => g.name.toLowerCase().includes(q) || g.alias.toLowerCase().includes(q)) : [...this.all];
+    this.filtered = q 
+      ? this.all.filter((g) => g.name.toLowerCase().includes(q) || g.alias.toLowerCase().includes(q)) 
+      : [...this.all];
     return this;
   }
 
@@ -112,6 +114,58 @@ class HRN_Core {
     }
     const shuffled = [...source].sort(() => 0.5 - Math.random());
     this.filtered = shuffled.slice(0, limit);
+    return this;
+  }
+
+  // Nieuwe features
+  shuffle() {
+    const source = this.filtered.length > 0 ? this.filtered : this.all;
+    this.filtered = [...source].sort(() => 0.5 - Math.random());
+    return this;
+  }
+
+  sortBy(key = "name") {
+    this.filtered.sort((a, b) => (a[key] || "").localeCompare(b[key] || ""));
+    return this;
+  }
+
+  sortByPopularity() {
+    this.filtered.sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
+    return this;
+  }
+
+  getRandomOne() {
+    return this.random(1).list[0];
+  }
+
+  getByAlias(alias) {
+    return this.all.find(game => game.alias === alias) || null;
+  }
+
+  getByCategory(category) {
+    this.filtered = this.all.filter(game => game.category === category);
+    return this;
+  }
+
+  filterByDevice() {
+    this.filtered = this.filtered.filter(game => game.isSupported);
+    return this;
+  }
+
+  addToHistory(alias) {
+    if (!this.history.includes(alias)) {
+      this.history.unshift(alias);
+      if (this.history.length > 50) this.history.pop();
+    }
+    return this;
+  }
+
+  getHistory() {
+    return this.all.filter(game => this.history.includes(game.alias));
+  }
+
+  clearHistory() {
+    this.history = [];
     return this;
   }
 
@@ -132,6 +186,14 @@ class HRN_Core {
 
   get list() {
     return this.filtered;
+  }
+
+  get total() {
+    return this.all.length;
+  }
+
+  get filteredCount() {
+    return this.filtered.length;
   }
 
   isFavorite(alias) {
