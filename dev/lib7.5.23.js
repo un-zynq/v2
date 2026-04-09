@@ -11,6 +11,7 @@ class HRN_Core {
     this.favorites = this._initStorage();
     this.deviceType = 2;
     this.history = [];
+    this._lastIndices = new Set();
   }
 
   async init(options = {}) {
@@ -112,15 +113,41 @@ class HRN_Core {
       this.filtered = [];
       return this;
     }
-    const shuffled = [...source].sort(() => 0.5 - Math.random());
-    this.filtered = shuffled.slice(0, limit);
+
+    if (limit >= source.length) {
+      this.filtered = [...source].sort(() => Math.random() - 0.5);
+      return this;
+    }
+
+    const result = [];
+    const availableIndices = Array.from(source.keys()).filter(i => !this._lastIndices.has(i));
+
+    const pool = availableIndices.length < limit ? Array.from(source.keys()) : availableIndices;
+
+    for (let i = 0; i < limit; i++) {
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      const val = pool.splice(randomIndex, 1)[0];
+      result.push(source[val]);
+    }
+
+    this._lastIndices.clear();
+    result.forEach(item => {
+      const idx = source.indexOf(item);
+      if (idx !== -1) this._lastIndices.add(idx);
+    });
+
+    this.filtered = result;
     return this;
   }
 
-  // Nieuwe features
   shuffle() {
     const source = this.filtered.length > 0 ? this.filtered : this.all;
-    this.filtered = [...source].sort(() => 0.5 - Math.random());
+    const arr = [...source];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    this.filtered = arr;
     return this;
   }
 
@@ -135,7 +162,8 @@ class HRN_Core {
   }
 
   getRandomOne() {
-    return this.random(1).list[0];
+    this.random(1);
+    return this.filtered[0];
   }
 
   getByAlias(alias) {
@@ -181,6 +209,7 @@ class HRN_Core {
 
   reset() {
     this.filtered = [...this.all];
+    this._lastIndices.clear();
     return this;
   }
 
