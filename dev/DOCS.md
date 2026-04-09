@@ -1,4 +1,4 @@
-# HRN Core Documentation v7.5.17
+# HRN Core Documentation v7.5.18
 
 Modern, lightweight game library loader and device detection utility.
 
@@ -8,19 +8,17 @@ Modern, lightweight game library loader and device detection utility.
 
 ### Standard Script
 ```html
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.17.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.18.min.js"></script>
 ```
 
 ### ES Module
 ```javascript
-import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.17.min.js';
+import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.18.min.js';
 ```
 
 ---
 
 ## Initialization
-
-The library must be initialized asynchronously to fetch the database.
 
 ```javascript
 await HRN.init({
@@ -46,18 +44,17 @@ await HRN.init({
 | Method | Description |
 | :--- | :--- |
 | `search(query)` | Filters the list by name or alias. |
-| `random(limit)` | Shuffles the current list and limits results (Default: 1). |
-| `filterSupported()` | Filters list to only show games compatible with current device. |
-| `filterFavorites()` | Filters list to only show favorited games. |
-| `toggleFavorite(alias)`| Adds or removes a game from favorites (saves to LocalStorage). |
-| `isFavorite(alias)` | Returns `true` if the game is in favorites. |
+| `random(limit)` | Shuffles the current list and limits results. |
+| `limit(count, offset)`| Slices the list for pagination. |
+| `filterSupported()` | Filters list by device compatibility. |
+| `filterFavorites()` | Filters list by favorited games. |
+| `toggleFavorite(id)`| Toggles favorite status and saves to LocalStorage. |
+| `on(event, cb)` | Subscribes to events (`init`, `filter`, `favoriteUpdate`). |
 | `reset()` | Clears all filters and restores the full list. |
 
 ---
 
 ## Data Structure
-
-Each object in `HRN.list` contains:
 
 ```javascript
 {
@@ -75,21 +72,22 @@ Each object in `HRN.list` contains:
 
 ## Usage Example
 
-### Chaining & Randomization
+### Events & Pagination
 ```javascript
-async function loadRandomGame() {
+// Listen for updates
+HRN.on('filter', (list) => {
+  console.log(`${list.length} games found.`);
+});
+
+async function loadPortal() {
   await HRN.init();
   
-  // Get one random supported Mario game
-  const game = HRN.search('mario').filterSupported().random().list[0];
-  
-  if (game) {
-    console.log(`Suggested: ${game.name}`);
-  }
-}
-
-async function getDiscoveryList() {
-  // Get 3 random favorites
-  const favorites = HRN.reset().filterFavorites().random(3).list;
+  // Chainable Discovery:
+  // Search 'quest', only supported, get 5 random results, skip first 0
+  const games = HRN.search('quest')
+                   .filterSupported()
+                   .random(10)
+                   .limit(5, 0)
+                   .list;
 }
 ```
