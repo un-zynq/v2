@@ -1,4 +1,4 @@
-# HRN Core v7.5.25 Documentation
+# HRN Core v7.5.27 Documentation
 
 HRN Core is a modern, lightweight, and powerful game library loader with intelligent device detection. It lets you dynamically load, search, filter, sort, randomize, and manage large collections of games with a clean and chainable API.
 
@@ -6,7 +6,7 @@ HRN Core is a modern, lightweight, and powerful game library loader with intelli
 
 ## Introduction
 
-### What's New in v7.5.25
+### What's New in v7.5.27
 * New `shuffle()` method
 * New `sortBy(key)` and `sortByPopularity()` methods
 * Convenient `getRandomOne()` method
@@ -20,13 +20,13 @@ HRN Core is a modern, lightweight, and powerful game library loader with intelli
 #### ES Module (recommended)
 ```html
 <script type="module">
-import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.25.min.js';
+import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.27.min.js';
 </script>
 ```
 
 #### Standard Script
 ```html
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.25.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.27.min.js"></script>
 ```
 
 ---
