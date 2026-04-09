@@ -11,7 +11,7 @@ class HRN_Core {
     this.favorites = this._initStorage();
     this.deviceType = 2;
     this.history = [];
-    this._lastIndices = new Set();
+    this._lastPickedAlias = null;
   }
 
   async init(options = {}) {
@@ -108,35 +108,24 @@ class HRN_Core {
   }
 
   random(limit = 1) {
-    const source = this.filtered.length > 0 ? this.filtered : this.all;
-    if (source.length === 0) {
-      this.filtered = [];
-      return this;
+    // We use a local pool to avoid destroying this.filtered during iterations
+    let pool = this.filtered.length > 0 ? [...this.filtered] : [...this.all];
+    
+    if (pool.length === 0) return this;
+
+    // Prevent immediate duplicate if we have enough options
+    if (pool.length > 1 && limit === 1) {
+      pool = pool.filter(g => g.alias !== this._lastPickedAlias);
     }
 
-    if (limit >= source.length) {
-      this.filtered = [...source].sort(() => Math.random() - 0.5);
-      return this;
+    const shuffled = pool.sort(() => Math.random() - 0.5);
+    const selection = shuffled.slice(0, limit);
+
+    if (limit === 1 && selection.length > 0) {
+      this._lastPickedAlias = selection[0].alias;
     }
 
-    const result = [];
-    const availableIndices = Array.from(source.keys()).filter(i => !this._lastIndices.has(i));
-
-    const pool = availableIndices.length < limit ? Array.from(source.keys()) : availableIndices;
-
-    for (let i = 0; i < limit; i++) {
-      const randomIndex = Math.floor(Math.random() * pool.length);
-      const val = pool.splice(randomIndex, 1)[0];
-      result.push(source[val]);
-    }
-
-    this._lastIndices.clear();
-    result.forEach(item => {
-      const idx = source.indexOf(item);
-      if (idx !== -1) this._lastIndices.add(idx);
-    });
-
-    this.filtered = result;
+    this.filtered = selection; 
     return this;
   }
 
@@ -162,8 +151,17 @@ class HRN_Core {
   }
 
   getRandomOne() {
-    this.random(1);
-    return this.filtered[0];
+    const pool = this.all.length > 0 ? this.all : [];
+    if (pool.length === 0) return null;
+    
+    let selection = pool;
+    if (pool.length > 1) {
+        selection = pool.filter(g => g.alias !== this._lastPickedAlias);
+    }
+    
+    const game = selection[Math.floor(Math.random() * selection.length)];
+    this._lastPickedAlias = game.alias;
+    return game;
   }
 
   getByAlias(alias) {
@@ -209,7 +207,7 @@ class HRN_Core {
 
   reset() {
     this.filtered = [...this.all];
-    this._lastIndices.clear();
+    this._lastPickedAlias = null;
     return this;
   }
 
