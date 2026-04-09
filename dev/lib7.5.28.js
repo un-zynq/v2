@@ -10,7 +10,7 @@ class ZYNQ_Core {
     this.filtered = [];
     this.favorites = this._initStorage();
     this.deviceType = 2;
-    this.history = [];
+    this.history = this._initHistory(); // Fixed: Load history from storage on startup
     this._pool = [];
     this._lastResults = [];
   }
@@ -82,7 +82,7 @@ class ZYNQ_Core {
               alias: alias,
               url: `${base}/${alias}`,
               thumb: `${this.config.cdn}/${base}/${alias}.webp`,
-              devices: meta.devices ? String(meta.devices).split(",").map(Number) : null,
+              devices: meta.devices ? String(meta.devices).split(",").map(Number) : [], // Fixed: Default to empty array
               get isSupported() {
                 return window.ZYNQ.deviceType === null || (this.devices?.includes(window.ZYNQ.deviceType) ?? true);
               },
@@ -167,19 +167,20 @@ class ZYNQ_Core {
   }
 
   addToHistory(alias) {
-    if (!this.history.includes(alias)) {
-      this.history.unshift(alias);
-      if (this.history.length > 50) this.history.pop();
-    }
+    // Fixed: Logic to move to front and persist to localStorage
+    this.history = [alias, ...this.history.filter(a => a !== alias)].slice(0, 50);
+    localStorage.setItem("ZYNQ_history", JSON.stringify(this.history));
     return this;
   }
 
   getHistory() {
-    return this.all.filter(game => this.history.includes(game.alias));
+    // Fixed: Returns games in chronological order (newest first)
+    return this.history.map(alias => this.getByAlias(alias)).filter(Boolean);
   }
 
   clearHistory() {
     this.history = [];
+    localStorage.removeItem("ZYNQ_history");
     return this;
   }
 
@@ -227,6 +228,15 @@ class ZYNQ_Core {
       return new Set(data ? JSON.parse(data) : []);
     } catch {
       return new Set();
+    }
+  }
+
+  _initHistory() {
+    try {
+      const data = localStorage.getItem("ZYNQ_history");
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
     }
   }
 }
