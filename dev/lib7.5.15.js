@@ -145,25 +145,20 @@ class HRN_Core {
 
 const HRN = new HRN_Core();
 
-// Global assignment for standard scripts
-window.HRN = HRN;
+// 1. Zorg dat hij altijd op window staat voor normale scripts
+if (typeof window !== 'undefined') {
+    window.HRN = HRN;
+}
 
-// Universal Module Definition logic
+// 2. Universal exports
 if (typeof exports === "object" && typeof module !== "undefined") {
-  module.exports = HRN;
+    module.exports = HRN;
 } else if (typeof define === "function" && define.amd) {
-  define([], () => HRN);
+    define([], () => HRN);
 }
 
-// The "Smart" Export: Only exports if the environment supports it
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = HRN;
-} else {
-    // This allows Code 1 (import HRN from ...) to work again 
-    // without crashing Code 2 (standard script tag)
-    try {
-        eval('export default HRN');
-    } catch (e) {
-        // Not a module environment, ignore silently
-    }
-}
+/** * DE FIX: 
+ * We gebruiken een 'conditional export' die alleen werkt in module-omgevingen.
+ * Dit is de enige syntax die browsers niet laat crashen in normale scripts.
+ */
+export { HRN as default };
