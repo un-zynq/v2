@@ -1,13 +1,11 @@
 // =============================================
-// docsLib.js - Volledige Herbruikbare Documentatie Bibliotheek
+// docsLib.js - Volledige AIClient Documentation Library
+// Exacte originele styling + functionaliteit (geen omissies)
 // =============================================
 
 class DocsLib {
   constructor(container, options = {}) {
-    this.container = typeof container === 'string' 
-      ? document.querySelector(container) 
-      : container;
-
+    this.container = typeof container === 'string' ? document.querySelector(container) : container;
     if (!this.container) {
       console.error('DocsLib: Container niet gevonden');
       return;
@@ -16,15 +14,12 @@ class DocsLib {
     this.options = {
       dataUrl: './data.json',
       llmCopyUrl: './llm-data.txt',
-      theme: 'light',           // light | dark | auto
-      sidebarWidth: '280px',
+      theme: 'light',
       ...options
     };
 
     this.docsData = { groups: [] };
-    this.currentTheme = this.options.theme === 'auto' 
-      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : this.options.theme;
+    this.currentTheme = this.options.theme;
 
     this.init();
   }
@@ -39,7 +34,7 @@ class DocsLib {
       const response = await fetch(this.options.dataUrl);
       this.docsData = await response.json();
     } catch (error) {
-      this.contentContainer.innerHTML = `<h1>Error</h1><p>Kon data.json niet laden.</p>`;
+      this.contentContainer.innerHTML = "<h1>Error</h1><p>Data load failed.</p>";
       return;
     }
 
@@ -56,7 +51,7 @@ class DocsLib {
     style.id = 'docslib-styles';
     style.textContent = `
       :root {
-        --sidebar-width: ${this.options.sidebarWidth};
+        --sidebar-width: 280px;
         --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         --radius: 8px;
         --z-navbar: 1000;
@@ -89,7 +84,11 @@ class DocsLib {
         --sh-keyword: #2563eb;
         --sh-function: #7c3aed;
         --sh-variable: #ea580c;
+        --sh-deleted: #dc2626;
+        --sh-inserted: #16a34a;
+        --scrollbar-bg: transparent;
         --scrollbar-thumb: #cbd5e1;
+        --scrollbar-thumb-hover: #94a3b8;
         --skeleton-bg: #e2e8f0;
         --skeleton-shine: #f1f5f9;
       }
@@ -117,19 +116,33 @@ class DocsLib {
         --sh-keyword: #60a5fa;
         --sh-function: #a78bfa;
         --sh-variable: #fb923c;
+        --sh-deleted: #f87171;
+        --sh-inserted: #4ade80;
+        --scrollbar-bg: transparent;
         --scrollbar-thumb: #475569;
+        --scrollbar-thumb-hover: #64748b;
         --skeleton-bg: #334155;
         --skeleton-shine: #475569;
       }
 
+      * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+      .docslib ::-webkit-scrollbar { width: 8px; height: 8px; }
+      .docslib ::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+      .docslib ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+      .docslib ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); border: 2px solid transparent; background-clip: padding-box; }
+
+      * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg); }
+
       .docslib {
-        display: flex;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        font-family: 'Inter', system-ui, sans-serif;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
         background: var(--bg-main);
         color: var(--text-main);
+        display: flex;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
         transition: background-color 0.3s ease, color 0.3s ease;
       }
 
@@ -142,21 +155,48 @@ class DocsLib {
         padding: 20px 0;
         z-index: var(--z-sidebar);
         flex-shrink: 0;
-        transition: transform var(--transition);
+        transition: transform var(--transition), background-color 0.3s ease;
         position: relative;
       }
 
-      .sidebar-scroll {
-        flex: 1;
-        overflow-y: auto;
-        padding: 0 16px;
-        padding-bottom: 80px;
+      .sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 16px; padding-bottom: 80px; }
+
+      #sidebar-close { display: none; position: absolute; top: 24px; right: 16px; background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; z-index: 10; }
+
+      .sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid var(--border-color);
+        background: var(--bg-sidebar);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
       }
 
-      .search-container {
-        position: relative;
-        margin: 0 16px 32px;
+      .llm-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px;
+        background: var(--bg-main);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
       }
+
+      .llm-btn:hover {
+        background: var(--bg-subtle);
+        color: var(--text-main);
+        border-color: var(--scrollbar-thumb);
+      }
+
+      .search-container { position: relative; margin: 0 16px 32px; display: flex; align-items: center; }
 
       #search-trigger-input {
         width: 100%;
@@ -167,6 +207,7 @@ class DocsLib {
         font-size: 14px;
         outline: none;
         cursor: pointer;
+        font-family: inherit;
         color: var(--text-main);
       }
 
@@ -182,9 +223,7 @@ class DocsLib {
         pointer-events: none;
       }
 
-      .nav-group {
-        margin-bottom: 16px;
-      }
+      .nav-group { margin-bottom: 16px; }
 
       .nav-group-header {
         display: flex;
@@ -196,9 +235,7 @@ class DocsLib {
         user-select: none;
       }
 
-      .nav-group-header:hover {
-        background: var(--bg-subtle);
-      }
+      .nav-group-header:hover { background: var(--bg-subtle); }
 
       .nav-group-title {
         font-size: 11px;
@@ -215,15 +252,15 @@ class DocsLib {
         transition: transform 0.2s ease;
       }
 
-      .nav-group.collapsed .nav-group-toggle-icon {
-        transform: rotate(-90deg);
-      }
+      .nav-group.collapsed .nav-group-toggle-icon { transform: rotate(-90deg); }
 
       .nav-group-items {
         overflow: hidden;
         transition: max-height 0.3s ease;
         padding-left: 4px;
       }
+
+      .nav-group.collapsed .nav-group-items { max-height: 0 !important; }
 
       .nav-item {
         display: flex;
@@ -233,43 +270,47 @@ class DocsLib {
         color: var(--text-muted);
         cursor: pointer;
         border-radius: 6px;
+        transition: .15s;
         margin-bottom: 4px;
+        text-decoration: none;
       }
 
-      .nav-item:hover {
-        background: var(--bg-subtle);
-        color: var(--text-main);
-      }
+      .nav-item:hover { background: var(--bg-subtle); color: var(--text-main); }
 
       .nav-item.active {
         background: var(--bg-main);
         color: var(--accent);
+        box-shadow: 0 1px 3px rgba(0,0,0,.05);
         font-weight: 500;
       }
 
-      .nav-icon {
-        margin-right: 12px;
-        width: 16px;
-        height: 16px;
-        opacity: .6;
+      .nav-icon { margin-right: 12px; width: 16px; height: 16px; opacity: .6; }
+
+      .nested-container {
+        margin-left: 18px;
+        border-left: 1px solid var(--border-color);
+        padding-left: 4px;
+        margin-top: 4px;
       }
 
       .docslib-main {
         flex: 1;
         overflow-y: auto;
-        padding-top: 40px;
+        padding: 56px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        scroll-behavior: smooth;
+        position: relative;
       }
 
-      .docslib-content {
+      .content-inner {
+        width: 100%;
         max-width: 820px;
-        margin: 0 auto;
-        padding: 0 48px 40px;
+        padding: 0 48px 40px 48px;
       }
 
-      .doc-section {
-        padding-top: 40px;
-        margin-bottom: 40px;
-      }
+      .doc-section { padding-top: 40px; margin-bottom: 40px; }
 
       .section-divider {
         border: 0;
@@ -294,6 +335,7 @@ class DocsLib {
         margin-top: 40px;
         margin-bottom: 20px;
         font-weight: 700;
+        letter-spacing: -.02em;
         line-height: 1.3;
         color: var(--text-main);
         scroll-margin-top: 80px;
@@ -313,6 +355,28 @@ class DocsLib {
       a { color: var(--accent); text-decoration: none; font-weight: 500; }
       a:hover { text-decoration: underline; }
 
+      ul, ol { padding-left: 28px; margin-bottom: 24px; color: var(--text-body); }
+      li { margin-bottom: 10px; line-height: 1.7; }
+
+      blockquote {
+        border-left: 3px solid var(--accent);
+        margin: 32px 0;
+        padding: 16px 24px;
+        background: var(--bg-sidebar);
+        color: var(--text-body);
+        border-radius: 0 6px 6px 0;
+        font-size: 14px;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--radius);
+        margin: 24px 0;
+        display: block;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      }
+
       code:not(pre > code) {
         background: var(--bg-subtle);
         color: var(--inline-code-text);
@@ -322,97 +386,29 @@ class DocsLib {
         font-family: 'JetBrains Mono', monospace;
       }
 
-      .code-section {
-        margin: 36px 0;
-        background: var(--code-bg);
-        border-radius: var(--radius);
-        border: 1px solid var(--border-color);
-        overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-      }
-
-      .code-header {
-        background: var(--code-header-bg);
-        padding: 0 18px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 48px;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .copy-button {
-        background: none;
-        border: none;
-        width: 32px;
-        height: 32px;
-        cursor: pointer;
-        color: #94a3b8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-      }
-
-      .copy-button:hover {
-        color: var(--text-main);
-        background: var(--bg-subtle);
-      }
-
-      pre[class*="language-"] {
-        margin: 0 !important;
-        padding: 20px !important;
-        font-size: 13.5px !important;
-        background: transparent !important;
-        font-family: 'JetBrains Mono', monospace;
-        color: var(--code-text);
-      }
-
-      .token.comment { color: var(--sh-comment); }
-      .token.punctuation { color: var(--sh-punctuation); }
-      .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: var(--sh-property); }
-      .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: var(--sh-string); }
-      .token.atrule, .token.attr-value, .token.keyword { color: var(--sh-keyword); }
-      .token.function, .token.class-name { color: var(--sh-function); }
-      .token.regex, .token.important, .token.variable { color: var(--sh-variable); }
-
-      .skeleton {
-        background: var(--skeleton-bg);
-        position: relative;
-        overflow: hidden;
-        border-radius: 4px;
-        min-height: 1em;
-      }
-
-      .skeleton::after {
-        content: '';
-        position: absolute;
-        top: 0; right: 0; bottom: 0; left: 0;
-        transform: translateX(-100%);
-        background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
-        animation: shimmer 1.5s infinite;
-      }
-
-      @keyframes shimmer { 100% { transform: translateX(100%); } }
-
-      .llm-btn {
+      .table-wrapper {
         width: 100%;
-        padding: 10px;
-        background: var(--bg-main);
+        overflow-x: auto;
+        margin: 32px 0;
         border: 1px solid var(--border-color);
-        border-radius: 6px;
-        color: var(--text-muted);
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
+        border-radius: var(--radius);
       }
 
-      .llm-btn:hover {
-        background: var(--bg-subtle);
-        color: var(--text-main);
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+        font-size: 14px;
       }
 
-      /* Search overlay */
+      th, td {
+        border-bottom: 1px solid var(--border-color);
+        padding: 14px 18px;
+        text-align: left;
+      }
+
+      th { background: var(--bg-sidebar); font-weight: 600; }
+
       #search-overlay {
         position: fixed;
         inset: 0;
@@ -434,7 +430,190 @@ class DocsLib {
         border-radius: 12px;
         box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        max-height: 75vh;
         border: 1px solid var(--border-color);
+      }
+
+      .search-modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      #search-input-real {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        font-family: inherit;
+        background: transparent;
+        color: var(--text-main);
+      }
+
+      #search-results {
+        overflow-y: auto;
+        flex: 1;
+        padding: 12px;
+        min-height: 200px;
+      }
+
+      .search-result-item {
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 14px;
+        color: var(--text-main);
+        transition: background 0.1s;
+        border: 1px solid transparent;
+        margin-bottom: 4px;
+      }
+
+      .search-result-item:hover {
+        background: var(--accent-light);
+        border-color: var(--accent-border);
+      }
+
+      .search-result-info { display: flex; flex-direction: column; gap: 2px; }
+
+      .search-result-label { font-weight: 600; color: var(--text-main); }
+
+      .search-result-preview {
+        font-size: 12px;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 450px;
+      }
+
+      .search-empty-hint {
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      .search-icon-grey { color: #94a3b8 !important; }
+
+      .code-section {
+        margin: 36px 0;
+        background: var(--code-bg);
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      }
+
+      .code-header {
+        background: var(--code-header-bg);
+        padding: 0 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 48px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .code-tab {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        padding: 4px 8px;
+      }
+
+      .copy-button {
+        background: none;
+        border: none;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        outline: none;
+        transition: color 0.2s;
+        border-radius: 4px;
+      }
+
+      .copy-button:hover {
+        color: var(--text-main);
+        background: var(--bg-subtle);
+      }
+
+      pre[class*="language-"] {
+        margin: 0 !important;
+        padding: 20px !important;
+        font-size: 13.5px !important;
+        overflow-x: auto;
+        background: transparent !important;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--code-text);
+      }
+
+      pre[class*="language-"] code {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        font-family: inherit;
+        font-size: inherit;
+        border-radius: 0;
+        text-shadow: none;
+        color: inherit;
+        white-space: pre;
+        position: static;
+      }
+
+      .token.comment { color: var(--sh-comment); }
+      .token.punctuation { color: var(--sh-punctuation); }
+      .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: var(--sh-property); }
+      .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: var(--sh-string); }
+      .token.atrule, .token.attr-value, .token.keyword { color: var(--sh-keyword); }
+      .token.function, .token.class-name { color: var(--sh-function); }
+      .token.regex, .token.important, .token.variable { color: var(--sh-variable); }
+
+      .skeleton {
+        background: var(--skeleton-bg);
+        position: relative;
+        overflow: hidden;
+        border-radius: 4px;
+        min-height: 1em;
+        min-width: 3em;
+      }
+
+      .skeleton::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0; bottom: 0; left: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg,transparent,var(--skeleton-shine),transparent);
+        animation: shimmer 1.5s infinite;
+      }
+
+      @keyframes shimmer { 100% { transform: translateX(100%) } }
+
+      .sk-nav-item { height: 28px; margin-bottom: 10px; }
+      .sk-badge { height: 20px; width: 50px; margin-bottom: 20px; border-radius: 6px; }
+      .sk-h1 { height: 38px; width: 40%; margin-bottom: 28px; }
+      .sk-p { height: 16px; width: 100%; margin-bottom: 20px; }
+      .sk-p-last { height: 16px; width: 70%; margin-bottom: 20px; }
+      .sk-code { height: 180px; width: 100%; margin-top: 36px; border-radius: var(--radius); }
+
+      @media (max-width: 768px) {
+        .docslib #navbar { display: flex; }
+        .docslib #sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
+        .docslib #sidebar.open { transform: translateX(0); box-shadow: 20px 0 25px -5px rgba(0,0,0,.1); }
+        .docslib #sidebar-close { display: flex; }
+        .docslib-main { padding-top: 80px; }
+        .content-inner { padding: 0 16px 100px 16px; }
+        .search-shortcut { display: none; }
       }
     `;
     document.head.appendChild(style);
@@ -442,8 +621,18 @@ class DocsLib {
 
   createStructure() {
     this.container.innerHTML = `
-      <div class="docslib ${this.currentTheme}-mode" style="height:100%;width:100%;">
-        <aside class="docslib-sidebar">
+      <div class="docslib ${this.currentTheme}-mode" style="height:100%; width:100%;">
+        <div id="sidebar-overlay"></div>
+        <div class="theme-toggle-wrapper">
+          <button id="theme-toggle-btn">
+            <i data-lucide="${this.currentTheme === 'light' ? 'moon' : 'sun'}" size="20"></i>
+          </button>
+        </div>
+        <nav id="navbar">
+          <button id="burger-btn"><i data-lucide="menu" size="22"></i></button>
+        </nav>
+        <aside id="sidebar">
+          <button id="sidebar-close"><i data-lucide="x" size="18"></i></button>
           <div class="search-container" id="search-trigger">
             <input type="text" id="search-trigger-input" placeholder="Search documentation..." readonly>
             <span class="search-shortcut">Ctrl K</span>
@@ -455,30 +644,31 @@ class DocsLib {
             </button>
           </div>
         </aside>
-
-        <main class="docslib-main">
-          <div class="docslib-content" id="dynamic-content"></div>
-        </main>
-
-        <!-- Search Overlay -->
         <div id="search-overlay">
           <div class="search-modal">
-            <div class="search-modal-header" style="padding:20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:14px;">
-              <input type="text" id="search-input-real" placeholder="Search by title, tags or content..." style="flex:1;border:none;outline:none;font-size:16px;background:transparent;color:var(--text-main);">
+            <div class="search-modal-header">
+              <i data-lucide="search" size="20" style="color:var(--text-muted)"></i>
+              <input type="text" id="search-input-real" placeholder="Search by title, tags or content...">
             </div>
-            <div id="search-results" style="overflow-y:auto;flex:1;padding:12px;min-height:200px;"></div>
+            <div id="search-results"></div>
           </div>
         </div>
+        <main id="main-scroll">
+          <div class="content-inner" id="dynamic-content"></div>
+        </main>
       </div>
     `;
 
-    this.root = this.container.querySelector('.docslib');
+    this.sidebar = this.container.querySelector('#sidebar');
+    this.overlay = this.container.querySelector('#sidebar-overlay');
     this.navContainer = this.container.querySelector('#dynamic-nav');
     this.contentContainer = this.container.querySelector('#dynamic-content');
+    this.mainScroll = this.container.querySelector('#main-scroll');
     this.llmBtn = this.container.querySelector('#llm-copy-btn');
     this.searchOverlay = this.container.querySelector('#search-overlay');
     this.searchInput = this.container.querySelector('#search-input-real');
     this.searchResults = this.container.querySelector('#search-results');
+    this.themeToggleBtn = this.container.querySelector('#theme-toggle-btn');
   }
 
   async loadScripts() {
@@ -494,7 +684,7 @@ class DocsLib {
 
     for (const src of scripts) {
       if (!document.querySelector(`script[src="${src}"]`)) {
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           const s = document.createElement('script');
           s.src = src;
           s.async = false;
@@ -507,60 +697,48 @@ class DocsLib {
 
   renderSkeletons() {
     let navHtml = '';
-    for (let i = 0; i < 4; i++) {
+    for(let i=0; i<4; i++) {
       navHtml += `<div style="padding:12px"><div class="skeleton" style="height:10px;width:30%;margin-bottom:16px"></div>`;
-      for (let j = 0; j < 3; j++) navHtml += `<div class="skeleton" style="height:28px;margin-bottom:10px"></div>`;
+      for(let j=0; j<3; j++) navHtml += `<div class="skeleton sk-nav-item" style="width:${75 + Math.random()*20}%"></div>`;
       navHtml += `</div>`;
     }
     this.navContainer.innerHTML = navHtml;
-
-    this.contentContainer.innerHTML = `
-      <div class="skeleton" style="height:38px;width:40%;margin-bottom:28px"></div>
-      <div class="skeleton" style="height:16px;margin-bottom:20px"></div>
-      <div class="skeleton" style="height:16px;margin-bottom:20px"></div>
-      <div class="skeleton" style="height:180px;margin-top:36px"></div>
-    `;
+    this.contentContainer.innerHTML = `<div class="skeleton sk-badge"></div><div class="skeleton sk-h1"></div><div class="skeleton sk-p"></div><div class="skeleton sk-p"></div><div class="skeleton sk-p-last"></div><div class="skeleton sk-code"></div>`;
   }
 
   parseMarkdown(text) {
     if (!text) return '';
     const html = marked.parse(text, { breaks: true, gfm: true });
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-    temp.querySelectorAll('table').forEach(table => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    tempDiv.querySelectorAll('table').forEach(table => {
       const wrapper = document.createElement('div');
       wrapper.className = 'table-wrapper';
       table.parentNode.insertBefore(wrapper, table);
       wrapper.appendChild(table);
     });
-    return temp.innerHTML;
+    return tempDiv.innerHTML;
   }
 
   processCodeBlocks(container) {
-    container.querySelectorAll('pre').forEach(pre => {
+    container.querySelectorAll('pre').forEach((pre) => {
       const codeEl = pre.querySelector('code');
-      const langClass = codeEl ? Array.from(codeEl.classList).find(c => c.startsWith('language-')) || '' : '';
-      const lang = langClass ? langClass.replace('language-', '') : 'text';
-
+      const langClass = codeEl ? Array.from(codeEl.classList).find(c => c.startsWith('language-')) : '';
+      let lang = langClass ? langClass.replace('language-', '') : 'code';
       const wrapper = document.createElement('div');
       wrapper.className = 'code-section';
-
       const header = document.createElement('div');
       header.className = 'code-header';
       header.innerHTML = `<span class="code-tab">${lang.toUpperCase()}</span><button class="copy-button"><i data-lucide="copy" size="14"></i></button>`;
-
       pre.parentNode.insertBefore(wrapper, pre);
       wrapper.appendChild(header);
       wrapper.appendChild(pre);
-
       header.querySelector('.copy-button').onclick = async () => {
-        const text = codeEl ? codeEl.textContent : pre.textContent;
-        await navigator.clipboard.writeText(text);
-        const btn = header.querySelector('.copy-button');
-        btn.innerHTML = '<i data-lucide="check" style="color:#16a34a" size="14"></i>';
+        await navigator.clipboard.writeText(codeEl ? codeEl.textContent : pre.textContent);
+        header.querySelector('.copy-button').innerHTML = '<i data-lucide="check" style="color:#16a34a" size="14"></i>';
         lucide.createIcons();
         setTimeout(() => {
-          btn.innerHTML = '<i data-lucide="copy" size="14"></i>';
+          header.querySelector('.copy-button').innerHTML = '<i data-lucide="copy" size="14"></i>';
           lucide.createIcons();
         }, 2000);
       };
@@ -577,32 +755,27 @@ class DocsLib {
 
   scrollToSection(id) {
     const target = document.getElementById(`section-${id}`);
-    if (target) {
-      this.container.querySelector('.docslib-main').scrollTo({
-        top: target.offsetTop - 20,
-        behavior: 'smooth'
-      });
+    if(target) {
+      this.mainScroll.scrollTo({ top: target.offsetTop - 20, behavior: 'smooth' });
+      if (window.innerWidth <= 768) this.toggleSidebar(false);
     }
   }
 
   renderAllContent() {
     this.contentContainer.innerHTML = '';
     const allItems = this.flattenItems(this.docsData.groups.flatMap(g => g.items)).filter(i => i.content);
-
     allItems.forEach((item, index) => {
       const section = document.createElement('section');
       section.id = `section-${item.id}`;
       section.className = 'doc-section';
       section.innerHTML = `<span class="badge">${item.badge || 'Docs'}</span>${this.parseMarkdown(item.content)}`;
       this.contentContainer.appendChild(section);
-
       if (index < allItems.length - 1) {
         const hr = document.createElement('hr');
         hr.className = 'section-divider';
         this.contentContainer.appendChild(hr);
       }
     });
-
     this.processCodeBlocks(this.contentContainer);
     Prism.highlightAll();
     lucide.createIcons();
@@ -618,7 +791,6 @@ class DocsLib {
       this.scrollToSection(item.id);
     };
     container.appendChild(el);
-
     if (item.children) {
       const childGroup = document.createElement('div');
       childGroup.className = 'nested-container';
@@ -632,15 +804,12 @@ class DocsLib {
     this.docsData.groups.forEach(g => {
       const groupDiv = document.createElement('div');
       groupDiv.className = 'nav-group';
-
       const header = document.createElement('div');
       header.className = 'nav-group-header';
       header.innerHTML = `<span class="nav-group-title">${g.title}</span><i data-lucide="chevron-down" class="nav-group-toggle-icon"></i>`;
-
       const itemsDiv = document.createElement('div');
       itemsDiv.className = 'nav-group-items';
       g.items.forEach(i => this.createNavItem(i, itemsDiv));
-
       header.onclick = () => {
         const isCollapsed = groupDiv.classList.contains('collapsed');
         if (isCollapsed) {
@@ -651,19 +820,22 @@ class DocsLib {
           itemsDiv.style.maxHeight = '0px';
         }
       };
-
       groupDiv.appendChild(header);
       groupDiv.appendChild(itemsDiv);
       this.navContainer.appendChild(groupDiv);
     });
     lucide.createIcons();
+  }
 
-    // Open all groups by default
-    setTimeout(() => {
-      document.querySelectorAll('.nav-group-items').forEach(el => {
-        el.style.maxHeight = el.scrollHeight + 'px';
-      });
-    }, 100);
+  toggleSidebar(open) {
+    this.sidebar.classList.toggle('open', open);
+    this.overlay.classList.toggle('active', open);
+  }
+
+  setActive(id) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const el = document.getElementById(`nav-${id}`);
+    if(el) el.classList.add('active');
   }
 
   openSearch() {
@@ -680,7 +852,6 @@ class DocsLib {
   performSearch(query) {
     const allItems = this.flattenItems(this.docsData.groups.flatMap(g => g.items)).filter(i => i.content);
     let results = [];
-
     if (!query.trim()) {
       results = allItems;
     } else {
@@ -689,45 +860,38 @@ class DocsLib {
         let score = 0;
         const label = (item.label || "").toLowerCase();
         const content = (item.content || "").toLowerCase();
-
         if (label === q) score += 100;
         else if (label.startsWith(q)) score += 80;
         else if (label.includes(q)) score += 60;
-
         if (content.includes(q)) {
           score += 20;
           const count = content.split(q).length - 1;
           score += Math.min(count * 2, 20);
         }
         return { ...item, score };
-      }).filter(item => item.score > 0)
-        .sort((a, b) => b.score - a.score);
+      }).filter(item => item.score > 0).sort((a, b) => b.score - a.score);
     }
-
     this.renderSearchResults(results, query);
   }
 
   renderSearchResults(results, query) {
     if (results.length === 0) {
-      this.searchResults.innerHTML = `<div style="padding:40px 20px;text-align:center;color:var(--text-muted);">No results found for "${query}"</div>`;
+      this.searchResults.innerHTML = `<div class="search-empty-hint">No results found for "${query}"</div>`;
       return;
     }
-
     this.searchResults.innerHTML = results.map(item => {
       const preview = item.content ? item.content.replace(/[#*`]/g, '').substring(0, 80) + '...' : '';
       return `
-        <div class="search-result-item" data-id="${item.id}" style="padding:12px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;border-radius:8px;margin-bottom:4px;">
-          <i data-lucide="${item.icon || 'file-text'}" size="18" style="color:#94a3b8"></i>
-          <div>
-            <div style="font-weight:600;">${item.label}</div>
-            <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${preview}</div>
+        <div class="search-result-item" data-id="${item.id}">
+          <i data-lucide="${item.icon || 'file-text'}" size="18" class="search-icon-grey"></i>
+          <div class="search-result-info">
+            <span class="search-result-label">${item.label}</span>
+            <span class="search-result-preview">${preview}</span>
           </div>
         </div>
       `;
     }).join('');
-
     lucide.createIcons();
-
     this.searchResults.querySelectorAll('.search-result-item').forEach(el => {
       el.onclick = () => {
         this.scrollToSection(el.dataset.id);
@@ -737,14 +901,19 @@ class DocsLib {
   }
 
   setupEventListeners() {
-    // Search
-    this.container.querySelector('#search-trigger').onclick = () => this.openSearch();
-    this.searchOverlay.onclick = (e) => {
-      if (e.target === this.searchOverlay) this.closeSearch();
+    this.themeToggleBtn.onclick = () => {
+      const isDark = this.container.querySelector('.docslib').classList.contains('dark-mode');
+      const newTheme = isDark ? 'light' : 'dark';
+      this.container.querySelector('.docslib').className = `docslib ${newTheme}-mode`;
+      localStorage.setItem('theme', newTheme);
+      this.themeToggleBtn.innerHTML = `<i data-lucide="${newTheme === 'light' ? 'moon' : 'sun'}" size="20"></i>`;
+      lucide.createIcons();
     };
+
+    this.container.querySelector('#search-trigger').onclick = () => this.openSearch();
+    this.searchOverlay.onclick = (e) => { if(e.target === this.searchOverlay) this.closeSearch(); };
     this.searchInput.oninput = (e) => this.performSearch(e.target.value);
 
-    // Keyboard
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
@@ -753,45 +922,51 @@ class DocsLib {
       if (e.key === 'Escape') this.closeSearch();
     });
 
-    // LLM Copy
+    this.container.querySelector('#burger-btn').onclick = () => this.toggleSidebar(true);
+    this.container.querySelector('#sidebar-close').onclick = () => this.toggleSidebar(false);
+    this.overlay.onclick = () => this.toggleSidebar(false);
+
     this.llmBtn.onclick = async () => {
       const original = this.llmBtn.innerHTML;
       try {
         const res = await fetch(this.options.llmCopyUrl);
+        if (!res.ok) throw new Error();
         const text = await res.text();
         await navigator.clipboard.writeText(text);
         this.llmBtn.innerHTML = '<span>Copied!</span>';
       } catch (err) {
         this.llmBtn.innerHTML = '<span>Error</span>';
       }
+      lucide.createIcons();
       setTimeout(() => {
         this.llmBtn.innerHTML = original;
+        lucide.createIcons();
       }, 2000);
     };
 
-    // Scroll spy for active nav
-    const mainScroll = this.container.querySelector('.docslib-main');
-    mainScroll.onscroll = () => {
+    this.mainScroll.onscroll = () => {
       const sections = this.contentContainer.querySelectorAll('.doc-section');
       let current = "";
       sections.forEach(s => {
-        if (mainScroll.scrollTop >= s.offsetTop - 100) current = s.id.replace('section-', '');
+        if (this.mainScroll.scrollTop >= s.offsetTop - 100) current = s.id.replace('section-', '');
       });
-      if (current) {
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        const activeEl = document.getElementById(`nav-${current}`);
-        if (activeEl) activeEl.classList.add('active');
-      }
+      if (current) this.setActive(current);
     };
+
+    setTimeout(() => {
+      document.querySelectorAll('.nav-group-items').forEach(el => {
+        el.style.maxHeight = el.scrollHeight + 'px';
+      });
+    }, 200);
   }
 
   applyTheme() {
-    // Theme toggle kan later toegevoegd worden indien gewenst
+    // Theme is al toegepast in createStructure
   }
 
   setTheme(theme) {
     this.currentTheme = theme;
-    this.root.className = `docslib ${theme}-mode`;
+    this.container.querySelector('.docslib').className = `docslib ${theme}-mode`;
   }
 
   destroy() {
@@ -802,15 +977,14 @@ class DocsLib {
 // Custom Element
 class DocsLibElement extends HTMLElement {
   connectedCallback() {
-    this.style.display = 'block';
     this.style.height = '100%';
     this.style.width = '100%';
+    this.style.display = 'block';
 
     new DocsLib(this, {
-      dataUrl: this.getAttribute('data-url') || './data.json',
-      llmCopyUrl: this.getAttribute('llm-url') || './llm-data.txt',
-      theme: this.getAttribute('theme') || 'light',
-      sidebarWidth: this.getAttribute('sidebar-width') || '280px'
+      dataUrl: this.getAttribute('data-url') || 'https://hyperrushnet.github.io/hrn-ai/client/data.json',
+      llmCopyUrl: this.getAttribute('llm-url') || '',
+      theme: this.getAttribute('theme') || 'dark'
     });
   }
 }
@@ -819,5 +993,4 @@ if (!customElements.get('docs-lib')) {
   customElements.define('docs-lib', DocsLibElement);
 }
 
-// Global export
 window.DocsLib = DocsLib;
