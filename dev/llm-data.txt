@@ -1,0 +1,171 @@
+# HRN Core v7.5.25 Documentation
+
+HRN Core is a modern, lightweight, and powerful game library loader with intelligent device detection. It lets you dynamically load, search, filter, sort, randomize, and manage large collections of games with a clean and chainable API.
+
+---
+
+## Introduction
+
+### What's New in v7.5.25
+* New `shuffle()` method
+* New `sortBy(key)` and `sortByPopularity()` methods
+* Convenient `getRandomOne()` method
+* `getByAlias()` and `getByCategory()` for quick lookups
+* History system (`addToHistory`, `getHistory`, `clearHistory`)
+* Useful getters: `total` and `filteredCount`
+* Improved chaining and overall stability
+
+### Installation
+
+#### ES Module (recommended)
+```html
+<script type="module">
+import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.25.min.js';
+</script>
+```
+
+#### Standard Script
+```html
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.25.min.js"></script>
+```
+
+---
+
+## Quick Start
+
+### 1. Initialize the library
+```javascript
+await HRN.init();
+```
+
+### 2. Get the current list
+```javascript
+console.log(HRN.list);
+```
+
+### 3. Get one random game (shortcut)
+```javascript
+const game = HRN.getRandomOne();
+console.log(game.name);
+```
+
+---
+
+## Configuration
+
+You can configure HRN Core when calling `init()`.
+
+| Option | Type | Default | Description |
+|-------|------|-----------|--------------|
+| `mode` | string | `'all'` | `'all'`, `'supported'`, or `'favs'` |
+| `sort` | string | `'name'` | Sort key: `'name'`, `'category'`, `'alias'` |
+| `search` | string | `''` | Initial search query |
+| `src` | string | (default) | Custom JSON database URL |
+| `cdn` | string | (default) | Custom thumbnail CDN base URL |
+
+### Example
+```javascript
+await HRN.init({
+  mode: 'supported',
+  sort: 'category',
+  search: 'mario',
+  src: 'https://your-site.com/games.json'
+});
+```
+
+---
+
+## Core API
+
+### Main Properties
+
+| Property | Type | Description |
+|----------|------|--------------|
+| `HRN.list` | Array | Current filtered / sorted / randomized game list |
+| `HRN.total` | Number | Total number of games in the library |
+| `HRN.filteredCount` | Number | Number of games after current filters |
+| `HRN.deviceType` | Number | 1=Desktop(touch), 2=Desktop(mouse), 3=Mobile, 4=Tablet |
+
+### Essential Methods
+* `search(query)` — Filter by name or alias
+* `random(limit)` — Get random games (default limit = 1)
+* `getRandomOne()` — Shortcut for one random game
+* `shuffle()` — Shuffle current list
+* `sortBy(key)` — Sort by name, category, alias, etc.
+* `filterSupported()` — Show only supported games
+* `filterFavorites()` — Show only favorites
+* `reset()` — Reset all filters and return to full list
+* `toggleFavorite(alias)` — Add or remove from favorites
+* `addToHistory(alias)` — Add game to history (max 50)
+
+---
+
+## Data Structure
+
+Every game in `HRN.list` has the following structure. Note that all **thumbnails are standardized at 400x300px**.
+
+```javascript
+{
+  name: "Super Mario Bros",
+  category: "Platformer",
+  alias: "mario",
+  url: "platformer/mario",
+  thumb: "https://cdn.../mario.webp", // Dimensions: 400x300px
+  devices: [2, 3, 4],
+  isSupported: true,     // getter
+  isFavorite: false      // getter
+}
+```
+
+---
+
+## Usage Examples
+
+### Chaining Filters
+```javascript
+const games = HRN
+  .search('sonic')
+  .filterSupported()
+  .shuffle()
+  .sortBy('name')
+  .list;
+```
+
+### Get 5 Random Games from a Category
+```javascript
+const racingGames = HRN
+  .getByCategory('racing')
+  .random(5)
+  .list;
+```
+
+### History Tracking
+```javascript
+HRN.addToHistory(game.alias);
+const recent = HRN.getHistory();
+```
+
+---
+
+## Advanced Features
+
+### Device Detection
+HRN Core automatically detects the device type for compatibility filtering.
+
+| Value | Type |
+|-------|------|
+| 1 | Desktop with touch |
+| 2 | Desktop with mouse/keyboard |
+| 3 | Mobile phone |
+| 4 | Tablet / large touch |
+
+### Favorites System
+Favorites are automatically saved in **LocalStorage** and persist between sessions.
+
+```javascript
+HRN.toggleFavorite('mario');           // toggle
+console.log(HRN.isFavorite('mario'));  // true or false
+
+// Get all favorite games
+const favorites = HRN.reset().filterFavorites().list;
+```
