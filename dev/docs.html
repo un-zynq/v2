@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +21,7 @@
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap' },
       { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css' }
     ];
-    links.forEach(l => {
+    links.forEach(l => { 
        if (!document.querySelector(`link[href="${l.href}"]`)) {
          const link = document.createElement('link');
          Object.assign(link, l);
@@ -40,7 +39,7 @@
       'https://cdn.jsdelivr.net/npm/marked/marked.min.js'
     ];
 
-    async function loadScripts() {
+    async function loadScripts() { 
        for (const src of scripts) {
          if (!document.querySelector(`script[src="${src}"]`)) {
            await new Promise((resolve) => {
@@ -100,23 +99,23 @@
       }
 
       body.dark-mode {
-        --bg-main: #0f172a;
-        --bg-sidebar: #1e293b;
-        --bg-subtle: #334155;
-        --bg-overlay: rgba(0,0,0,0.6);
-        --text-main: #f1f5f9;
-        --text-body: #cbd5e1;
-        --text-muted: #94a3b8;
+        --bg-main: #0a0a0a;
+        --bg-sidebar: #121212;
+        --bg-subtle: #1e1e1e;
+        --bg-overlay: rgba(0,0,0,0.8);
+        --text-main: #ededed;
+        --text-body: #a0a0a0;
+        --text-muted: #737373;
         --accent: #3b82f6;
         --accent-light: rgba(59,130,246,0.1);
-        --accent-border: #1e40af;
-        --border-color: #334155;
-        --code-bg: #1e293b;
-        --code-header-bg: #0f172a;
-        --code-text: #f1f5f9;
+        --accent-border: #2563eb;
+        --border-color: #262626;
+        --code-bg: #121212;
+        --code-header-bg: #0a0a0a;
+        --code-text: #ededed;
         --inline-code-text: #60a5fa;
-        --sh-comment: #94a3b8;
-        --sh-punctuation: #94a3b8;
+        --sh-comment: #737373;
+        --sh-punctuation: #a0a0a0;
         --sh-property: #f87171;
         --sh-string: #4ade80;
         --sh-keyword: #60a5fa;
@@ -125,10 +124,10 @@
         --sh-deleted: #f87171;
         --sh-inserted: #4ade80;
         --scrollbar-bg: transparent;
-        --scrollbar-thumb: #475569;
-        --scrollbar-thumb-hover: #64748b;
-        --skeleton-bg: #334155;
-        --skeleton-shine: #475569;
+        --scrollbar-thumb: #333333;
+        --scrollbar-thumb-hover: #444444;
+        --skeleton-bg: #1e1e1e;
+        --skeleton-shine: #262626;
       }
 
       * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -167,7 +166,6 @@
       
       main { flex: 1; overflow-y: auto; padding: 56px 0 0 0; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; position: relative; }
       
-      /* FIXED: Toggle is now always visible (fixed) and more subtle */
       .theme-toggle-wrapper { position: fixed; top: 20px; right: 24px; z-index: var(--z-toggle); }
       #theme-toggle-btn { background: transparent; border: none; color: var(--text-muted); padding: 8px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; opacity: 0.7; }
       #theme-toggle-btn:hover { background: var(--bg-subtle); color: var(--text-main); opacity: 1; transform: translateY(-1px); }
@@ -188,14 +186,13 @@
       li { margin-bottom: 10px; line-height: 1.7; }
       blockquote { border-left: 3px solid var(--accent); margin: 32px 0; padding: 16px 24px; background: var(--bg-sidebar); color: var(--text-body); border-radius: 0 6px 6px 0; font-size: 14px; }
       img { max-width: 100%; height: auto; border-radius: var(--radius); margin: 24px 0; display: block; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-      
       code:not(pre > code) { background: var(--bg-subtle); color: var(--inline-code-text); padding: 0.2em 0.4em; border-radius: 4px; font-size: 85%; font-family: 'JetBrains Mono', monospace; }
       
       .table-wrapper { width: 100%; overflow-x: auto; margin: 32px 0; border: 1px solid var(--border-color); border-radius: var(--radius); }
       table { width: 100%; border-collapse: collapse; margin: 0; font-size: 14px; }
       th, td { border-bottom: 1px solid var(--border-color); padding: 14px 18px; text-align: left; }
       th { background: var(--bg-sidebar); font-weight: 600; }
-      
+
       #search-overlay { position: fixed; inset: 0; background: var(--bg-overlay); display: none; justify-content: center; align-items: flex-start; padding-top: 10vh; z-index: var(--z-search); backdrop-filter: blur(4px); }
       #search-overlay.active { display: flex; }
       .search-modal { width: 90%; max-width: 640px; background: var(--bg-main); border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,.25); overflow: hidden; display: flex; flex-direction: column; max-height: 75vh; border: 1px solid var(--border-color); }
@@ -208,17 +205,17 @@
       .search-result-label { font-weight: 600; color: var(--text-main); }
       .search-result-preview { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 450px; }
       .search-empty-hint { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 14px; }
-      .search-icon-grey { color: #94a3b8 !important; } 
-      
+      .search-icon-grey { color: #737373 !important; }
+
       .code-section { margin: 36px 0; background: var(--code-bg); border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
       .code-header { background: var(--code-header-bg); padding: 0 18px; display: flex; align-items: center; justify-content: space-between; height: 48px; border-bottom: 1px solid var(--border-color); }
       .code-tab { font-size: 12px; font-weight: 500; color: var(--text-muted); padding: 4px 8px; }
-      .copy-button { background: none; border: none; width: 32px; height: 32px; cursor: pointer; color: #94a3b8; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.2s; border-radius: 4px; }
+      .copy-button { background: none; border: none; width: 32px; height: 32px; cursor: pointer; color: #737373; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.2s; border-radius: 4px; }
       .copy-button:hover { color: var(--text-main); background: var(--bg-subtle); }
-      
+
       pre[class*="language-"] { margin: 0 !important; padding: 20px !important; font-size: 13.5px !important; overflow-x: auto; background: transparent !important; font-family: 'JetBrains Mono', monospace; color: var(--code-text); }
       pre[class*="language-"] code { padding: 0 !important; margin: 0 !important; background: transparent !important; font-family: inherit; font-size: inherit; border-radius: 0; text-shadow: none; color: inherit; white-space: pre; position: static; }
-      
+
       .token.comment { color: var(--sh-comment); }
       .token.punctuation { color: var(--sh-punctuation); }
       .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: var(--sh-property); }
@@ -240,7 +237,7 @@
       @media (max-width: 768px) {
         #navbar { display: flex; }
         #sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); }
-        #sidebar.open { transform: translateX(0); box-shadow: 20px 0 25px -5px rgba(0,0,0,.1); }
+        #sidebar.open { transform: translateX(0); box-shadow: 20px 0 25px -5px rgba(0,0,0,.5); }
         #sidebar-close { display: flex; }
         #sidebar-overlay { display: none; position: fixed; inset: 0; background: var(--bg-overlay); z-index: var(--z-overlay); }
         #sidebar-overlay.active { display: block; }
@@ -302,7 +299,6 @@
     const searchInput = document.getElementById('search-input-real');
     const searchResults = document.getElementById('search-results');
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
-    
     let docsData = { groups: [] };
 
     function renderSkeletons() {
@@ -316,12 +312,12 @@
       contentContainer.innerHTML = `<div class="skeleton sk-badge"></div><div class="skeleton sk-h1"></div><div class="skeleton sk-p"></div><div class="skeleton sk-p"></div><div class="skeleton sk-p-last"></div><div class="skeleton sk-code"></div>`;
     }
 
-    const toggleSidebar = (open) => {
+    const toggleSidebar = (open) => { 
        sidebar.classList.toggle('open', open);
        overlay.classList.toggle('active', open);
     };
 
-    const setActive = (id) => {
+    const setActive = (id) => { 
        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
        const el=document.getElementById(`nav-${id}`);
        if(el) el.classList.add('active');
@@ -401,7 +397,7 @@
       el.className = 'nav-item';
       el.id = `nav-${item.id}`;
       el.innerHTML = `<i data-lucide="${item.icon || 'file-text'}" class="nav-icon"></i><span>${item.label}</span>`;
-      el.onclick = (e) => {
+      el.onclick = (e) => { 
          e.stopPropagation();
          scrollToSection(item.id);
       };
@@ -567,8 +563,8 @@
 
       setTimeout(() => {
         document.querySelectorAll('.nav-group-items').forEach(el => { 
-          el.style.maxHeight = el.scrollHeight + 'px'; 
-        });
+           el.style.maxHeight = el.scrollHeight + 'px'; 
+         });
       }, 200);
     }
 
