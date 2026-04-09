@@ -41,16 +41,20 @@ class HRN_Core {
     const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
     const hasHover = window.matchMedia("(hover: hover)").matches;
     const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    const gl =
+      canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
     const debugInfo = gl?.getExtension("WEBGL_debug_renderer_info");
-    const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "";
+    const renderer = debugInfo
+      ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+      : "";
 
     let scores = { desktop: 0, mobile: 0 };
 
     if (/Win|Mac|Linux/i.test(ua)) scores.desktop += 15;
     if (ua.includes("x64") || ua.includes("wow64")) scores.desktop += 10;
     if (hasFinePointer && hasHover) scores.desktop += 20;
-    if (/Intel|Nvidia|AMD|Direct3D|GeForce/i.test(renderer)) scores.desktop += 25;
+    if (/Intel|Nvidia|AMD|Direct3D|GeForce/i.test(renderer))
+      scores.desktop += 25;
     if (/Android|iPhone|iPad|iPod/i.test(ua)) scores.mobile += 20;
     if (/Adreno|Mali|PowerVR|Apple GPU/i.test(renderer)) scores.mobile += 25;
 
@@ -59,9 +63,24 @@ class HRN_Core {
     } else if (/Macintosh/i.test(ua) && touchPoints > 1) {
       this.deviceType = 4;
     } else {
-      const isLarge = window.screen.width >= 1024 || (window.screen.width >= 768 && touchPoints > 1);
+      const isLarge =
+        window.screen.width >= 1024 ||
+        (window.screen.width >= 768 && touchPoints > 1);
       this.deviceType = isLarge ? 4 : 3;
     }
+  }
+
+  random(limit = 1) {
+    const source = this.filtered.length > 0 ? this.filtered : this.all;
+    if (source.length === 0) {
+      this.filtered = [];
+      return this;
+    }
+
+    const shuffled = [...source].sort(() => 0.5 - Math.random());
+    this.filtered = shuffled.slice(0, limit);
+
+    return this;
   }
 
   async _loadData(sortKey) {
@@ -79,7 +98,9 @@ class HRN_Core {
               alias: alias,
               url: `${base}/${alias}`,
               thumb: `${this.config.cdn}/${base}/${alias}.webp`,
-              devices: meta.devices ? String(meta.devices).split(",").map(Number) : null,
+              devices: meta.devices
+                ? String(meta.devices).split(",").map(Number)
+                : null,
               get isSupported() {
                 return this.devices?.includes(window.HRN.deviceType) ?? true;
               },
@@ -91,7 +112,9 @@ class HRN_Core {
         });
       });
 
-      this.all = library.sort((a, b) => (a[sortKey] || "").localeCompare(b[sortKey] || ""));
+      this.all = library.sort((a, b) =>
+        (a[sortKey] || "").localeCompare(b[sortKey] || ""),
+      );
       this.filtered = [...this.all];
     } catch (err) {
       console.error("HRN Core Error:", err);
@@ -100,7 +123,13 @@ class HRN_Core {
 
   search(query) {
     const q = query?.toLowerCase().trim();
-    this.filtered = q ? this.all.filter((g) => g.name.toLowerCase().includes(q) || g.alias.toLowerCase().includes(q)) : [...this.all];
+    this.filtered = q
+      ? this.all.filter(
+          (g) =>
+            g.name.toLowerCase().includes(q) ||
+            g.alias.toLowerCase().includes(q),
+        )
+      : [...this.all];
     return this;
   }
 
@@ -128,7 +157,9 @@ class HRN_Core {
   }
 
   toggleFavorite(alias) {
-    this.favorites.has(alias) ? this.favorites.delete(alias) : this.favorites.add(alias);
+    this.favorites.has(alias)
+      ? this.favorites.delete(alias)
+      : this.favorites.add(alias);
     localStorage.setItem("hrn_favs", JSON.stringify([...this.favorites]));
     return this;
   }
