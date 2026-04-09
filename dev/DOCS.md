@@ -1,4 +1,4 @@
-# HRN Core Documentation v7.5.18
+# HRN Core Documentation v7.5.19
 
 Modern, lightweight game library loader and device detection utility.
 
@@ -8,12 +8,12 @@ Modern, lightweight game library loader and device detection utility.
 
 ### Standard Script
 ```html
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.18.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.19.min.js"></script>
 ```
 
 ### ES Module
 ```javascript
-import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.18.min.js';
+import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.19.min.js';
 ```
 
 ---
