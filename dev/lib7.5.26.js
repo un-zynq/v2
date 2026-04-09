@@ -12,6 +12,7 @@ class HRN_Core {
     this.deviceType = 2;
     this.history = [];
     this._pool = [];
+    this._lastResults = [];
   }
 
   async init(options = {}) {
@@ -33,6 +34,7 @@ class HRN_Core {
     if (mode === "supported") this.filterSupported();
     if (mode === "favs") this.filterFavorites();
 
+    this._updateLastResults();
     return this;
   }
 
@@ -101,7 +103,17 @@ class HRN_Core {
   }
 
   _refreshPool() {
-    this._pool = [...this.all].sort(() => Math.random() - 0.5);
+    this._pool = [...this.all]
+      .filter(game => !this._lastResults.some(last => last.alias === game.alias))
+      .sort(() => Math.random() - 0.5);
+    
+    if (this._pool.length === 0) {
+      this._pool = [...this.all].sort(() => Math.random() - 0.5);
+    }
+  }
+
+  _updateLastResults() {
+    this._lastResults = [...this.filtered];
   }
 
   search(query) {
@@ -109,6 +121,7 @@ class HRN_Core {
     this.filtered = q 
       ? this.all.filter((g) => g.name.toLowerCase().includes(q) || g.alias.toLowerCase().includes(q)) 
       : [...this.all];
+    this._updateLastResults();
     return this;
   }
 
@@ -122,6 +135,7 @@ class HRN_Core {
     }
 
     this.filtered = selection;
+    this._updateLastResults();
     return this;
   }
 
@@ -133,35 +147,44 @@ class HRN_Core {
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     this.filtered = arr;
+    this._updateLastResults();
     return this;
   }
 
   sortBy(key = "name") {
     this.filtered.sort((a, b) => (a[key] || "").localeCompare(b[key] || ""));
+    this._updateLastResults();
     return this;
   }
 
   sortByPopularity() {
     this.filtered.sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
+    this._updateLastResults();
     return this;
   }
 
   getRandomOne() {
     if (this._pool.length === 0) this._refreshPool();
-    return this._pool.pop();
+    const game = this._pool.pop();
+    this._lastResults = [game];
+    return game;
   }
 
   getByAlias(alias) {
-    return this.all.find(game => game.alias === alias) || null;
+    const game = this.all.find(game => game.alias === alias) || null;
+    if (game) this._lastResults = [game];
+    return game;
   }
 
   getByCategory(category) {
     this.filtered = this.all.filter(game => game.category === category);
+    this._updateLastResults();
     return this;
   }
 
   filterByDevice() {
     this.filtered = this.filtered.filter(game => game.isSupported);
+    this._updateLastResults();
     return this;
   }
 
@@ -184,22 +207,29 @@ class HRN_Core {
 
   filterFavorites() {
     this.filtered = this.filtered.filter((g) => g.isFavorite);
+    this._updateLastResults();
     return this;
   }
 
   filterSupported() {
     this.filtered = this.filtered.filter((g) => g.isSupported);
+    this._updateLastResults();
     return this;
   }
 
   reset() {
     this.filtered = [...this.all];
+    this._lastResults = [];
     this._refreshPool();
     return this;
   }
 
   get list() {
     return this.filtered;
+  }
+
+  get lastResults() {
+    return this._lastResults;
   }
 
   get total() {
