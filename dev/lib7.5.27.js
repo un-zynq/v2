@@ -84,7 +84,7 @@ class HRN_Core {
               thumb: `${this.config.cdn}/${base}/${alias}.webp`,
               devices: meta.devices ? String(meta.devices).split(",").map(Number) : null,
               get isSupported() {
-                return this.devices?.includes(window.HRN.deviceType) ?? true;
+                return window.HRN.deviceType === null || (this.devices?.includes(window.HRN.deviceType) ?? true);
               },
               get isFavorite() {
                 return window.HRN.isFavorite(this.alias);
@@ -103,13 +103,7 @@ class HRN_Core {
   }
 
   _refreshPool() {
-    this._pool = [...this.all]
-      .filter(game => !this._lastResults.some(last => last.alias === game.alias))
-      .sort(() => Math.random() - 0.5);
-    
-    if (this._pool.length === 0) {
-      this._pool = [...this.all].sort(() => Math.random() - 0.5);
-    }
+    this._pool = [...this.all].sort(() => Math.random() - 0.5);
   }
 
   _updateLastResults() {
@@ -121,20 +115,13 @@ class HRN_Core {
     this.filtered = q 
       ? this.all.filter((g) => g.name.toLowerCase().includes(q) || g.alias.toLowerCase().includes(q)) 
       : [...this.all];
-    this._updateLastResults();
     return this;
   }
 
   random(limit = 1) {
-    if (this.all.length === 0) return this;
-
-    const selection = [];
-    for (let i = 0; i < limit; i++) {
-      if (this._pool.length === 0) this._refreshPool();
-      selection.push(this._pool.pop());
-    }
-
-    this.filtered = selection;
+    const source = this.filtered.length > 0 ? this.filtered : this.all;
+    const shuffled = [...source].sort(() => Math.random() - 0.5);
+    this.filtered = shuffled.slice(0, limit);
     this._updateLastResults();
     return this;
   }
@@ -147,44 +134,35 @@ class HRN_Core {
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     this.filtered = arr;
-    this._updateLastResults();
     return this;
   }
 
   sortBy(key = "name") {
     this.filtered.sort((a, b) => (a[key] || "").localeCompare(b[key] || ""));
-    this._updateLastResults();
     return this;
   }
 
   sortByPopularity() {
     this.filtered.sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
-    this._updateLastResults();
     return this;
   }
 
   getRandomOne() {
-    if (this._pool.length === 0) this._refreshPool();
-    const game = this._pool.pop();
-    this._lastResults = [game];
-    return game;
+    const source = this.filtered.length > 0 ? this.filtered : this.all;
+    return source[Math.floor(Math.random() * source.length)];
   }
 
   getByAlias(alias) {
-    const game = this.all.find(game => game.alias === alias) || null;
-    if (game) this._lastResults = [game];
-    return game;
+    return this.all.find(game => game.alias === alias) || null;
   }
 
   getByCategory(category) {
     this.filtered = this.all.filter(game => game.category === category);
-    this._updateLastResults();
     return this;
   }
 
   filterByDevice() {
     this.filtered = this.filtered.filter(game => game.isSupported);
-    this._updateLastResults();
     return this;
   }
 
@@ -207,29 +185,22 @@ class HRN_Core {
 
   filterFavorites() {
     this.filtered = this.filtered.filter((g) => g.isFavorite);
-    this._updateLastResults();
     return this;
   }
 
   filterSupported() {
     this.filtered = this.filtered.filter((g) => g.isSupported);
-    this._updateLastResults();
     return this;
   }
 
   reset() {
     this.filtered = [...this.all];
-    this._lastResults = [];
     this._refreshPool();
     return this;
   }
 
   get list() {
     return this.filtered;
-  }
-
-  get lastResults() {
-    return this._lastResults;
   }
 
   get total() {
