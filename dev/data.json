@@ -7,15 +7,15 @@
           "id": "about",
           "label": "About HRN Core",
           "icon": "home",
-          "badge": "v7.5.21",
-          "content": "# HRN Core\n\n`HRN Core` is a modern, lightweight game library loader combined with a smart device detection utility. It allows you to dynamically fetch, filter, and manage game collections with minimal setup.\n\n### Core Features\n\n* **Dynamic Game Loader**: Fetches a structured game database asynchronously.\n* **Device Detection**: Automatically detects device type for compatibility filtering.\n* **Chainable API**: Clean and fluent method chaining for powerful queries.\n* **Favorites System**: Built-in LocalStorage support for saving favorite games.\n* **Filtering & Sorting**: Search, filter, and randomize game lists easily.\n\n---\n\n### Installation\n\n#### Standard Script\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.21.min.js\"></script>\n```\n\n#### ES Module\n```javascript\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.21.min.js';\n```"
+          "badge": "v7.5.22",
+          "content": "# HRN Core v7.5.22\n\n`HRN Core` is a modern, lightweight, and powerful game library loader with intelligent device detection. It lets you dynamically load, search, filter, sort, randomize, and manage large collections of games with a clean and chainable API.\n\n### What's New in v7.5.22\n\n- New `shuffle()` method\n- New `sortBy(key)` and `sortByPopularity()` methods\n- Convenient `getRandomOne()` method\n- `getByAlias()` and `getByCategory()` for quick lookups\n- History system (`addToHistory`, `getHistory`, `clearHistory`)\n- Useful getters: `total` and `filteredCount`\n- Improved chaining and overall stability\n\n### Core Features\n\n* **Dynamic Game Loader** — Async fetching from JSON with thumbnail support\n* **Smart Device Detection** — Automatic detection for desktop, mobile, and tablet\n* **Fully Chainable API** — Fluent method chaining for complex queries\n* **Favorites System** — Persistent via LocalStorage\n* **Advanced Filtering & Sorting** — Search, category, supported devices, random, shuffle\n* **History Tracking** — Keep track of recently played or viewed games\n\n---\n\n### Installation\n\n#### ES Module (recommended)\n```html\n<script type=\"module\">\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.22.min.js';\n</script>\n```\n\n#### Standard Script\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.22.min.js\"></script>\n```"
         },
         {
           "id": "quickstart",
           "label": "Quick Start",
           "icon": "play-circle",
           "badge": "Start here",
-          "content": "# Quick Start\n\nGet up and running in seconds.\n\n### 1. Initialize\n\n```javascript\nawait HRN.init();\n```\n\n### 2. Access Game List\n\n```javascript\nconsole.log(HRN.list);\n```\n\n### 3. Get a Random Game\n\n```javascript\nconst game = HRN.random().list[0];\nconsole.log(game.name);\n```"
+          "content": "# Quick Start\n\n### 1. Initialize the library\n```javascript\nawait HRN.init();\n```\n\n### 2. Get the current list\n```javascript\nconsole.log(HRN.list);\n```\n\n### 3. Get one random game\n```javascript\nconst game = HRN.random().list[0];\nconsole.log(game.name);\n```\n\n### 4. Get one random game (new shortcut)\n```javascript\nconst game = HRN.getRandomOne();\nconsole.log(game.name);\n```"
         }
       ]
     },
@@ -26,7 +26,7 @@
           "id": "init-options",
           "label": "Initialization Options",
           "icon": "settings",
-          "content": "# Initialization Options\n\nConfigure the library during `HRN.init()`.\n\n### Options\n\n| Option | Type | Default | Description |\n|---|---|---|---|\n| `mode` | `string` | `'all'` | `'all'`, `'supported'`, or `'favs'`. |\n| `sort` | `string` | `'name'` | Sort by `'name'`, `'category'`, or `'alias'`. |\n| `search` | `string` | `''` | Initial search query. |\n| `src` | `string` | `undefined` | Custom JSON data source URL. |\n| `cdn` | `string` | `undefined` | Custom thumbnail CDN base URL. |\n\n### Example\n\n```javascript\nawait HRN.init({\n  mode: 'supported',\n  sort: 'category',\n  search: 'mario'\n});\n```"
+          "content": "# Initialization Options\n\nYou can configure HRN Core when calling `init()`.\n\n### Available Options\n\n| Option     | Type     | Default      | Description                                      |\n|------------|----------|--------------|--------------------------------------------------|\n| `mode`     | string   | `'all'`      | `'all'`, `'supported'`, or `'favs'`              |\n| `sort`     | string   | `'name'`     | Sort key: `'name'`, `'category'`, `'alias'`      |\n| `search`   | string   | `''`         | Initial search query                             |\n| `src`      | string   | (default)    | Custom JSON database URL                         |\n| `cdn`      | string   | (default)    | Custom thumbnail CDN base URL                    |\n\n### Example\n```javascript\nawait HRN.init({\n  mode: 'supported',\n  sort: 'category',\n  search: 'mario',\n  src: 'https://your-site.com/games.json'\n});\n```"
         }
       ]
     },
@@ -37,13 +37,13 @@
           "id": "properties",
           "label": "Properties",
           "icon": "database",
-          "content": "# Properties\n\n### Available Properties\n\n| Property | Type | Description |\n|---|---|---|\n| `HRN.list` | `Array` | Current filtered and sorted game list. |\n| `HRN.deviceType` | `Number` | 1: Desktop (Touch), 2: Desktop (Mouse), 3: Mobile, 4: Tablet. |\n\n### Example\n\n```javascript\nconsole.log(HRN.deviceType);\nconsole.log(HRN.list);\n```"
+          "content": "# Properties\n\n### Main Properties\n\n| Property            | Type     | Description                                              |\n|---------------------|----------|----------------------------------------------------------|\n| `HRN.list`          | Array    | Current filtered / sorted / randomized game list         |\n| `HRN.total`         | Number   | Total number of games in the library                     |\n| `HRN.filteredCount` | Number   | Number of games after current filters                    |\n| `HRN.deviceType`    | Number   | 1 = Desktop (touch), 2 = Desktop (mouse), 3 = Mobile, 4 = Tablet |\n\n### Example\n```javascript\nconsole.log(`Total games: ${HRN.total}`);\nconsole.log(`Showing: ${HRN.filteredCount} games`);\nconsole.log(`Device type: ${HRN.deviceType}`);\n```"
         },
         {
           "id": "methods",
           "label": "Methods",
           "icon": "cpu",
-          "content": "# Methods\n\n### Available Methods\n\n* `search(query)` – Filter by name or alias.\n* `random(limit)` – Shuffle list and limit results.\n* `filterSupported()` – Show only supported games.\n* `filterFavorites()` – Show only favorites.\n* `toggleFavorite(alias)` – Add/remove favorite.\n* `isFavorite(alias)` – Check favorite status.\n* `reset()` – Reset all filters.\n\n### Example\n\n```javascript\nconst games = HRN\n  .search('sonic')\n  .filterSupported()\n  .random(2)\n  .list;\n```"
+          "content": "# Methods\n\n### Essential Methods\n\n* `search(query)` → Filter by name or alias\n* `random(limit)` → Get random games (default limit = 1)\n* `getRandomOne()` → Shortcut for one random game\n* `shuffle()` → Shuffle current list\n* `sortBy(key)` → Sort by name, category, alias, etc.\n* `sortByPopularity()` → Sort by playCount (if available)\n* `filterSupported()` → Show only supported games\n* `filterFavorites()` → Show only favorites\n* `getByAlias(alias)` → Find single game by alias\n* `getByCategory(category)` → Filter by category\n* `reset()` → Reset all filters and return to full list\n* `toggleFavorite(alias)` → Add or remove from favorites\n* `isFavorite(alias)` → Check if game is favorite\n\n### History Methods (new in v7.5.22)\n* `addToHistory(alias)` → Add game to history (max 50)\n* `getHistory()` → Return games from history\n* `clearHistory()` → Clear history\n\n### Chaining Example\n```javascript\nconst games = HRN\n  .search('sonic')\n  .filterSupported()\n  .shuffle()\n  .sortBy('name')\n  .list;\n```"
         }
       ]
     },
@@ -54,7 +54,7 @@
           "id": "data-structure",
           "label": "Data Structure",
           "icon": "file-text",
-          "content": "# Data Structure\n\nEach game object in `HRN.list` contains:\n\n```javascript\n{\n  name: \"Game Name\",\n  category: \"Action\",\n  alias: \"game-id\",\n  url: \"path/game-id\",\n  thumb: \"cdn/path/game-id.webp\",\n  isSupported: true,\n  isFavorite: false\n}\n```"
+          "content": "# Game Object Structure\n\nEvery game in `HRN.list` has the following structure:\n\n```javascript\n{\n  name: \"Super Mario Bros\",\n  category: \"Platformer\",\n  alias: \"mario\",\n  url: \"platformer/mario\",\n  thumb: \"https://cdn.../platformer/mario.webp\",\n  devices: [2, 3, 4],\n  isSupported: true,     // getter\n  isFavorite: false      // getter\n}\n```\n\n`isSupported` and `isFavorite` are dynamic getters that update automatically."
         }
       ]
     },
@@ -65,7 +65,7 @@
           "id": "examples",
           "label": "Usage Examples",
           "icon": "code",
-          "content": "# Usage Examples\n\n### Random Supported Game\n\n```javascript\nasync function loadRandomGame() {\n  await HRN.init();\n\n  const game = HRN\n    .search('mario')\n    .filterSupported()\n    .random()\n    .list[0];\n\n  if (game) {\n    console.log(`Suggested: ${game.name}`);\n  }\n}\n```\n\n### Favorites Discovery\n\n```javascript\nasync function getDiscoveryList() {\n  const favorites = HRN\n    .reset()\n    .filterFavorites()\n    .random(3)\n    .list;\n}\n```"
+          "content": "# Practical Examples\n\n### Get one random supported game\n```javascript\nconst game = HRN\n  .filterSupported()\n  .random()\n  .list[0];\n\nconsole.log(`Play: ${game.name}`);\n```\n\n### Get 5 random games from a category\n```javascript\nconst racingGames = HRN\n  .getByCategory('racing')\n  .random(5)\n  .list;\n```\n\n### Shuffle current list\n```javascript\nHRN.shuffle();\nconsole.log(HRN.list);\n```\n\n### Favorites + Random\n```javascript\nconst favPicks = HRN\n  .reset()\n  .filterFavorites()\n  .random(3)\n  .list;\n```\n\n### Add to history after playing\n```javascript\nHRN.addToHistory(game.alias);\nconst recent = HRN.getHistory();\n```"
         }
       ]
     },
@@ -76,13 +76,13 @@
           "id": "device-detection",
           "label": "Device Detection",
           "icon": "smartphone",
-          "content": "# Device Detection\n\n`HRN.deviceType` automatically detects the user's device.\n\n### Values\n\n| Value | Device |\n|---|---|\n| 1 | Desktop (Touch) |\n| 2 | Desktop (Mouse) |\n| 3 | Mobile |\n| 4 | Tablet |\n\n### Example\n\n```javascript\nif (HRN.deviceType === 3) {\n  console.log('Mobile device detected');\n}\n```"
+          "content": "# Device Detection\n\nHRN Core automatically detects the device type for compatibility filtering.\n\n### Device Type Values\n\n| Value | Type                      |\n|-------|---------------------------|\n| 1     | Desktop with touch        |\n| 2     | Desktop with mouse/keyboard (default for most PCs) |\n| 3     | Mobile phone              |\n| 4     | Tablet / large touch      |\n\n### Example\n```javascript\nif (HRN.deviceType === 3 || HRN.deviceType === 4) {\n  console.log('Touch device detected');\n}\n```"
         },
         {
           "id": "favorites",
           "label": "Favorites System",
           "icon": "star",
-          "content": "# Favorites System\n\nFavorites are stored automatically using LocalStorage, allowing users to persist their favorite games across sessions.\n\n---\n\n### Toggle Favorite\n\nAdd or remove a game from favorites using its alias.\n\n```javascript\nHRN.toggleFavorite('mario');\n```\n\n---\n\n### Check Favorite Status\n\n```javascript\nif (HRN.isFavorite('mario')) {\n  console.log('Mario is a favorite');\n}\n```\n\n---\n\n### Get All Favorite Games\n\n```javascript\nconst favorites = HRN\n  .reset()\n  .filterFavorites()\n  .list;\n\nconsole.log(favorites);\n```\n\n---\n\n### Random Favorite Game\n\n```javascript\nconst game = HRN\n  .reset()\n  .filterFavorites()\n  .random()\n  .list[0];\n\nif (game) {\n  console.log(`Play this: ${game.name}`);\n}\n```\n\n---\n\n### Remove All Favorites (Manual Reset)\n\n```javascript\nHRN.list.forEach(game => {\n  if (game.isFavorite) {\n    HRN.toggleFavorite(game.alias);\n  }\n});\n```\n\n---\n\n### UI Example (Toggle Button)\n\n```javascript\nfunction toggleFav(alias) {\n  HRN.toggleFavorite(alias);\n\n  const isFav = HRN.isFavorite(alias);\n  console.log(isFav ? 'Added to favorites' : 'Removed from favorites');\n}\n```\n\n---\n\n### Notes\n\n* Favorites persist via LocalStorage.\n* Works instantly without reloading.\n* Can be combined with filters, search, and randomization.\n\n```javascript\n// Example combo\nconst picks = HRN\n  .search('kart')\n  .filterFavorites()\n  .random(2)\n  .list;\n```\n"
+          "content": "# Favorites System\n\nFavorites are automatically saved in **LocalStorage** and persist between sessions.\n\n### Basic Usage\n```javascript\nHRN.toggleFavorite('mario');           // toggle\nconsole.log(HRN.isFavorite('mario'));  // true or false\n```\n\n### Get all favorite games\n```javascript\nconst favorites = HRN\n  .reset()\n  .filterFavorites()\n  .list;\n```\n\n### Random favorite game\n```javascript\nconst game = HRN\n  .reset()\n  .filterFavorites()\n  .getRandomOne();\n```\n\n### Combined example\n```javascript\nconst picks = HRN\n  .search('kart')\n  .filterFavorites()\n  .random(2)\n  .list;\n```\n\nFavorites update instantly and work together with all other filters and methods."
         }
       ]
     }
