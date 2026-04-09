@@ -1,6 +1,6 @@
 "use strict";
 
-class HRN_Core {
+class ZYNQ_Core {
   constructor() {
     this.config = {
       src: "https://un-zynq.github.io/games2.json",
@@ -84,10 +84,10 @@ class HRN_Core {
               thumb: `${this.config.cdn}/${base}/${alias}.webp`,
               devices: meta.devices ? String(meta.devices).split(",").map(Number) : null,
               get isSupported() {
-                return window.HRN.deviceType === null || (this.devices?.includes(window.HRN.deviceType) ?? true);
+                return window.ZYNQ.deviceType === null || (this.devices?.includes(window.ZYNQ.deviceType) ?? true);
               },
               get isFavorite() {
-                return window.HRN.isFavorite(this.alias);
+                return window.ZYNQ.isFavorite(this.alias);
               },
             });
           });
@@ -98,7 +98,7 @@ class HRN_Core {
       this.filtered = [...this.all];
       this._refreshPool();
     } catch (err) {
-      console.error("HRN Core Error:", err);
+      console.error("ZYNQ Core Error:", err);
     }
   }
 
@@ -217,13 +217,13 @@ class HRN_Core {
 
   toggleFavorite(alias) {
     this.favorites.has(alias) ? this.favorites.delete(alias) : this.favorites.add(alias);
-    localStorage.setItem("hrn_favs", JSON.stringify([...this.favorites]));
+    localStorage.setItem("ZYNQ_favs", JSON.stringify([...this.favorites]));
     return this;
   }
 
   _initStorage() {
     try {
-      const data = localStorage.getItem("hrn_favs");
+      const data = localStorage.getItem("ZYNQ_favs");
       return new Set(data ? JSON.parse(data) : []);
     } catch {
       return new Set();
@@ -231,11 +231,11 @@ class HRN_Core {
   }
 }
 
-const HRN = new HRN_Core();
-window.HRN = HRN;
+const ZYNQ = new ZYNQ_Core();
+window.ZYNQ = ZYNQ;
 
 if (typeof exports === "object" && typeof module !== "undefined") {
-  module.exports = HRN;
+  module.exports = ZYNQ;
 } else if (typeof define === "function" && define.amd) {
-  define([], () => HRN);
+  define([], () => ZYNQ);
 }
