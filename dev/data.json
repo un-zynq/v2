@@ -54,7 +54,7 @@
           "id": "data-structure",
           "label": "Data Structure",
           "icon": "file-text",
-          "content": "# Game Object Structure\n\nEvery game in `HRN.list` has the following structure:\n\n```javascript\n{\n  name: \"Super Mario Bros\",\n  category: \"Platformer\",\n  alias: \"mario\",\n  url: \"platformer/mario\",\n  thumb: \"https://cdn.../platformer/mario.webp\",\n  devices: [2, 3, 4],\n  isSupported: true,     // getter\n  isFavorite: false      // getter\n}\n```\n\n`isSupported` and `isFavorite` are dynamic getters that update automatically."
+          "content": "# Game Object Structure\n\nEvery game in `HRN.list` has the following structure:\n\n```javascript\n{\n  name: \"Super Mario Bros\",\n  category: \"Platformer\",\n  alias: \"mario\",\n  url: \"platformer/mario\",\n  thumb: \"https://cdn.../platformer/mario.webp // 400x300px\",\n  devices: [2, 3, 4],\n  isSupported: true,     // getter\n  isFavorite: false      // getter\n}\n```\n\n`isSupported` and `isFavorite` are dynamic getters that update automatically."
         }
       ]
     },
