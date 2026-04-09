@@ -10,7 +10,6 @@ class HRN_Core {
     this.filtered = [];
     this.favorites = this._initStorage();
     this.deviceType = 2;
-    this.events = {};
   }
 
   async init(options = {}) {
@@ -32,7 +31,6 @@ class HRN_Core {
     if (mode === "supported") this.filterSupported();
     if (mode === "favs") this.filterFavorites();
 
-    this.trigger("init", this.all);
     return this;
   }
 
@@ -77,13 +75,13 @@ class HRN_Core {
           Object.entries(games).forEach(([alias, meta]) => {
             library.push({
               name: meta.name || alias,
-              category: meta.category || "Other",
+              category: meta.category || undefined,
               alias: alias,
               url: `${base}/${alias}`,
               thumb: `${this.config.cdn}/${base}/${alias}.webp`,
               devices: meta.devices ? String(meta.devices).split(",").map(Number) : null,
               get isSupported() {
-                return this.devices ? this.devices.includes(window.HRN.deviceType) : true;
+                return this.devices?.includes(window.HRN.deviceType) ?? true;
               },
               get isFavorite() {
                 return window.HRN.isFavorite(this.alias);
@@ -102,66 +100,34 @@ class HRN_Core {
 
   search(query) {
     const q = query?.toLowerCase().trim();
-    if (!q) {
-      this.filtered = [...this.all];
-    } else {
-      this.filtered = this.all.filter((g) => 
-        g.name.toLowerCase().includes(q) || 
-        g.alias.toLowerCase().includes(q) ||
-        (g.category && g.category.toLowerCase().includes(q))
-      );
-    }
-    this.trigger("filter", this.filtered);
+    this.filtered = q ? this.all.filter((g) => g.name.toLowerCase().includes(q) || g.alias.toLowerCase().includes(q)) : [...this.all];
     return this;
   }
 
   random(limit = 1) {
-    const source = [...this.filtered];
-    if (source.length === 0) return this;
-    
-    for (let i = source.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [source[i], source[j]] = [source[j], source[i]];
+    const source = this.filtered.length > 0 ? this.filtered : this.all;
+    if (source.length === 0) {
+      this.filtered = [];
+      return this;
     }
-    
-    this.filtered = source.slice(0, limit);
-    this.trigger("filter", this.filtered);
+    const shuffled = [...source].sort(() => 0.5 - Math.random());
+    this.filtered = shuffled.slice(0, limit);
     return this;
   }
 
   filterFavorites() {
     this.filtered = this.filtered.filter((g) => g.isFavorite);
-    this.trigger("filter", this.filtered);
     return this;
   }
 
   filterSupported() {
     this.filtered = this.filtered.filter((g) => g.isSupported);
-    this.trigger("filter", this.filtered);
-    return this;
-  }
-
-  limit(count, offset = 0) {
-    this.filtered = this.filtered.slice(offset, offset + count);
     return this;
   }
 
   reset() {
     this.filtered = [...this.all];
-    this.trigger("filter", this.filtered);
     return this;
-  }
-
-  on(event, callback) {
-    if (!this.events[event]) this.events[event] = [];
-    this.events[event].push(callback);
-    return this;
-  }
-
-  trigger(event, data) {
-    if (this.events[event]) {
-      this.events[event].forEach((cb) => cb(data));
-    }
   }
 
   get list() {
@@ -173,13 +139,8 @@ class HRN_Core {
   }
 
   toggleFavorite(alias) {
-    if (this.favorites.has(alias)) {
-      this.favorites.delete(alias);
-    } else {
-      this.favorites.add(alias);
-    }
+    this.favorites.has(alias) ? this.favorites.delete(alias) : this.favorites.add(alias);
     localStorage.setItem("hrn_favs", JSON.stringify([...this.favorites]));
-    this.trigger("favoriteUpdate", alias);
     return this;
   }
 
