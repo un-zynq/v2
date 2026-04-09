@@ -11,7 +11,7 @@ class HRN_Core {
     this.favorites = this._initStorage();
     this.deviceType = 2;
     this.history = [];
-    this._lastPickedAlias = null;
+    this._pool = [];
   }
 
   async init(options = {}) {
@@ -94,9 +94,14 @@ class HRN_Core {
 
       this.all = library.sort((a, b) => (a[sortKey] || "").localeCompare(b[sortKey] || ""));
       this.filtered = [...this.all];
+      this._refreshPool();
     } catch (err) {
       console.error("HRN Core Error:", err);
     }
+  }
+
+  _refreshPool() {
+    this._pool = [...this.all].sort(() => Math.random() - 0.5);
   }
 
   search(query) {
@@ -108,24 +113,15 @@ class HRN_Core {
   }
 
   random(limit = 1) {
-    // We use a local pool to avoid destroying this.filtered during iterations
-    let pool = this.filtered.length > 0 ? [...this.filtered] : [...this.all];
-    
-    if (pool.length === 0) return this;
+    if (this.all.length === 0) return this;
 
-    // Prevent immediate duplicate if we have enough options
-    if (pool.length > 1 && limit === 1) {
-      pool = pool.filter(g => g.alias !== this._lastPickedAlias);
+    const selection = [];
+    for (let i = 0; i < limit; i++) {
+      if (this._pool.length === 0) this._refreshPool();
+      selection.push(this._pool.pop());
     }
 
-    const shuffled = pool.sort(() => Math.random() - 0.5);
-    const selection = shuffled.slice(0, limit);
-
-    if (limit === 1 && selection.length > 0) {
-      this._lastPickedAlias = selection[0].alias;
-    }
-
-    this.filtered = selection; 
+    this.filtered = selection;
     return this;
   }
 
@@ -151,17 +147,8 @@ class HRN_Core {
   }
 
   getRandomOne() {
-    const pool = this.all.length > 0 ? this.all : [];
-    if (pool.length === 0) return null;
-    
-    let selection = pool;
-    if (pool.length > 1) {
-        selection = pool.filter(g => g.alias !== this._lastPickedAlias);
-    }
-    
-    const game = selection[Math.floor(Math.random() * selection.length)];
-    this._lastPickedAlias = game.alias;
-    return game;
+    if (this._pool.length === 0) this._refreshPool();
+    return this._pool.pop();
   }
 
   getByAlias(alias) {
@@ -207,7 +194,7 @@ class HRN_Core {
 
   reset() {
     this.filtered = [...this.all];
-    this._lastPickedAlias = null;
+    this._refreshPool();
     return this;
   }
 
