@@ -107,7 +107,7 @@ class HRN_Core {
     return this;
   }
 
-  random(limit = 1) {
+random(limit = 1) {
     const source = this.filtered.length > 0 ? this.filtered : this.all;
     if (source.length === 0) {
       this.filtered = [];
@@ -115,6 +115,8 @@ class HRN_Core {
     }
     const shuffled = [...source].sort(() => 0.5 - Math.random());
     this.filtered = shuffled.slice(0, limit);
+    
+    this.trigger("filter", this.filtered);
     return this;
   }
 
