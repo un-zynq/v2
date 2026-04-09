@@ -1,12 +1,12 @@
-# HRN Core v7.5.27 Documentation
+# ZYNQ Core v7.5.28 Documentation
 
-HRN Core is a modern, lightweight, and powerful game library loader with intelligent device detection. It lets you dynamically load, search, filter, sort, randomize, and manage large collections of games with a clean and chainable API.
+ZYNQ Core is a modern, lightweight, and powerful game library loader with intelligent device detection. It lets you dynamically load, search, filter, sort, randomize, and manage large collections of games with a clean and chainable API.
 
 ---
 
 ## Introduction
 
-### What's New in v7.5.27
+### What's New in v7.5.28
 * New `shuffle()` method
 * New `sortBy(key)` and `sortByPopularity()` methods
 * Convenient `getRandomOne()` method
@@ -20,13 +20,13 @@ HRN Core is a modern, lightweight, and powerful game library loader with intelli
 #### ES Module (recommended)
 ```html
 <script type="module">
-import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.27.min.js';
+import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.28.min.js';
 </script>
 ```
 
 #### Standard Script
 ```html
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.27.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.28.min.js"></script>
 ```
 
 ---
@@ -35,17 +35,17 @@ import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.27.min.js';
 
 ### 1. Initialize the library
 ```javascript
-await HRN.init();
+await ZYNQ.init();
 ```
 
 ### 2. Get the current list
 ```javascript
-console.log(HRN.list);
+console.log(ZYNQ.list);
 ```
 
 ### 3. Get one random game (shortcut)
 ```javascript
-const game = HRN.getRandomOne();
+const game = ZYNQ.getRandomOne();
 console.log(game.name);
 ```
 
@@ -53,7 +53,7 @@ console.log(game.name);
 
 ## Configuration
 
-You can configure HRN Core when calling `init()`.
+You can configure ZYNQ Core when calling `init()`.
 
 | Option | Type | Default | Description |
 |-------|------|-----------|--------------|
@@ -65,7 +65,7 @@ You can configure HRN Core when calling `init()`.
 
 ### Example
 ```javascript
-await HRN.init({
+await ZYNQ.init({
   mode: 'supported',
   sort: 'category',
   search: 'mario',
@@ -81,10 +81,10 @@ await HRN.init({
 
 | Property | Type | Description |
 |----------|------|--------------|
-| `HRN.list` | Array | Current filtered / sorted / randomized game list |
-| `HRN.total` | Number | Total number of games in the library |
-| `HRN.filteredCount` | Number | Number of games after current filters |
-| `HRN.deviceType` | Number | 1=Desktop(touch), 2=Desktop(mouse), 3=Mobile, 4=Tablet |
+| `ZYNQ.list` | Array | Current filtered / sorted / randomized game list |
+| `ZYNQ.total` | Number | Total number of games in the library |
+| `ZYNQ.filteredCount` | Number | Number of games after current filters |
+| `ZYNQ.deviceType` | Number | 1=Desktop(touch), 2=Desktop(mouse), 3=Mobile, 4=Tablet |
 
 ### Essential Methods
 * `search(query)` — Filter by name or alias
@@ -102,7 +102,7 @@ await HRN.init({
 
 ## Data Structure
 
-Every game in `HRN.list` has the following structure. Note that all **thumbnails are standardized at 400x300px**.
+Every game in `ZYNQ.list` has the following structure. Note that all **thumbnails are standardized at 400x300px**.
 
 ```javascript
 {
@@ -123,7 +123,7 @@ Every game in `HRN.list` has the following structure. Note that all **thumbnails
 
 ### Chaining Filters
 ```javascript
-const games = HRN
+const games = ZYNQ
   .search('sonic')
   .filterSupported()
   .shuffle()
@@ -133,7 +133,7 @@ const games = HRN
 
 ### Get 5 Random Games from a Category
 ```javascript
-const racingGames = HRN
+const racingGames = ZYNQ
   .getByCategory('racing')
   .random(5)
   .list;
@@ -141,8 +141,8 @@ const racingGames = HRN
 
 ### History Tracking
 ```javascript
-HRN.addToHistory(game.alias);
-const recent = HRN.getHistory();
+ZYNQ.addToHistory(game.alias);
+const recent = ZYNQ.getHistory();
 ```
 
 ---
@@ -150,7 +150,7 @@ const recent = HRN.getHistory();
 ## Advanced Features
 
 ### Device Detection
-HRN Core automatically detects the device type for compatibility filtering.
+ZYNQ Core automatically detects the device type for compatibility filtering.
 
 | Value | Type |
 |-------|------|
@@ -163,9 +163,9 @@ HRN Core automatically detects the device type for compatibility filtering.
 Favorites are automatically saved in **LocalStorage** and persist between sessions.
 
 ```javascript
-HRN.toggleFavorite('mario');           // toggle
-console.log(HRN.isFavorite('mario'));  // true or false
+ZYNQ.toggleFavorite('mario');           // toggle
+console.log(ZYNQ.isFavorite('mario'));  // true or false
 
 // Get all favorite games
-const favorites = HRN.reset().filterFavorites().list;
+const favorites = ZYNQ.reset().filterFavorites().list;
 ```
