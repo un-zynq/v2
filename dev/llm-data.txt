@@ -132,7 +132,7 @@ await ZYNQ.init({
 #### History (v7.5.29)
 
 * `addToHistory(alias)` → Add game to history (max 50)
-* `getHistory()` → Retrieve history list
+* `getHistory()` → Retrieve history list (array of game objects)
 * `clearHistory()` → Clear history
 
 ### Chaining Example
