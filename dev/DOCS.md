@@ -1,4 +1,4 @@
-# HRN Core Documentation v7.5.16
+# HRN Core Documentation v7.5.17
 
 Modern, lightweight game library loader and device detection utility.
 
@@ -8,12 +8,12 @@ Modern, lightweight game library loader and device detection utility.
 
 ### Standard Script
 ```html
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.16.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.17.min.js"></script>
 ```
 
 ### ES Module
 ```javascript
-import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.16.min.js';
+import 'https://cdn.jsdelivr.net/gh/un-zynq/v2/dev/lib7.5.17.min.js';
 ```
 
 ---
@@ -46,6 +46,7 @@ await HRN.init({
 | Method | Description |
 | :--- | :--- |
 | `search(query)` | Filters the list by name or alias. |
+| `random(limit)` | Shuffles the current list and limits results (Default: 1). |
 | `filterSupported()` | Filters list to only show games compatible with current device. |
 | `filterFavorites()` | Filters list to only show favorited games. |
 | `toggleFavorite(alias)`| Adds or removes a game from favorites (saves to LocalStorage). |
@@ -74,14 +75,21 @@ Each object in `HRN.list` contains:
 
 ## Usage Example
 
+### Chaining & Randomization
 ```javascript
-async function loadGames() {
+async function loadRandomGame() {
   await HRN.init();
   
-  const games = HRN.search('mario').filterSupported().list;
+  // Get one random supported Mario game
+  const game = HRN.search('mario').filterSupported().random().list[0];
   
-  games.forEach(game => {
-    console.log(`Title: ${game.name}, URL: ${game.url}`);
-  });
+  if (game) {
+    console.log(`Suggested: ${game.name}`);
+  }
+}
+
+async function getDiscoveryList() {
+  // Get 3 random favorites
+  const favorites = HRN.reset().filterFavorites().random(3).list;
 }
 ```
