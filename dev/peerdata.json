@@ -24,17 +24,6 @@
       ]
     },
     {
-      "title": "Core Usage",
-      "items": [
-        {
-          "id": "usage",
-          "label": "Usage Rules",
-          "icon": "cpu",
-          "content": "# Usage Rules\n\n## ALWAYS use direct API:\n\n### Correct\n```javascript\nZYNQ.peer.start()\nZYNQ.peer.connect(id)\nZYNQ.peer.broadcast(msg)\n```\n\n### Wrong ❌\n```javascript\nconst p = ZYNQ.peer\np.start()\n```\n\n---\n\n## Minimal pattern\n```javascript\nawait ZYNQ.load(\"peer\")\nawait ZYNQ.peer.start()\n\nZYNQ.peer.on('ready', id => console.log(id))\n```"
-        }
-      ]
-    },
-    {
       "title": "Events",
       "items": [
         {
