@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PulseNet v6.4 | Original Stable</title>
+    <title>PulseNet v6.4 | Original Stable + Cleanup</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <style>
         :root {
@@ -99,17 +99,28 @@
             this.peer.on('open', id => this.dispatchEvent(new CustomEvent('ready', { detail: id })));
             this.peer.on('connection', c => this._setupData(c));
             this.peer.on('call', c => this._handleMedia(c));
+            
+            // Global error catcher voor PeerJS crashes
+            this.peer.on('error', err => {
+                console.error('PeerJS Error:', err.type);
+                if(err.type === 'peer-unavailable') {
+                    logChat('SYSTEM', 'Target node not found or offline.');
+                }
+            });
         }
 
         async _initStream(config) {
             if (this.stream) return;
             try {
                 this.stream = await navigator.mediaDevices.getUserMedia({
-                    video: config.video ? { width: 640, height: 480 } : false,
-                    audio: config.audio ? true : false
+                    video: config.video ? { width: 640, height: 480, frameRate: 24 } : false,
+                    audio: config.audio ? { echoCancellation: true, noiseSuppression: true } : false
                 });
                 this.dispatchEvent(new CustomEvent('localStream', { detail: this.stream }));
-            } catch (e) { console.warn("Stream init failed", e); }
+            } catch (e) { 
+                console.warn("Stream init failed", e); 
+                logChat('SYSTEM', 'Camera/Mic access denied.');
+            }
         }
 
         async dial(targetId, config) {
@@ -143,6 +154,7 @@
                 }
             });
             conn.on('close', () => this._cleanup(conn.peer, false));
+            conn.on('error', () => this._cleanup(conn.peer, false));
         }
 
         async respond(pid, ok) {
@@ -157,12 +169,17 @@
 
         _handleMedia(call) {
             const s = this.sessions.get(call.peer);
-            if (s) { s.call = call; call.answer(this.stream); this._bindCall(call); }
+            if (s) { 
+                s.call = call; 
+                call.answer(this.stream); 
+                this._bindCall(call); 
+            }
         }
 
         _bindCall(call) {
             call.on('stream', st => this.dispatchEvent(new CustomEvent('stream', { detail: { pid: call.peer, stream: st } })));
             call.on('close', () => this._cleanup(call.peer, false));
+            call.on('error', () => this._cleanup(call.peer, false));
         }
 
         broadcast(msg) {
@@ -172,9 +189,20 @@
         _cleanup(pid, notifyPeer) {
             const s = this.sessions.get(pid);
             if (!s) return;
-            if (notifyPeer && s.conn && s.conn.open) s.conn.send({ type: 'BYE' });
-            if (s.call) s.call.close();
+
+            if (notifyPeer && s.conn && s.conn.open) {
+                try { s.conn.send({ type: 'BYE' }); } catch(e){}
+            }
+
+            // Explicitly stop tracks to free up memory/camera
+            if (s.call) {
+                s.call.close();
+                if (s.call.remoteStream) {
+                    s.call.remoteStream.getTracks().forEach(t => t.stop());
+                }
+            }
             if (s.conn) s.conn.close();
+
             this.sessions.delete(pid);
             this.dispatchEvent(new CustomEvent('left', { detail: pid }));
         }
@@ -261,6 +289,9 @@
 
     core.addEventListener('left', e => {
         const pid = e.detail;
+        const videoElement = document.getElementById(`v-${pid}`);
+        if(videoElement) videoElement.srcObject = null; // Memory catch-up
+        
         document.getElementById(`wrap-${pid}`)?.remove();
         document.getElementById(`node-${pid}`)?.remove();
         logChat('SYSTEM', `Node offline: ${pid.substring(0,8)}`);
