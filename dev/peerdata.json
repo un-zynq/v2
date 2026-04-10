@@ -1,13 +1,14 @@
 {
   "groups": [
     {
-      "title": "Installation",
+      "title": "Introduction",
       "items": [
         {
-          "id": "install",
-          "label": "Install",
+          "id": "about",
+          "label": "About ZYNQ.peer",
           "icon": "home",
-          "content": "<script type=\"module\">\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.2.1/index.min.js'\nawait ZYNQ.load(\"peer\")\n</script>"
+          "badge": "v1.0.0",
+          "content": "# ZYNQ.peer\n\n`ZYNQ.peer` is a lightweight WebRTC wrapper built on top of PeerJS.\nIt enables real-time peer-to-peer communication with messaging, audio, and video.\n\n---\n\n## Core Features\n\n- Peer-to-peer messaging\n- Video & audio calls\n- Session management\n- Event-driven API\n- Auto heartbeat system\n- Zero setup usage"
         }
       ]
     },
@@ -15,32 +16,21 @@
       "title": "Quick Start",
       "items": [
         {
-          "id": "start",
-          "label": "Start",
+          "id": "quickstart",
+          "label": "Quick Start",
           "icon": "play-circle",
-          "content": "await ZYNQ.peer.start()\n\nZYNQ.peer.on('ready', id => {\n  console.log(id)\n})"
+          "content": "# Quick Start\n\n### 1. Import + Load\n```javascript\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.2.1/index.min.js'\nawait ZYNQ.load(\"peer\")\nawait ZYNQ.peer.start()\n```\n\n---\n\n### 2. Get your ID\n```javascript\nZYNQ.peer.on('ready', id => {\n  console.log(id)\n})\n```\n\n---\n\n### 3. Connect\n```javascript\nawait ZYNQ.peer.connect('peer-id')\n```\n\n---\n\n### 4. Send message\n```javascript\nZYNQ.peer.sendTo('peer-id', 'hello')\n```\n\n---\n\n### 5. Receive messages\n```javascript\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(message)\n})\n```"
         }
       ]
     },
     {
-      "title": "Messaging",
+      "title": "Core Usage",
       "items": [
         {
-          "id": "msg",
-          "label": "Messaging",
-          "icon": "message-circle",
-          "content": "ZYNQ.peer.sendTo('id', 'hello')\n\nZYNQ.peer.broadcast('hello')\n\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(message)\n})"
-        }
-      ]
-    },
-    {
-      "title": "Media",
-      "items": [
-        {
-          "id": "media",
-          "label": "Media",
-          "icon": "video",
-          "content": "ZYNQ.peer.connect('id', {\n  video: true,\n  audio: true,\n  resolution: 720,\n  fps: 30\n})\n\nZYNQ.peer.on('local-stream', stream => {\n  video.srcObject = stream\n})\n\nZYNQ.peer.on('remote-stream', ({ stream }) => {\n  video.srcObject = stream\n})"
+          "id": "usage",
+          "label": "Usage Rules",
+          "icon": "cpu",
+          "content": "# Usage Rules\n\n## ALWAYS use direct API:\n\n### Correct\n```javascript\nZYNQ.peer.start()\nZYNQ.peer.connect(id)\nZYNQ.peer.broadcast(msg)\n```\n\n### Wrong ❌\n```javascript\nconst p = ZYNQ.peer\np.start()\n```\n\n---\n\n## Minimal pattern\n```javascript\nawait ZYNQ.load(\"peer\")\nawait ZYNQ.peer.start()\n\nZYNQ.peer.on('ready', id => console.log(id))\n```"
         }
       ]
     },
@@ -51,7 +41,29 @@
           "id": "events",
           "label": "Events",
           "icon": "zap",
-          "content": "ZYNQ.peer.on('ready', id => {})\nZYNQ.peer.on('invite', data => data.accept())\nZYNQ.peer.on('message', data => {})\nZYNQ.peer.on('joined', id => {})\nZYNQ.peer.on('left', id => {})\nZYNQ.peer.on('remote-stream', data => {})\nZYNQ.peer.on('local-stream', stream => {})"
+          "content": "# Events\n\n```javascript\nZYNQ.peer.on('ready', id => {})\nZYNQ.peer.on('message', data => {})\nZYNQ.peer.on('invite', data => data.accept())\n```\n\n---\n\n## Available Events\n\n- ready\n- invite\n- joined\n- left\n- message\n- remote-stream\n- local-stream\n- bitrate\n- error\n- destroyed"
+        }
+      ]
+    },
+    {
+      "title": "Messaging",
+      "items": [
+        {
+          "id": "messaging",
+          "label": "Messaging",
+          "icon": "message-circle",
+          "content": "# Messaging\n\n## Send to peer\n```javascript\nZYNQ.peer.sendTo('id', 'hello')\n```\n\n## Broadcast\n```javascript\nZYNQ.peer.broadcast('hello all')\n```\n\n## Receive\n```javascript\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(peerId, message)\n})\n```"
+        }
+      ]
+    },
+    {
+      "title": "Media",
+      "items": [
+        {
+          "id": "media",
+          "label": "Video/Audio",
+          "icon": "video",
+          "content": "# Media Calls\n\n## Connect with media\n```javascript\nZYNQ.peer.connect('peer-id', {\n  video: true,\n  audio: true,\n  resolution: 720,\n  fps: 30\n})\n```\n\n---\n\n## Streams\n```javascript\nZYNQ.peer.on('local-stream', stream => {\n  video.srcObject = stream\n})\n\nZYNQ.peer.on('remote-stream', ({ stream }) => {\n  video.srcObject = stream\n})\n```"
         }
       ]
     },
@@ -60,9 +72,9 @@
       "items": [
         {
           "id": "system",
-          "label": "System",
+          "label": "System Behavior",
           "icon": "settings",
-          "content": "await ZYNQ.peer.start()\nZYNQ.peer.destroy()"
+          "content": "# System\n\n- Auto heartbeat every 2s\n- Auto disconnect after timeout\n- Session tracking\n- Bitrate monitoring\n\n---\n\n## Start\n```javascript\nawait ZYNQ.peer.start()\n```\n\n## Destroy\n```javascript\nZYNQ.peer.destroy()\n```"
         }
       ]
     }
