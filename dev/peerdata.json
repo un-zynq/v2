@@ -1,0 +1,101 @@
+{
+  "groups": [
+    {
+      "title": "Introduction",
+      "items": [
+        {
+          "id": "about",
+          "label": "About ZYNQ.peer",
+          "icon": "home",
+          "badge": "v1.0.0",
+          "content": "# ZYNQ.peer\n\n`ZYNQ.peer` is a lightweight, event-driven WebRTC wrapper built on top of PeerJS. It enables real-time peer-to-peer communication including messaging, video/audio streaming, and session management with minimal setup.\n\nIt is designed for simplicity while still offering powerful control over connections, media streams, and lifecycle handling.\n\n---\n\n### Core Capabilities\n\n* **Peer-to-Peer Messaging** — Send and receive structured messages instantly.\n* **WebRTC Media Streaming** — Built-in support for video/audio calls.\n* **Session Management** — Automatically tracks active peers.\n* **Event System** — Reactive architecture using `on()` listeners.\n* **Auto Heartbeat** — Detects disconnects and cleans sessions.\n* **Zero Config Start** — Works out of the box with minimal setup.\n\n---\n\n### Features Overview\n\n* Automatic PeerJS loading (CDN fallback)\n* Real-time bitrate monitoring\n* Smart reconnect / timeout handling\n* Stream lifecycle management\n* Broadcast and direct messaging\n* Fully asynchronous API\n\n---\n\n### Installation\n\n#### Standard Script\n```html\n<script src=\"your-zynq-peer.js\"></script>\n```\n\n#### PeerJS (optional manual include)\n```html\n<script src=\"https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js\"></script>\n```"
+        },
+        {
+          "id": "quickstart",
+          "label": "Quick Start",
+          "icon": "play-circle",
+          "badge": "Start here",
+          "content": "# Quick Start\n\n### 1. Start the peer\n```javascript\nawait ZYNQ.peer.start();\n```\n\n### 2. Listen for readiness\n```javascript\nZYNQ.peer.on('ready', id => {\n  console.log('My ID:', id);\n});\n```\n\n### 3. Connect to another peer\n```javascript\nawait ZYNQ.peer.connect('peer-id');\n```\n\n### 4. Send a message\n```javascript\nZYNQ.peer.sendTo('peer-id', 'Hello world');\n```\n\n### 5. Listen for messages\n```javascript\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(peerId, message);\n});\n```"
+        }
+      ]
+    },
+    {
+      "title": "Configuration",
+      "items": [
+        {
+          "id": "start-options",
+          "label": "Start Options",
+          "icon": "settings",
+          "content": "# Start Options\n\nYou can configure the peer instance during startup.\n\n### Example\n```javascript\nawait ZYNQ.peer.start({\n  host: 'your-server.com',\n  port: 443,\n  secure: true\n});\n```\n\nThese options are passed directly to the PeerJS constructor.\n\n---\n\n### Debug Level\n\n```javascript\nZYNQ.peer.setDebug(2);\n```\n\n| Level | Description |\n|------|------------|\n| 0 | Silent |\n| 1 | Basic logs |\n| 2 | Verbose |\n| 3 | Full debug |\n\n---\n\n### Auto Start\n\n```javascript\nZYNQ.peer.setAutoStart(true);\n```\n\nControls whether internal logic loops automatically start."
+        }
+      ]
+    },
+    {
+      "title": "Core API",
+      "items": [
+        {
+          "id": "properties",
+          "label": "Properties",
+          "icon": "database",
+          "content": "# Properties\n\n### Main Properties\n\n| Property | Type | Description |\n|---------|------|------------|\n| `peer` | Object | PeerJS instance |\n| `sessions` | Map | Active peer sessions |\n| `localStream` | MediaStream | Current local media stream |\n| `ready` | Boolean | Whether peer is ready |\n| `myId` | String | Your peer ID |\n\n---\n\n### Example\n```javascript\nconsole.log(ZYNQ.peer.getMyId());\nconsole.log(ZYNQ.peer.getActivePeers());\n```"
+        },
+        {
+          "id": "methods",
+          "label": "Methods",
+          "icon": "cpu",
+          "content": "# Methods\n\n### Connection Methods\n\n* `start(options)` → Initialize peer\n* `connect(peerId, config)` → Connect to peer\n* `disconnect(peerId)` → Disconnect session\n* `destroy()` → Destroy entire instance\n\n---\n\n### Messaging\n\n* `sendTo(peerId, message)` → Send message\n* `broadcast(message)` → Send to all peers\n\n---\n\n### Media\n\n* Automatically handled via connection negotiation\n* Uses `getUserMedia`\n\n---\n\n### Utility\n\n* `getMyId()` → Return your peer ID\n* `getActivePeers()` → List connected peers\n* `setDebug(level)` → Set debug level\n* `setAutoStart(bool)` → Enable/disable auto logic loop"
+        }
+      ]
+    },
+    {
+      "title": "Events",
+      "items": [
+        {
+          "id": "events",
+          "label": "Event System",
+          "icon": "zap",
+          "content": "# Events\n\nZYNQ.peer uses an event-driven system.\n\n### Register Event\n```javascript\nZYNQ.peer.on('event', callback);\n```\n\n### Remove Event\n```javascript\nZYNQ.peer.off('event', callback);\n```\n\n---\n\n### Available Events\n\n| Event | Description |\n|------|------------|\n| `ready` | Peer initialized |\n| `invite` | Incoming connection request |\n| `joined` | Peer joined session |\n| `left` | Peer disconnected |\n| `message` | Message received |\n| `remote-stream` | Remote media stream |\n| `local-stream` | Local media stream ready |\n| `local-stream-ended` | Local stream stopped |\n| `bitrate` | Live bitrate update |\n| `rejected` | Connection rejected |\n| `error` | Error occurred |\n| `destroyed` | Instance destroyed |\n\n---\n\n### Example\n```javascript\nZYNQ.peer.on('invite', ({ id, accept, reject }) => {\n  accept();\n});\n```"
+        }
+      ]
+    },
+    {
+      "title": "Media & Streaming",
+      "items": [
+        {
+          "id": "media-config",
+          "label": "Media Configuration",
+          "icon": "video",
+          "content": "# Media Configuration\n\nWhen connecting, you can define media settings.\n\n### Example\n```javascript\nZYNQ.peer.connect('peer-id', {\n  video: true,\n  audio: true,\n  resolution: 720,\n  fps: 30\n});\n```\n\n---\n\n### Options\n\n| Option | Type | Description |\n|-------|------|------------|\n| `video` | Boolean | Enable video |\n| `audio` | Boolean | Enable audio |\n| `resolution` | Number | 720 or 1080 |\n| `fps` | Number | Frames per second |\n\n---\n\n### Stream Events\n\n```javascript\nZYNQ.peer.on('remote-stream', ({ peerId, stream }) => {\n  video.srcObject = stream;\n});\n```"
+        }
+      ]
+    },
+    {
+      "title": "Session System",
+      "items": [
+        {
+          "id": "sessions",
+          "label": "Session Lifecycle",
+          "icon": "users",
+          "content": "# Session Lifecycle\n\nEach connected peer is stored as a session.\n\n### Session Object\n\n```javascript\n{\n  conn,\n  call,\n  config,\n  lastSeen,\n  lastBytes,\n  status\n}\n```\n\n---\n\n### Lifecycle Flow\n\n1. Connect request (`REQ`)\n2. Accept (`ACC`) or reject (`REJ`)\n3. Media call starts\n4. Heartbeat keeps connection alive\n5. Disconnect on timeout or manual\n\n---\n\n### Timeout Handling\n\nPeers are automatically disconnected after ~12 seconds of inactivity."
+        }
+      ]
+    },
+    {
+      "title": "Advanced",
+      "items": [
+        {
+          "id": "heartbeat",
+          "label": "Heartbeat System",
+          "icon": "activity",
+          "content": "# Heartbeat System\n\nZYNQ.peer runs an internal loop every 2 seconds.\n\n### Responsibilities\n\n* Sends `PING` messages\n* Expects `PONG` responses\n* Tracks last activity time\n* Calculates bitrate\n* Disconnects inactive peers\n\n---\n\n### Bitrate Monitoring\n\n```javascript\nZYNQ.peer.on('bitrate', ({ peerId, kbps }) => {\n  console.log(`${peerId}: ${kbps} kbps`);\n});\n```"
+        },
+        {
+          "id": "cleanup",
+          "label": "Cleanup & Destroy",
+          "icon": "trash",
+          "content": "# Cleanup & Destroy\n\n### Destroy Instance\n```javascript\nZYNQ.peer.destroy();\n```\n\n---\n\n### What Happens\n\n* All sessions disconnected\n* Media tracks stopped\n* PeerJS instance destroyed\n* Events cleared\n* Internal loop stopped\n\n---\n\n### Auto Cleanup\n\nLocal media stream is automatically stopped when no sessions remain."
+        }
+      ]
+    }
+  ]
+}
