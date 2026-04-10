@@ -3,570 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PulseNet v7.3 • Reclaim Edition</title>
+    <title>PulseNet • Simpel</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <style>
         :root {
-            --bg: #0a0a0f;
-            --side: #111118;
-            --accent: #00f0ff;
-            --text: #f8f9ff;
-            --dim: #8a8a9e;
-            --border: #22222a;
-            --card: #1a1a22;
-            --danger: #ff3b5c;
-            --success: #00ff9d;
-            --glass: rgba(255,255,255,0.06);
+            --bg: #111111;
+            --text: #ffffff;
+            --accent: #00ffff;
+            --gray: #222222;
+            --danger: #ff4444;
         }
-
-        * { box-sizing: border-box; }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
             display: flex;
             height: 100vh;
             overflow: hidden;
-            position: relative;
         }
-
-        /* Glassmorphic header + responsive sidebar */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 68px;
-            background: rgba(17,17,24,0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-            z-index: 1000;
-            gap: 16px;
-        }
-        .brand {
-            font-weight: 800;
-            font-size: 1.35rem;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .brand span { color: var(--accent); }
-        .brand-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            box-shadow: 0 0 12px var(--success);
-            animation: pulse 2s infinite;
-        }
-
         aside {
-            width: 340px;
-            background: var(--side);
-            border-right: 1px solid var(--border);
+            width: 260px;
+            background: #1a1a1a;
+            border-right: 1px solid #333;
             display: flex;
             flex-direction: column;
-            padding-top: 68px;
-            box-sizing: border-box;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px;
         }
-
-        /* Main content */
         main {
             flex: 1;
-            padding: 24px;
-            padding-top: 92px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            background: linear-gradient(180deg, #0a0a0f, #111118);
-            overflow: hidden;
-        }
-
-        #video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-            flex: 1;
-            overflow-y: auto;
-            padding: 4px;
-        }
-        .v-box {
-            background: var(--card);
-            border-radius: 16px;
-            overflow: hidden;
-            position: relative;
-            aspect-ratio: 16/9;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.1);
-        }
-        .v-box:hover { border-color: var(--accent); box-shadow: 0 20px 40px rgba(0, 240, 255, 0.25); }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: #000;
-        }
-        .v-label {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            font-size: 11px;
-            font-weight: 700;
-            background: rgba(10,10,15,0.85);
-            backdrop-filter: blur(10px);
-            padding: 4px 12px;
-            border-radius: 9999px;
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .v-label::before {
-            content: '';
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: live 1.5s infinite;
-        }
-
-        /* Chat */
-        #chat-wrap {
-            height: 260px;
-            background: var(--card);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-        #chat-feed {
-            flex: 1;
             padding: 20px;
-            overflow-y: auto;
-            font-size: 14px;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            gap: 15px;
         }
-        .chat-message {
-            max-width: 78%;
-            padding: 12px 18px;
-            border-radius: 20px;
-            position: relative;
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
         }
-        .chat-message.you {
-            align-self: flex-end;
-            background: var(--accent);
-            color: #000;
-            border-bottom-right-radius: 4px;
-        }
-        .chat-message.other {
-            align-self: flex-start;
-            background: #27272e;
-            border-bottom-left-radius: 4px;
-        }
-        .chat-in {
-            padding: 16px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 12px;
-        }
-        .chat-in input {
-            flex: 1;
-            background: #111118;
-            border: 1px solid var(--border);
-            color: #fff;
-            padding: 14px 20px;
-            border-radius: 9999px;
-            outline: none;
+        .id-box {
+            background: #222;
+            padding: 14px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            font-family: monospace;
             font-size: 15px;
-            transition: all 0.2s;
-        }
-        .chat-in input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.2);
-        }
-
-        /* Sidebar content */
-        .identity-section {
-            padding: 24px;
-            border-bottom: 1px solid var(--border);
-        }
-        .node-id {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 15px;
-            background: #111118;
-            padding: 16px 20px;
-            border-radius: 12px;
-            border: 2px solid var(--border);
             word-break: break-all;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            margin-bottom: 15px;
+            text-align: center;
         }
-        .node-id:hover {
-            border-color: var(--accent);
-            transform: scale(1.02);
-        }
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            margin-top: 12px;
-            color: var(--dim);
-        }
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--success);
-            box-shadow: 0 0 10px var(--success);
-        }
-        .reclaim-btn {
-            font-size: 12px;
-            padding: 6px 14px;
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            border-radius: 9999px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .reclaim-btn:hover {
-            background: var(--accent);
-            color: #000;
-        }
-
-        #active-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 24px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .node-item {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .node-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 10px 20px 30px -10px rgba(0, 240, 255, 0.15);
-            border-color: var(--accent);
-        }
-        .node-id-small {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            color: var(--accent);
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-        .badge-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 14px;
-        }
-        .badge {
-            font-size: 10px;
-            padding: 4px 10px;
-            border-radius: 9999px;
-            font-weight: 700;
-            background: #22222a;
-            color: #aaa;
-        }
-        .badge.on {
-            background: rgba(0, 240, 255, 0.15);
-            color: var(--accent);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-        }
-
+        .id-box:hover { border-color: var(--accent); }
         .btn {
+            padding: 12px;
             background: var(--accent);
             color: #000;
             border: none;
-            padding: 14px 24px;
-            border-radius: 9999px;
-            font-weight: 700;
-            font-size: 14px;
+            border-radius: 6px;
+            font-weight: bold;
             cursor: pointer;
-            width: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 240, 255, 0.4);
-        }
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
+            margin-bottom: 8px;
         }
         .btn-danger {
             background: transparent;
             color: var(--danger);
             border: 2px solid var(--danger);
         }
-        .btn-danger:hover {
-            background: var(--danger);
+        .section {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin: 15px 0 8px;
+        }
+        #active-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .node-item {
+            background: #222;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: #333;
+            border-radius: 3px;
+            margin-right: 4px;
+        }
+        .badge.on { background: #00ffff; color: #000; }
+
+        #video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .v-box {
+            background: #000;
+            aspect-ratio: 16/9;
+            border: 2px solid #333;
+            position: relative;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .v-label {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.7);
             color: white;
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 4px;
         }
 
-        /* Modals */
-        .modal-overlay {
+        #chat-wrap {
+            height: 200px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-feed {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        .chat-in {
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #333;
+        }
+        .chat-in input {
+            flex: 1;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+        }
+
+        .modal {
             position: fixed;
             inset: 0;
-            background: rgba(10,10,15,0.92);
-            backdrop-filter: blur(16px);
+            background: rgba(0,0,0,0.9);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 10000;
+            z-index: 9999;
         }
         .modal-content {
-            background: var(--card);
-            border-radius: 20px;
+            background: #222;
             width: 100%;
-            max-width: 440px;
-            border: 1px solid var(--border);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
-        .modal-header {
-            padding: 20px 28px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-        .modal-body {
-            padding: 28px;
-        }
-
-        /* Toasts */
-        #notification-stack {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 340px;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            max-width: 380px;
+            padding: 25px;
+            border: 2px solid #444;
         }
         .toast {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 18px 22px;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #222;
+            color: white;
+            padding: 14px 20px;
             border-left: 5px solid var(--accent);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 10000;
+            max-width: 320px;
         }
         .toast.error { border-left-color: var(--danger); }
-        .toast.success { border-left-color: var(--success); }
-        @keyframes toastIn {
-            0% { transform: translateY(40px) scale(0.95); opacity: 0; }
-            100% { transform: translateY(0) scale(1); opacity: 1; }
-        }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes live { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            #video-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-        }
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            header { height: 60px; padding: 0 16px; }
-            aside {
-                width: 100%;
-                height: auto;
-                max-height: 68px;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-                flex-direction: row;
-                padding-top: 0;
-                overflow-x: auto;
-                gap: 12px;
-            }
-            .identity-section { padding: 12px 16px; flex-shrink: 0; }
-            #active-list {
-                display: flex;
-                flex-direction: row;
-                padding: 12px 16px;
-                overflow-x: auto;
-                gap: 12px;
-                flex: none;
-            }
-            main { padding: 16px; padding-top: 80px; }
-            .modal-content { max-width: 92%; margin: 20px; }
-            #chat-wrap { height: 220px; }
-        }
-        @media (max-width: 480px) {
-            #video-grid { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <header>
-        <div class="brand">PULSE<span>NET</span> 7.3 <span class="brand-dot"></span></div>
-        
-        <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
-            <div id="connection-status" style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--success);">
-                <div class="status-dot" id="global-dot"></div>
-                <span id="status-text">VERBONDEN • ID RECLAIM READY</span>
-            </div>
-            
-            <button onclick="toggleReclaim()" class="reclaim-btn" id="reclaim-header-btn">
-                <span id="reclaim-text">🔄 RECLAIM ID</span>
-            </button>
-            
-            <button onclick="openDial()" class="btn" id="dial-btn-header" style="width:auto; padding:10px 24px;" disabled>
-                ✦ NIEUWE LINK
-            </button>
-        </div>
-    </header>
-
-    <!-- SIDEBAR -->
     <aside>
-        <div class="identity-section">
-            <div style="font-size:11px; font-weight:800; color:var(--dim); margin-bottom:8px; letter-spacing:1px;">JOUW NODE ID</div>
-            <div id="my-id" class="node-id" onclick="copyId()">
-                <span id="id-display">WACHTEN OP ID...</span>
-                <span style="font-size:18px; opacity:0.4;">📋</span>
-            </div>
-            
-            <div class="status-bar">
-                <div class="status-dot" id="id-dot"></div>
-                <span id="id-status-text">Klaar voor verbinding</span>
-                <button onclick="forceReclaim()" style="margin-left:auto; font-size:11px; background:transparent; border:none; color:var(--accent); cursor:pointer;">herstellen</button>
-            </div>
-        </div>
-
-        <div style="padding:0 24px 12px;">
-            <div class="section-label" style="font-size:10px; font-weight:800; color:var(--dim); text-transform:uppercase; letter-spacing:1.5px;">Actieve Uplinks</div>
-        </div>
+        <div class="title">PULSE<span style="color:#00ffff">NET</span></div>
         
+        <div style="margin-bottom:10px;">Jouw ID</div>
+        <div id="my-id" class="id-box" onclick="copyId()">WACHTEN...</div>
+        
+        <button onclick="forceReclaim()" class="btn">🔄 RECLAIM ID</button>
+        <button onclick="switchToRandom()" class="btn" style="background:#444;color:white;">NIEUWE RANDOM ID</button>
+
+        <div class="section">Actieve verbindingen</div>
         <div id="active-list"></div>
     </aside>
 
-    <!-- MAIN -->
     <main>
-        <div id="video-grid">
-            <!-- Local video will be injected here -->
-        </div>
+        <div id="video-grid"></div>
 
-        <!-- Chat -->
         <div id="chat-wrap">
             <div id="chat-feed"></div>
             <div class="chat-in">
-                <input id="msg-input" placeholder="Typ hier je bericht... (chat moet actief zijn)" 
-                       onkeypress="if(event.key==='Enter') sendMsg()" disabled>
-                <button id="send-btn" class="btn" style="width:auto; padding:0 28px;" onclick="sendMsg()" disabled>
-                    VERSTUUR
-                </button>
+                <input id="msg-input" placeholder="Bericht versturen..." onkeypress="if(event.key==='Enter') sendMsg()" disabled>
+                <button onclick="sendMsg()" class="btn" style="width:80px">SEND</button>
             </div>
         </div>
     </main>
 
-    <!-- ID SETUP MODAL (mooier + Dutch) -->
-    <div id="id-setup-modal" class="modal-overlay">
+    <!-- ID SETUP MODAL (super simpel) -->
+    <div id="id-setup-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>🔑 Node Identity Setup</h2>
-                <button onclick="closeIdModal()" style="background:none; border:none; font-size:28px; color:var(--dim); cursor:pointer; line-height:1;">×</button>
+            <h2 style="margin-bottom:15px;">Kies je Node ID</h2>
+            <p style="font-size:14px;color:#aaa;margin-bottom:20px;">Of gebruik random. PulseNet probeert automatisch je ID terug te nemen als hij verloren gaat.</p>
+            
+            <input id="custom-id-input" type="text" placeholder="bijv. mijnhuis42" 
+                   style="width:100%;padding:14px;background:#111;border:2px solid #555;color:white;font-family:monospace;font-size:16px;margin-bottom:20px;">
+            
+            <div style="display:flex;gap:10px;">
+                <button onclick="useRandomId()" class="btn" style="flex:1;background:#444;color:white;">RANDOM ID</button>
+                <button onclick="claimCustomId()" class="btn" style="flex:1;">CLAIM</button>
             </div>
-            <div class="modal-body">
-                <p style="font-size:14px; color:var(--dim); margin-bottom:24px; line-height:1.5;">
-                    Kies of genereer je unieke Node ID.<br>
-                    <strong>Als je ID later verloren gaat, probeert PulseNet hem automatisch terug te claimen.</strong>
-                </p>
-                
-                <input id="custom-id-input" type="text" placeholder="bijv. mijnhuis42 • studio007 • pulse-vip"
-                       style="width:100%; background:#111118; border:2px solid var(--border); color:#fff; padding:16px 20px; border-radius:9999px; margin-bottom:20px; box-sizing:border-box; font-family: monospace; font-size:16px;">
-                
-                <div style="display:flex; gap:14px;">
-                    <button onclick="useRandomId()" class="btn" style="flex:1; background:var(--card); color:var(--text);">
-                        🎲 RANDOM ID
-                    </button>
-                    <button onclick="claimCustomId()" class="btn" style="flex:1;">
-                        CLAIM ID
-                    </button>
-                </div>
-                
-                <div style="margin-top:20px; font-size:12px; color:var(--dim); text-align:center;">
-                    4–20 tekens • alleen a-z, 0-9, _ en - toegestaan<br>
-                    <span style="color:var(--accent)">PulseNet probeert je ID automatisch terug te nemen als hij verloren gaat</span>
-                </div>
+            
+            <div style="margin-top:20px;font-size:12px;color:#666;text-align:center;">
+                4-20 tekens • a-z 0-9 _ -
             </div>
         </div>
     </div>
 
-    <!-- DIAL MODAL -->
-    <div id="dial-modal" class="modal-overlay">
+    <!-- DIAL MODAL (simpel) -->
+    <div id="dial-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>✦ Nieuwe Sessie Starten</h2>
-                <button onclick="closeDial()" style="background:none; border:none; font-size:28px; color:var(--dim); cursor:pointer; line-height:1;">×</button>
-            </div>
-            <div class="modal-body">
-                <input id="target-id" type="text" placeholder="Andere Node ID plakken..." 
-                       style="width:100%; background:#111118; border:2px solid var(--border); color:#fff; padding:16px 20px; border-radius:9999px; margin-bottom:24px; box-sizing:border-box; font-family: monospace; font-size:16px;">
-                
-                <div style="font-size:14px; margin-bottom:18px;">
-                    <label style="display:flex; align-items:center; gap:10px; padding:12px; background:var(--glass); border-radius:12px; margin-bottom:8px;">
-                        <input type="checkbox" id="sw-video" checked> 
-                        <span style="flex:1;">Video versturen</span>
-                    </label>
-                    <label style="display:flex; align-items:center; gap:10px; padding:12px; background:var(--glass); border-radius:12px; margin-bottom:8px;">
-                        <input type="checkbox" id="sw-audio" checked> 
-                        <span style="flex:1;">Audio versturen</span>
-                    </label>
-                    <label style="display:flex; align-items:center; gap:10px; padding:12px; background:var(--glass); border-radius:12px;">
-                        <input type="checkbox" id="sw-chat" checked> 
-                        <span style="flex:1;">Chat inschakelen</span>
-                    </label>
-                </div>
-                
-                <button onclick="startDial()" class="btn">LINK MAKEN</button>
-                <button onclick="closeDial()" style="margin-top:12px; background:none; color:var(--dim); width:100%; font-weight:600;">Annuleren</button>
-            </div>
+            <h2 style="margin-bottom:15px;">Nieuwe link starten</h2>
+            <input id="target-id" type="text" placeholder="Andere Node ID" 
+                   style="width:100%;padding:14px;background:#111;border:2px solid #555;color:white;font-family:monospace;font-size:16px;margin-bottom:20px;">
+            
+            <label style="display:block;margin:8px 0;"><input type="checkbox" id="sw-video" checked> Video</label>
+            <label style="display:block;margin:8px 0;"><input type="checkbox" id="sw-audio" checked> Audio</label>
+            <label style="display:block;margin:8px 0;"><input type="checkbox" id="sw-chat" checked> Chat</label>
+            
+            <button onclick="startDial()" class="btn" style="margin-top:15px;width:100%;">START LINK</button>
+            <button onclick="closeDial()" style="margin-top:8px;width:100%;background:transparent;color:#888;border:none;">Annuleren</button>
         </div>
     </div>
 
-    <!-- NOTIFICATION STACK -->
     <div id="notification-stack"></div>
 
     <script>
@@ -576,184 +259,140 @@
                 this.sessions = new Map();
                 this.masterLocalStream = null;
                 this.pendingCalls = new Map();
-                this.preferredId = null;           // Belangrijk: onthoudt de ID die we willen reclaimen
+                this.preferredId = null;
                 this.reconnectAttempts = 0;
-                this.maxReconnects = 8;
+                this.maxReconnects = 20;        // veel meer pogingen
                 this.isReclaiming = false;
             }
 
             init(desiredId = null) {
                 return new Promise((resolve, reject) => {
-                    // Bewaar de gewenste ID voor toekomstige reclaim
                     if (desiredId) this.preferredId = desiredId;
                     const idToUse = this.preferredId || undefined;
 
-                    this.peer = new Peer(idToUse, {
-                        debug: 1
-                    });
+                    // Oude peer altijd eerst volledig destroyen
+                    if (this.peer) {
+                        this.peer.destroy();
+                        this.peer = null;
+                    }
 
-                    // === ALLE EVENT LISTENERS DIRECT AANMAKEN ===
-                    this._attachFullListeners();
+                    this.peer = new Peer(idToUse);
+
+                    this._attachListeners();
 
                     this.peer.on('open', (id) => {
                         this.reconnectAttempts = 0;
                         this.isReclaiming = false;
                         
-                        document.getElementById('id-display').innerHTML = `
-                            ${id} 
-                            <span style="font-size:13px; background:#00ff9d; color:#000; padding:2px 8px; border-radius:9999px; margin-left:8px;">LIVE</span>
+                        document.getElementById('my-id').innerHTML = `
+                            <strong>${id}</strong> 
+                            <span style="background:#00ffff;color:#000;padding:2px 8px;border-radius:4px;font-size:12px;">LIVE</span>
                         `;
-                        document.getElementById('my-id').style.borderColor = 'var(--success)';
-                        document.getElementById('id-dot').style.background = 'var(--success)';
-                        document.getElementById('id-status-text').innerHTML = 'ID VEILIG • RECLAIM READY';
-                        document.getElementById('dial-btn-header').disabled = false;
-                        document.getElementById('global-dot').style.background = 'var(--success)';
-
-                        showToast(this.preferredId 
-                            ? `✅ ID <strong>${id}</strong> succesvol teruggeclaimd!` 
-                            : `✅ Node klaar met random ID`, "success");
+                        document.getElementById('my-id').style.borderColor = '#00ffff';
                         
+                        showToast(`✅ ID <b>${id}</b> actief`, "success");
                         this._syncUI();
                         resolve(id);
                     });
 
                     this.peer.on('error', (err) => {
-                        console.error('PeerJS Error →', err.type, err);
-
                         if (err.type === 'unavailable-id' && this.preferredId) {
                             this.reconnectAttempts++;
                             this.isReclaiming = true;
-                            
-                            if (this.reconnectAttempts <= this.maxReconnects) {
-                                const delay = 2200 + Math.random() * 1800;
-                                showToast(`🔄 ID <strong>${this.preferredId}</strong> bezet door ander…<br>Opnieuw claimen over ${Math.round(delay/1000)}s (poging ${this.reconnectAttempts}/${this.maxReconnects})`, "error");
-                                
-                                setTimeout(() => {
-                                    if (this.peer) this.peer.destroy();
-                                    this.init(this.preferredId).catch(() => {});
-                                }, delay);
-                                return;
-                            } else {
-                                showToast('❌ Kon ID niet terugclaimen na 8 pogingen.<br>Maak een nieuwe ID aan.', "error");
-                                document.getElementById('id-setup-modal').style.display = 'flex';
+
+                            if (this.reconnectAttempts > this.maxReconnects) {
+                                showToast("Oude sessie blijft blokkeren.<br>Automatisch overschakelen naar random ID...", "error");
                                 this.preferredId = null;
-                                reject(err);
+                                setTimeout(() => this.init(), 1000);
                                 return;
                             }
+
+                            // LANGERE WACHTTIJD zodat oude instantie écht kan doodgaan
+                            const delay = 6500 + Math.random() * 3500;
+                            showToast(`🔄 ID <b>${this.preferredId}</b> nog bezet door oude instantie...<br>Wachten ${Math.round(delay/1000)} seconden (poging ${this.reconnectAttempts}/${this.maxReconnects})`, "error");
+
+                            setTimeout(() => {
+                                if (this.peer) this.peer.destroy();
+                                this.init(this.preferredId).catch(() => {});
+                            }, delay);
+                            return;
                         }
-                        
+
                         if (err.type === 'disconnected' || err.type === 'server-error') {
                             this.handleLostConnection();
+                        } else {
+                            showToast(`Fout: ${err.type}`, "error");
                         }
-                        
-                        showToast(`Fout: ${err.type}`, "error");
                         reject(err);
                     });
                 });
             }
 
-            _attachFullListeners() {
-                // Data & calls
-                this.peer.on('connection', (conn) => this._handleData(conn));
-                this.peer.on('call', async (call) => {
+            _attachListeners() {
+                this.peer.on('connection', conn => this._handleData(conn));
+                this.peer.on('call', async call => {
                     const pid = call.peer;
-                    const session = this.sessions.get(pid);
-                    if (session) {
-                        await this._answerCall(call, session.config);
-                    } else {
+                    const s = this.sessions.get(pid);
+                    if (s) await this._answerCall(call, s.config);
+                    else {
                         this.pendingCalls.set(pid, call);
                         setTimeout(() => {
                             if (this.pendingCalls.has(pid)) {
                                 this.pendingCalls.get(pid).answer();
                                 this.pendingCalls.delete(pid);
                             }
-                        }, 7000);
+                        }, 8000);
                     }
                 });
 
-                // Belangrijk: automatisch reconnecten bij verlies
-                this.peer.on('disconnected', () => {
-                    console.log('Peer disconnected from broker → reclaiming');
-                    this.handleLostConnection();
-                });
+                this.peer.on('disconnected', () => this.handleLostConnection());
+                this.peer.on('close', () => this.handleLostConnection());
 
-                this.peer.on('close', () => {
-                    console.log('Peer fully closed → reclaiming');
-                    this.handleLostConnection();
-                });
-
-                // Heartbeat voor actieve sessies
+                // Heartbeat
                 setInterval(() => {
                     const now = Date.now();
                     this.sessions.forEach((s, pid) => {
-                        if (now - s.lastSeen > 18000) {
-                            this.terminate(pid, true, "Verbinding verloren (timeout)");
-                        }
+                        if (now - s.lastSeen > 20000) this.terminate(pid, true, "Verbinding verloren");
                     });
-                }, 6000);
+                }, 5000);
             }
 
             handleLostConnection() {
                 if (this.isReclaiming) return;
                 this.isReclaiming = true;
-                
-                const msg = this.preferredId 
-                    ? `🔥 ID <strong>${this.preferredId}</strong> verloren! Probeer terug te claimen…`
-                    : `🔥 Verbinding verloren. Nieuwe sessie opbouwen…`;
-                
-                showToast(msg, "error");
-                document.getElementById('id-dot').style.background = 'var(--danger)';
-                document.getElementById('id-status-text').innerHTML = 'RECLAIMING…';
-
-                // Destroy oude peer
+                showToast(this.preferredId ? `🔥 ID ${this.preferredId} verloren → reclaim...` : "Verbinding verloren", "error");
                 if (this.peer) this.peer.destroy();
-
-                setTimeout(() => {
-                    if (this.preferredId) {
-                        this.init(this.preferredId).catch(() => {
-                            this.isReclaiming = false;
-                        });
-                    } else {
-                        this.init().catch(() => {
-                            this.isReclaiming = false;
-                        });
-                    }
-                }, 1400);
+                setTimeout(() => this.init(this.preferredId), 1200);
             }
 
             async _reconcileLocalStream(needsVideo, needsAudio) {
-                const currentHasVideo = !!(this.masterLocalStream?.getVideoTracks().length);
-                const currentHasAudio = !!(this.masterLocalStream?.getAudioTracks().length);
-
-                if (currentHasVideo === needsVideo && currentHasAudio === needsAudio) return this.masterLocalStream;
-
+                if (this.masterLocalStream) {
+                    const hasV = !!this.masterLocalStream.getVideoTracks().length;
+                    const hasA = !!this.masterLocalStream.getAudioTracks().length;
+                    if (hasV === needsVideo && hasA === needsAudio) return this.masterLocalStream;
+                }
                 this._stopHardware();
                 if (!needsVideo && !needsAudio) return null;
 
                 try {
                     this.masterLocalStream = await navigator.mediaDevices.getUserMedia({
-                        video: needsVideo ? { width: 1280, height: 720, facingMode: "user" } : false,
+                        video: needsVideo ? { width: 1280, height: 720 } : false,
                         audio: needsAudio
                     });
-                    const localBox = document.getElementById('local-box') || this._createLocalBox();
+                    let box = document.getElementById('local-box');
+                    if (!box) {
+                        box = document.createElement('div');
+                        box.className = 'v-box';
+                        box.id = 'local-box';
+                        box.innerHTML = `<video id="local-video" autoplay muted playsinline></video><div class="v-label">JIJ</div>`;
+                        document.getElementById('video-grid').appendChild(box);
+                    }
                     document.getElementById('local-video').srcObject = this.masterLocalStream;
-                    localBox.style.display = 'block';
                     return this.masterLocalStream;
-                } catch (e) {
-                    showToast("Geen toegang tot camera/microfoon", "error");
+                } catch(e) {
+                    showToast("Camera/microfoon niet toegestaan", "error");
                     return null;
                 }
-            }
-
-            _createLocalBox() {
-                const box = document.createElement('div');
-                box.className = 'v-box';
-                box.id = 'local-box';
-                box.innerHTML = `
-                    <video id="local-video" autoplay muted playsinline></video>
-                    <div class="v-label">JIJ • LIVE</div>`;
-                document.getElementById('video-grid').appendChild(box);
-                return box;
             }
 
             _stopHardware() {
@@ -761,8 +400,8 @@
                     this.masterLocalStream.getTracks().forEach(t => t.stop());
                     this.masterLocalStream = null;
                 }
-                const localBox = document.getElementById('local-box');
-                if (localBox) localBox.style.display = 'none';
+                const lb = document.getElementById('local-box');
+                if (lb) lb.remove();
             }
 
             async _getOutgoingStream(config) {
@@ -770,11 +409,10 @@
                 const anyAudio = Array.from(this.sessions.values()).some(s => s.config.audio) || config.audio;
                 await this._reconcileLocalStream(anyVideo, anyAudio);
                 if (!this.masterLocalStream) return null;
-
-                const outgoing = new MediaStream();
-                if (config.video) this.masterLocalStream.getVideoTracks().forEach(t => outgoing.addTrack(t));
-                if (config.audio) this.masterLocalStream.getAudioTracks().forEach(t => outgoing.addTrack(t));
-                return outgoing;
+                const out = new MediaStream();
+                if (config.video) this.masterLocalStream.getVideoTracks().forEach(t => out.addTrack(t));
+                if (config.audio) this.masterLocalStream.getAudioTracks().forEach(t => out.addTrack(t));
+                return out;
             }
 
             async _answerCall(call, config) {
@@ -786,10 +424,8 @@
             }
 
             dial(id, config) {
-                if (this.peer?.id === id) return showToast("Je kunt jezelf niet bellen!", "error");
-                if (this.sessions.has(id)) return showToast("Sessie bestaat al", "error");
-
-                showToast(`Verbinden met ${id.substring(0,10)}…`, "success");
+                if (this.peer.id === id) return showToast("Niet naar jezelf bellen", "error");
+                if (this.sessions.has(id)) return;
                 const conn = this.peer.connect(id);
                 this._handleData(conn, config, true);
             }
@@ -797,20 +433,14 @@
             _handleData(conn, config, isInit = false) {
                 conn.on('open', () => {
                     if (isInit) conn.send({ type: 'REQ', config });
-                    const hb = setInterval(() => {
-                        if (conn.open) conn.send({ type: 'PING' });
-                        else clearInterval(hb);
-                    }, 4500);
                 });
-
-                conn.on('data', async (data) => {
+                conn.on('data', async data => {
                     const pid = conn.peer;
                     if (this.sessions.has(pid)) this.sessions.get(pid).lastSeen = Date.now();
 
-                    if (data.type === 'REQ') {
-                        this._showInvite(pid, data.config, conn);
-                    } else if (data.type === 'ACCEPT') {
-                        showToast("✅ Link succesvol opgezet", "success");
+                    if (data.type === 'REQ') this._showInvite(pid, data.config, conn);
+                    else if (data.type === 'ACCEPT') {
+                        showToast("Link gemaakt", "success");
                         const stream = await this._getOutgoingStream(config);
                         const call = stream ? this.peer.call(pid, stream) : null;
                         if (call) this._handleMedia(call);
@@ -820,154 +450,112 @@
                         showToast("Link geweigerd", "error");
                         conn.close();
                     } else if (data.type === 'BYE') {
-                        this.terminate(pid, true, "Andere node heeft verbinding verbroken");
+                        this.terminate(pid, true);
                     } else if (typeof data === 'string') {
-                        logChat(pid.substring(0, 8), data);
+                        logChat(pid.substring(0,8), data);
                     }
                 });
-
                 conn.on('close', () => this.terminate(conn.peer, true));
             }
 
             _handleMedia(call) {
-                call.on('stream', (stream) => {
+                call.on('stream', st => {
                     let box = document.getElementById(`wrap-${call.peer}`);
                     if (!box) {
                         box = document.createElement('div');
                         box.className = 'v-box';
                         box.id = `wrap-${call.peer}`;
-                        box.innerHTML = `
-                            <video id="v-${call.peer}" autoplay playsinline></video>
-                            <div class="v-label">NODE • ${call.peer.substring(0,8)}</div>`;
+                        box.innerHTML = `<video id="v-${call.peer}" autoplay playsinline></video><div class="v-label">${call.peer.substring(0,8)}</div>`;
                         document.getElementById('video-grid').appendChild(box);
                     }
-                    document.getElementById(`v-${call.peer}`).srcObject = stream;
+                    document.getElementById(`v-${call.peer}`).srcObject = st;
                 });
             }
 
-            terminate(pid, remote = false, reason = "") {
+            terminate(pid, remote, reason) {
                 const s = this.sessions.get(pid);
                 if (!s) return;
-
-                if (!remote && s.conn && s.conn.open) s.conn.send({ type: 'BYE' });
-                if (remote && reason) showToast(reason, "error");
-
-                s.conn?.close();
+                if (!remote && s.conn.open) s.conn.send({ type: 'BYE' });
+                s.conn.close();
                 if (s.call) s.call.close();
                 this.sessions.delete(pid);
-
-                const box = document.getElementById(`wrap-${pid}`);
-                if (box) box.remove();
-
+                document.getElementById(`wrap-${pid}`)?.remove();
                 this._reconcileLocalStream(
                     Array.from(this.sessions.values()).some(x => x.config.video),
                     Array.from(this.sessions.values()).some(x => x.config.audio)
                 );
-
                 this._syncUI();
             }
 
             _showInvite(pid, config, conn) {
-                const stack = document.getElementById('notification-stack');
                 const t = document.createElement('div');
                 t.className = 'toast';
                 t.innerHTML = `
-                    <div>
-                        <div style="font-size:12px; font-weight:800; color:var(--accent);">INCOMING LINK REQUEST</div>
-                        <div style="margin:12px 0; display:flex; gap:6px;">
-                            <span class="badge ${config.video?'on':''}">📹 VID</span>
-                            <span class="badge ${config.audio?'on':''}">🔊 AUD</span>
-                            <span class="badge ${config.chat?'on':''}">💬 TXT</span>
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn" style="padding:10px 24px; font-size:13px;" id="acc-${pid}">ACCEPTEREN</button>
-                            <button class="btn btn-danger" style="padding:10px 24px; font-size:13px;" id="rej-${pid}">WEIGEREN</button>
-                        </div>
+                    <div>INCOMING LINK<br>
+                    <span class="badge ${config.video?'on':''}">VID</span>
+                    <span class="badge ${config.audio?'on':''}">AUD</span>
+                    <span class="badge ${config.chat?'on':''}">TXT</span></div>
+                    <div style="margin-top:12px;display:flex;gap:8px;">
+                        <button onclick="acceptInvite('${pid}')" class="btn" style="padding:8px 16px">ACCEPTEREN</button>
+                        <button onclick="rejectInvite('${pid}')" class="btn btn-danger" style="padding:8px 16px">WEIGEREN</button>
                     </div>`;
-                
-                t.querySelector(`#acc-${pid}`).onclick = async () => {
+                document.getElementById('notification-stack').appendChild(t);
+                setTimeout(() => t.remove(), 20000);
+                window.acceptInvite = (p) => {
                     conn.send({ type: 'ACCEPT' });
-                    this.sessions.set(pid, { conn, config, lastSeen: Date.now() });
+                    this.sessions.set(p, { conn, config, lastSeen: Date.now() });
                     this._syncUI();
                     t.remove();
-                    if (this.pendingCalls.has(pid)) {
-                        const call = this.pendingCalls.get(pid);
-                        this.pendingCalls.delete(pid);
-                        await this._answerCall(call, config);
-                    }
                 };
-                
-                t.querySelector(`#rej-${pid}`).onclick = () => {
+                window.rejectInvite = (p) => {
                     conn.send({ type: 'REJECT' });
                     conn.close();
                     t.remove();
                 };
-                
-                stack.appendChild(t);
-                setTimeout(() => { if (t.parentNode) t.remove(); }, 25000);
             }
 
             _syncUI() {
                 const list = document.getElementById('active-list');
                 list.innerHTML = '';
-                let chatEnabled = false;
-
+                let chatOn = false;
                 this.sessions.forEach((s, pid) => {
-                    if (s.config.chat) chatEnabled = true;
-                    const item = document.createElement('div');
-                    item.className = 'node-item';
-                    item.innerHTML = `
-                        <div class="node-id-small">${pid}</div>
-                        <div class="badge-row">
-                            <span class="badge ${s.config.video?'on':''}">📹</span>
-                            <span class="badge ${s.config.audio?'on':''}">🔊</span>
-                            <span class="badge ${s.config.chat?'on':''}">💬</span>
+                    if (s.config.chat) chatOn = true;
+                    const div = document.createElement('div');
+                    div.className = 'node-item';
+                    div.innerHTML = `
+                        <div style="font-family:monospace;font-size:13px;">${pid}</div>
+                        <div style="margin:6px 0;">
+                            <span class="badge ${s.config.video?'on':''}">VID</span>
+                            <span class="badge ${s.config.audio?'on':''}">AUD</span>
+                            <span class="badge ${s.config.chat?'on':''}">TXT</span>
                         </div>
-                        <button class="btn btn-danger" style="padding:8px 16px; font-size:12px;" onclick="core.terminate('${pid}', false)">
-                            VERBREKEN
-                        </button>`;
-                    list.appendChild(item);
+                        <button onclick="core.terminate('${pid}',false)" class="btn-danger" style="width:100%;padding:6px;font-size:12px;">VERBREKEN</button>`;
+                    list.appendChild(div);
                 });
-
-                // Chat toggle
-                const chatInput = document.getElementById('msg-input');
-                const sendBtn = document.getElementById('send-btn');
-                chatInput.disabled = !chatEnabled;
-                sendBtn.disabled = !chatEnabled;
-                chatInput.placeholder = chatEnabled ? "Typ je bericht…" : "Chat is uitgeschakeld";
+                document.getElementById('msg-input').disabled = !chatOn;
             }
         }
 
-        // Global core
         let core = new PulseCore();
 
         function useRandomId() {
             document.getElementById('id-setup-modal').style.display = 'none';
             core.preferredId = null;
-            core.init().catch(console.error);
+            core.init();
         }
-
         function claimCustomId() {
             const val = document.getElementById('custom-id-input').value.trim();
-            if (!/^[a-zA-Z0-9_-]{4,20}$/.test(val)) {
-                return showToast("ID ongeldig (4-20 tekens, alleen a-z 0-9 _ -)", "error");
-            }
+            if (!/^[a-zA-Z0-9_-]{4,20}$/.test(val)) return showToast("Ongeldige ID", "error");
             document.getElementById('id-setup-modal').style.display = 'none';
-            core.init(val).catch(() => {
-                // Als init faalt (bijv. na max pogingen) modal weer tonen
-                setTimeout(() => document.getElementById('id-setup-modal').style.display = 'flex', 800);
-            });
+            core.init(val);
         }
-
-        function showToast(message, type = "info") {
-            const stack = document.getElementById('notification-stack');
+        function showToast(msg, type = "success") {
             const t = document.createElement('div');
             t.className = `toast ${type}`;
-            t.innerHTML = `<div style="flex:1;">${message}</div>`;
-            stack.appendChild(t);
-            setTimeout(() => t.remove(), 4800);
+            t.innerHTML = msg;
+            document.getElementById('notification-stack').appendChild(t);
+            setTimeout(() => t.remove(), 4500);
         }
-
         function startDial() {
             const id = document.getElementById('target-id').value.trim();
             if (!id) return;
@@ -978,78 +566,69 @@
             });
             closeDial();
         }
-
         function sendMsg() {
             const input = document.getElementById('msg-input');
-            const msg = input.value.trim();
-            if (!msg) return;
-
+            const txt = input.value.trim();
+            if (!txt) return;
             core.sessions.forEach(s => {
-                if (s.config.chat && s.conn && s.conn.open) {
-                    s.conn.send(msg);
-                }
+                if (s.config.chat && s.conn.open) s.conn.send(txt);
             });
-            logChat('JIJ', msg);
+            logChat('JIJ', txt);
             input.value = '';
         }
-
         function logChat(user, msg) {
             const feed = document.getElementById('chat-feed');
-            const div = document.createElement('div');
-            div.className = `chat-message ${user === 'JIJ' ? 'you' : 'other'}`;
-            div.innerHTML = `<strong>${user}:</strong> ${msg}`;
-            feed.appendChild(div);
+            const d = document.createElement('div');
+            d.innerHTML = `<b>${user}:</b> ${msg}`;
+            feed.appendChild(d);
             feed.scrollTop = feed.scrollHeight;
         }
-
         function openDial() {
             document.getElementById('dial-modal').style.display = 'flex';
         }
-
         function closeDial() {
             document.getElementById('dial-modal').style.display = 'none';
         }
-
-        function closeIdModal() {
-            document.getElementById('id-setup-modal').style.display = 'none';
-        }
-
         function copyId() {
-            const idEl = document.getElementById('id-display');
-            const id = idEl.textContent.trim().split(' ')[0];
-            navigator.clipboard.writeText(id).then(() => {
-                showToast("✅ ID gekopieerd naar klembord", "success");
-            });
+            const id = document.getElementById('my-id').innerText.split(' ')[0];
+            navigator.clipboard.writeText(id);
+            showToast("ID gekopieerd");
         }
-
-        function toggleReclaim() {
-            if (core.preferredId) {
-                forceReclaim();
-            } else {
-                showToast("Je gebruikt momenteel een random ID.<br>Maak een custom ID om te reclaimen.", "error");
+        function forceReclaim() {
+            if (!core.preferredId) {
+                showToast("Je hebt geen custom ID om terug te claimen", "error");
+                return;
+            }
+            showToast("Force reclaim gestart...", "success");
+            if (core.peer) core.peer.destroy();
+            core.reconnectAttempts = 0;
+            core.init(core.preferredId);
+        }
+        function switchToRandom() {
+            if (confirm("Echt overschakelen naar een nieuwe random ID?")) {
+                core.preferredId = null;
+                if (core.peer) core.peer.destroy();
+                core.init();
             }
         }
 
-        function forceReclaim() {
-            if (!core.preferredId) return;
-            showToast(`Handmatig reclaimen van ID <strong>${core.preferredId}</strong>…`, "success");
-            if (core.peer) core.peer.destroy();
-            core.init(core.preferredId).catch(() => {});
-        }
-
-        // Start applicatie
+        // START
         window.onload = () => {
             document.getElementById('id-setup-modal').style.display = 'flex';
             
-            // Extra keyboard shortcut voor reclaim (Cmd/Ctrl + K)
-            document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                    e.preventDefault();
-                    forceReclaim();
-                }
+            // Zorg dat oude tab altijd netjes afsluit
+            window.addEventListener('beforeunload', () => {
+                if (core.peer) core.peer.destroy();
             });
             
-            console.log('%c🚀 PulseNet v7.3 Reclaim Edition geladen – ID auto-reclaim actief!', 'color:#00f0ff; font-weight:700');
+            // Extra knop in sidebar voor dial (simpel)
+            const aside = document.querySelector('aside');
+            const dialBtn = document.createElement('button');
+            dialBtn.className = 'btn';
+            dialBtn.textContent = '✦ NIEUWE LINK';
+            dialBtn.style.marginTop = 'auto';
+            dialBtn.onclick = openDial;
+            aside.appendChild(dialBtn);
         };
     </script>
 </body>
