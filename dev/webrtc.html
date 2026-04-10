@@ -2,749 +2,335 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PulseNet Pro • High-Spec Telemetry</title>
-    
-    <!-- === BIBLIOTHEKEN (extern, zo snel mogelijk geladen) === -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseNet Pro • Ultra Edition</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --bg: #050506; 
-            --card: #0c0c0e; 
-            --accent: #22d3ee;
-            --danger: #f43f5e; 
-            --border: #1e1e22; 
-            --success: #10b981;
-            --warn: #fbbf24; 
-            --meta: #52525b;
+        :root { 
+            --bg: #050506; --card: #0c0c0e; --accent: #22d3ee; 
+            --danger: #f43f5e; --border: #1e1e22; --success: #10b981; 
+            --warn: #fbbf24; --meta: #52525b;
         }
-        
-        * { 
-            margin:0; 
-            padding:0; 
-            box-sizing:border-box; 
-            font-family: 'JetBrains Mono', monospace; 
-        }
-        
-        body { 
-            background: var(--bg); 
-            color: #e4e4e7; 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden; 
-            border: 1px solid var(--border); 
-        }
-        
-        /* === MOBILE / DEVICE OPTIMALISATIE === */
-        @media (max-width: 768px) {
-            body { 
-                flex-direction: column; 
-                height: auto; 
-                min-height: 100vh; 
-            }
-            aside { 
-                width: 100% !important; 
-                height: auto; 
-                max-height: 280px; 
-                border-right: none; 
-                border-bottom: 1px solid var(--border); 
-                flex-direction: row; 
-                flex-wrap: wrap; 
-                padding: 12px; 
-                gap: 8px; 
-                overflow-y: auto; 
-                z-index: 60; 
-            }
-            main { 
-                flex: 1; 
-                min-height: calc(100vh - 280px); 
-                padding: 12px; 
-                gap: 10px; 
-            }
-            #video-grid { 
-                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important; 
-            }
-            .v-box { aspect-ratio: 16/9; }
-            #term-wrap { height: 160px; }
-        }
-        
-        aside { 
-            width: 340px; 
-            background: var(--card); 
-            border-right: 1px solid var(--border); 
-            display: flex; 
-            flex-direction: column; 
-            padding: 20px; 
-            z-index: 50; 
-        }
-        
-        .title { 
-            font-size: 18px; 
-            font-weight: 900; 
-            color: var(--accent); 
-            margin-bottom: 5px; 
-            letter-spacing: -1px; 
-        }
-        .version { 
-            font-size: 8px; 
-            color: var(--meta); 
-            margin-bottom: 20px; 
-            letter-spacing: 2px; 
-        }
-       
-        .id-box { 
-            background: #000; 
-            padding: 12px; 
-            border: 1px solid var(--border); 
-            border-radius: 4px; 
-            font-size: 10px; 
-            cursor: pointer; 
-            border-left: 3px solid var(--accent); 
-            margin-bottom: 20px; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            white-space: nowrap; 
-        }
-       
-        .telemetry-unit { 
-            margin-bottom: 15px; 
-            background: #000; 
-            border: 1px solid var(--border); 
-            padding: 10px; 
-        }
-        .tel-label { 
-            font-size: 8px; 
-            color: var(--meta); 
-            margin-bottom: 5px; 
-            display: flex; 
-            justify-content: space-between; 
-            text-transform: uppercase; 
-        }
-        .tel-val { 
-            color: var(--success); 
-            font-weight: bold; 
-        }
-        .progress-bg { 
-            height: 4px; 
-            background: #1a1a1e; 
-            border-radius: 2px; 
-            overflow: hidden; 
-        }
-        .progress-fill { 
-            height: 100%; 
-            background: var(--success); 
-            width: 0%; 
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        
-        .btn { 
-            padding: 12px; 
-            background: var(--accent); 
-            color: #000; 
-            border: none; 
-            border-radius: 4px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            width: 100%; 
-            font-size: 10px; 
-            text-transform: uppercase; 
-            margin-bottom: 8px; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        .btn:hover { filter: brightness(1.25); transform: translateY(-1px); }
-        .btn-danger { 
-            background: transparent; 
-            color: var(--danger); 
-            border: 1px solid var(--danger); 
-        }
-        .btn-danger:hover { 
-            background: var(--danger); 
-            color: #000; 
-        }
-        
-        main { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 20px; 
-            gap: 15px; 
-            position: relative; 
-        }
-        
-        #video-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 15px; 
-            flex: 1; 
-            overflow-y: auto; 
-            scroll-behavior: smooth; 
-        }
-        
-        .v-box { 
-            background: #000; 
-            aspect-ratio: 16/9; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            border: 1px solid var(--border); 
-            position: relative; 
-            box-shadow: 0 0 15px rgba(34, 211, 238, 0.1); 
-        }
-        video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            background: #000; 
-            transform: translateZ(0); /* GPU acceleration */
-        }
-        
-        .v-overlay { 
-            position: absolute; 
-            inset: 0; 
-            padding: 10px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            pointer-events: none; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 40%); 
-        }
-        
-        #term-wrap { 
-            height: 200px; 
-            background: #000; 
-            border: 1px solid var(--border); 
-            display: flex; 
-            flex-direction: column; 
-            border-radius: 4px; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.3); 
-        }
-        #term-feed { 
-            flex: 1; 
-            padding: 12px; 
-            overflow-y: auto; 
-            font-size: 11px; 
-            line-height: 1.5; 
-            color: #a1a1aa; 
-            scroll-behavior: smooth; 
-        }
-        .term-in { 
-            padding: 10px; 
-            display: flex; 
-            border-top: 1px solid var(--border); 
-            gap: 10px; 
-        }
-        .term-in input { 
-            flex: 1; 
-            background: transparent; 
-            border: none; 
-            color: var(--accent); 
-            outline: none; 
-            font-size: 11px; 
-        }
-        
-        .modal { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.92); 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
-            backdrop-filter: blur(8px); 
-        }
-        .modal-card { 
-            background: var(--card); 
-            padding: 30px; 
-            border: 1px solid var(--border); 
-            width: 440px; 
-            max-width: 92vw; 
-            box-shadow: 0 0 40px rgba(34, 211, 238, 0.15); 
-            border-radius: 8px; 
-        }
-        
-        .toast-stack { 
-            position: fixed; 
-            top: 20px; 
-            right: 20px; 
-            z-index: 2000; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-        }
-        .toast { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            padding: 15px; 
-            width: 300px; 
-            max-width: 92vw; 
-            font-size: 11px; 
-            border-left: 4px solid var(--warn); 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4); 
-            animation: toastIn 0.3s ease; 
-        }
-        
-        select, input[type="text"] { 
-            width:100%; 
-            padding:10px; 
-            background:#000; 
-            border:1px solid var(--border); 
-            color:var(--accent); 
-            font-size:10px; 
-            outline:none; 
-            margin-bottom:10px; 
-            border-radius: 4px; 
-        }
-        .label-sm { 
-            font-size: 8px; 
-            color: var(--meta); 
-            margin-bottom: 4px; 
-            display: block; 
-            text-transform: uppercase; 
-        }
-        
-        @keyframes toastIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'JetBrains Mono', monospace; }
+        body { background: var(--bg); color: #e4e4e7; display: flex; height: 100vh; overflow: hidden; border: 1px solid var(--border); }
+        aside { width: 320px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; z-index: 50; }
+        .title { font-size: 16px; font-weight: 900; color: var(--accent); margin-bottom: 5px; letter-spacing: 1px; }
+        .version { font-size: 8px; color: var(--meta); margin-bottom: 20px; letter-spacing: 2px; }
+        .id-box { background: #000; padding: 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 10px; cursor: pointer; border-left: 3px solid var(--accent); margin-bottom: 20px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .telemetry-unit { margin-bottom: 15px; background: #000; border: 1px solid var(--border); padding: 10px; }
+        .tel-label { font-size: 8px; color: var(--meta); margin-bottom: 5px; display: flex; justify-content: space-between; text-transform: uppercase; }
+        .tel-val { color: var(--success); font-weight: bold; }
+        .progress-bg { height: 4px; background: #1a1a1e; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+        .btn { padding: 12px; background: var(--accent); color: #000; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; width: 100%; font-size: 10px; text-transform: uppercase; margin-bottom: 8px; transition: 0.2s; }
+        .btn:hover { filter: brightness(1.2); }
+        .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #000; }
+        main { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 15px; background: radial-gradient(circle at center, #0a0a0c 0%, #050506 100%); }
+        #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; flex: 1; overflow-y: auto; }
+        .v-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        .v-overlay { position: absolute; inset: 0; padding: 10px; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent 40%); }
+        #term-wrap { height: 180px; background: #000; border: 1px solid var(--border); display: flex; flex-direction: column; border-radius: 4px; }
+        #term-feed { flex: 1; padding: 12px; overflow-y: auto; font-size: 10px; color: #a1a1aa; scroll-behavior: smooth; }
+        .term-in { padding: 10px; display: flex; border-top: 1px solid var(--border); gap: 10px; background: #08080a; }
+        .term-in input { flex: 1; background: transparent; border: none; color: var(--accent); outline: none; font-size: 11px; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-card { background: var(--card); padding: 25px; border: 1px solid var(--border); width: 380px; border-top: 4px solid var(--accent); }
+        .toast-stack { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--card); border: 1px solid var(--border); padding: 15px; width: 280px; font-size: 10px; border-left: 4px solid var(--warn); box-shadow: 0 10px 25px rgba(0,0,0,0.5); animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        select, input[type="text"] { width:100%; padding:10px; background:#000; border:1px solid var(--border); color:var(--accent); font-size:10px; outline:none; margin-bottom:10px; }
+        .label-sm { font-size: 8px; color: var(--meta); margin-bottom: 4px; display: block; text-transform: uppercase; }
     </style>
 </head>
 <body>
     <aside>
         <div class="title">PULSE_NET // PRO</div>
-        <div class="version">ULTRA_LOW_LATENCY_v2.1 • DEVICE-OPTIMIZED</div>
+        <div class="version">CORE_V2.1_STRICT_RESOURCE_CTRL</div>
         <div id="my-id" class="id-box" onclick="copyId()">INITIALIZING...</div>
-        
         <div class="telemetry-unit">
-            <div class="tel-label"><span>LIVE_BITRATE</span><span class="tel-val" id="val-bitrate">0 kbps</span></div>
-            <div class="progress-bg"><div class="progress-fill" id="bar-bitrate" style="width: 0%"></div></div>
+            <div class="tel-label"><span>Active_Bitrate</span><span class="tel-val" id="val-bitrate">0 kbps</span></div>
+            <div class="progress-bg"><div class="progress-fill" id="bar-bitrate"></div></div>
         </div>
-        
-        <button onclick="openDial()" class="btn">INITIATE HANDSHAKE</button>
-        <button onclick="location.reload()" class="btn btn-danger">EMERGENCY KILLSWITCH</button>
-        
-        <div style="font-size: 9px; color: var(--meta); margin-top: 15px; margin-bottom: 5px;">ACTIVE_NODES</div>
+        <button onclick="openDial()" class="btn">New Handshake</button>
+        <button onclick="location.reload()" class="btn btn-danger">Emergency Killswitch</button>
+        <div style="font-size: 9px; color: var(--meta); margin: 15px 0 5px 0;">ACTIVE_NODES</div>
         <div id="node-list" style="flex:1; overflow-y:auto;"></div>
     </aside>
-    
+
     <main>
         <div id="video-grid"></div>
         <div id="term-wrap">
             <div id="term-feed"></div>
             <div class="term-in">
                 <span style="color:var(--accent)">>></span>
-                <input id="msg-input" placeholder="Awaiting connection..." onkeypress="if(event.key==='Enter') uiSend()" disabled>
+                <input id="msg-input" placeholder="No active data channel..." onkeypress="if(event.key==='Enter') uiSend()" disabled>
             </div>
         </div>
     </main>
-    
+
     <div id="dial-modal" class="modal">
         <div class="modal-card">
-            <h3 style="margin-bottom:15px; font-size:12px; color:var(--accent);">CONNECTION_PARAMETERS</h3>
-            
-            <span class="label-sm">TARGET_ID</span>
-            <input id="target-id" type="text" placeholder="Paste Remote ID...">
-            
+            <h3 style="margin-bottom:15px; font-size:11px; color:var(--accent);">INITIATE_P2P_LINK</h3>
+            <span class="label-sm">Target ID</span>
+            <input id="target-id" type="text" spellcheck="false" placeholder="0000-0000-0000...">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div>
-                    <span class="label-sm">RESOLUTION</span>
-                    <select id="cfg-res">
-                        <option value="720">720p (HD) – FAST</option>
-                        <option value="1080">1080p (FHD)</option>
-                        <option value="480">480p (SD) – MOBILE</option>
-                    </select>
+                    <span class="label-sm">Resolution</span>
+                    <select id="cfg-res"><option value="720">720p</option><option value="1080">1080p</option><option value="480">480p</option></select>
                 </div>
                 <div>
-                    <span class="label-sm">FRAME_RATE</span>
-                    <select id="cfg-fps">
-                        <option value="30">30 FPS – BALANCED</option>
-                        <option value="60">60 FPS – SMOOTH</option>
-                        <option value="15">15 FPS – ULTRA LOW BANDWIDTH</option>
-                    </select>
+                    <span class="label-sm">Framerate</span>
+                    <select id="cfg-fps"><option value="30">30 FPS</option><option value="60">60 FPS</option><option value="15">15 FPS</option></select>
                 </div>
             </div>
-            
-            <span class="label-sm">CHANNELS</span>
+            <span class="label-sm">Permissions</span>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
                 <label style="font-size:9px;"><input type="checkbox" id="sw-vid" checked> VIDEO</label>
                 <label style="font-size:9px;"><input type="checkbox" id="sw-aud" checked> AUDIO</label>
                 <label style="font-size:9px;"><input type="checkbox" id="sw-txt" checked> DATA</label>
             </div>
-            
-            <button id="dial-exe" onclick="uiDial()" class="btn">CONNECT • GODSPEED</button>
-            <button onclick="uiAbortOutgoing()" class="btn btn-danger" style="margin:0;">CANCEL</button>
+            <button id="dial-exe" onclick="uiDial()" class="btn">Connect</button>
+            <button onclick="closeDial()" class="btn btn-danger" style="margin:0;">Cancel</button>
         </div>
     </div>
-    
+
     <div id="toast-layer" class="toast-stack"></div>
 
-    <!-- === CORE APP LOGIC (alles in één blok, geoptimaliseerd voor snelheid) === -->
     <script>
-        /**
-         * PulseNet Pro v2.1 – Ultra low latency + device-optimized
-         * - GPU acceleration voor video
-         * - Mobiele constraints (facingMode, echoCancellation, noiseSuppression)
-         * - Responsive layout (werkt perfect op telefoon/tablet/desktop)
-         * - Snellere heartbeat & bitrate berekening (per sessie)
-         * - Minder DOM writes, betere performance
-         */
-
         class PulseNet {
             constructor() {
                 this.peer = null;
-                this.sessions = new Map();           // id → session object
-                this.pendingConn = null;
+                this.sessions = new Map();
                 this.localStream = null;
+                this.lastBytes = 0;
                 this.events = {};
-                this.byteStats = new Map();          // per-peer byte tracking (fix voor multi-peer)
             }
-            
-            on(e, cb) { 
-                if(!this.events[e]) this.events[e] = []; 
-                this.events[e].push(cb); 
-            }
-            
-            emit(e, d) { 
-                if(this.events[e]) this.events[e].forEach(cb => cb(d)); 
-            }
-            
+
+            on(e, cb) { if(!this.events[e]) this.events[e] = []; this.events[e].push(cb); }
+            emit(e, d) { if(this.events[e]) this.events[e].forEach(cb => cb(d)); }
+
             start() {
-                // PeerJS met lage latency instellingen
-                this.peer = new Peer({ 
-                    debug: 1,
-                    config: {
-                        iceServers: [
-                            { urls: 'stun:stun.l.google.com:19302' },
-                            { urls: 'stun:stun1.l.google.com:19302' }
-                        ]
-                    }
-                });
-                
+                this.peer = new Peer({ debug: 1 });
                 this.peer.on('open', id => this.emit('ready', id));
                 this.peer.on('connection', c => this._setupData(c));
-                this.peer.on('call', async call => this._handleIncomingCall(call));
-                
-                // Snelle heartbeat (1.5s i.p.v. 2s)
-                setInterval(() => this._logicLoop(), 1500);
-            }
-            
-            async _handleIncomingCall(call) {
-                const s = this.sessions.get(call.peer);
-                const config = s ? s.config : { video: true, audio: true, res: 720, fps: 30 };
-                
-                const st = await this._getHW(config);
-                call.answer(st);
-                this._setupMedia(call);
-                
-                if (s) s.call = call;
-                else this.sessions.set(call.peer, { call, config, lastSeen: Date.now() });
-            }
-            
-            _logicLoop() {
-                const now = Date.now();
-                
-                this.sessions.forEach((s, id) => {
-                    if (now - s.lastSeen > 9000) {
-                        this.emit('flatline', id);
-                        this.terminate(id);
-                        return;
-                    }
+                this.peer.on('call', async call => {
+                    const session = this.sessions.get(call.peer);
+                    const config = session ? session.config : { video: true, audio: true, res: 720, fps: 30 };
                     
-                    if (s.conn && s.conn.open) s.conn.send({ type: 'PING' });
-                    
-                    // Bitrate per sessie (sneller + correct voor meerdere peers)
-                    if (s.call && s.call.peerConnection) {
-                        s.call.peerConnection.getStats().then(stats => {
-                            let videoReport = null;
-                            stats.forEach(report => {
-                                if (report.type === 'inbound-rtp' && report.kind === 'video') videoReport = report;
-                            });
-                            
-                            if (videoReport) {
-                                const bytes = videoReport.bytesReceived || 0;
-                                const prev = this.byteStats.get(id) || 0;
-                                const delta = Math.max(0, bytes - prev);
-                                const bitrate = Math.round((delta * 8) / 1.5); // 1500ms interval → kbps
-                                
-                                this.byteStats.set(id, bytes);
-                                this.emit('stat_bitrate', bitrate); // UI toont de laatste actieve
-                            }
-                        }).catch(() => {}); // silent fail op trage devices
-                    }
+                    const stream = await this._getHardware(config);
+                    call.answer(stream);
+                    this._setupMedia(call);
+                    if(session) session.call = call;
                 });
+                
+                setInterval(() => this._monitor(), 2000);
             }
-            
-            // === DEVICE-OPTIMIZED getUserMedia (super snel op mobiel + desktop) ===
-            async _getHW(conf) {
-                // Oude stream direct stoppen (geen memory leak)
-                if (this.localStream) {
-                    this.localStream.getTracks().forEach(t => t.stop());
-                }
-                
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                
-                const videoConstraints = conf.video ? {
-                    width: { ideal: parseInt(conf.res) === 1080 ? 1920 : 1280 },
-                    height: { ideal: parseInt(conf.res) === 1080 ? 1080 : 720 },
-                    frameRate: { ideal: parseInt(conf.fps), max: isMobile ? 30 : 60 },
-                    facingMode: { ideal: "user" },           // voorkant voor calls (kan later aangepast)
-                    // Extra low-latency hints voor mobiel
-                    ...(isMobile && { resizeMode: "crop-and-scale" })
-                } : false;
-                
-                const audioConstraints = conf.audio ? {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true,
-                    sampleRate: isMobile ? 16000 : 48000
-                } : false;
+
+            async _getHardware(conf) {
+                // Alleen camera/mic starten als dat strikt nodig is
+                if (!conf.video && !conf.audio) return null;
+                if (this.localStream) return this.localStream; 
                 
                 try {
-                    this.localStream = await navigator.mediaDevices.getUserMedia({
-                        video: videoConstraints,
-                        audio: audioConstraints
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: conf.video ? { width: { ideal: parseInt(conf.res) === 1080 ? 1920 : 1280 }, frameRate: { ideal: parseInt(conf.fps) } } : false,
+                        audio: conf.audio
                     });
-                    
-                    this.emit('local_stream', this.localStream);
-                    return this.localStream;
+                    this.localStream = stream;
+                    this.emit('local_stream', stream);
+                    return stream;
                 } catch(e) {
-                    console.error("HW access denied", e);
-                    this.emit('err', "HW_ACCESS_DENIED");
+                    this.emit('err', "Hardware Access Denied");
                     return null;
                 }
             }
-            
-            dial(id, config) {
-                this.pendingConn = this.peer.connect(id);
-                this._setupData(this.pendingConn, config, true);
-            }
-            
-            abortOutgoing() {
-                if (this.pendingConn) {
-                    this.pendingConn.send({ type: 'ABT' });
-                    setTimeout(() => { 
-                        if (this.pendingConn) this.pendingConn.close(); 
-                        this.pendingConn = null; 
-                    }, 30);
+
+            _stopHardware() {
+                if (this.localStream && this.sessions.size === 0) {
+                    this.localStream.getTracks().forEach(track => track.stop());
+                    this.localStream = null;
+                    this.emit('local_stream_stop');
                 }
             }
-            
+
+            dial(id, config) {
+                const conn = this.peer.connect(id);
+                this._setupData(conn, config, true);
+            }
+
             _setupData(conn, outConf = null, isInit = false) {
                 conn.on('open', () => {
-                    if (isInit) conn.send({ type: 'REQ', config: outConf });
+                    if(isInit) conn.send({ type: 'REQ', config: outConf });
                 });
-                
+
                 conn.on('data', async data => {
                     const pid = conn.peer;
                     let s = this.sessions.get(pid);
-                    if (s) s.lastSeen = Date.now();
-                    
-                    if (data.type === 'PING') {
-                        conn.send({ type: 'PONG' });
-                    } else if (data.type === 'REQ') {
-                        this.emit('invite', {
-                            id: pid,
-                            config: data.config,
-                            accept: async () => {
-                                conn.send({ type: 'ACC', config: data.config });
-                                this.sessions.set(pid, { conn, config: data.config, lastSeen: Date.now() });
-                                this.emit('joined', pid);
-                            },
-                            reject: () => { conn.send({ type: 'REJ' }); conn.close(); }
-                        });
-                    } else if (data.type === 'ABT') {
-                        this.emit('remote_abort', pid);
-                        conn.close();
-                    } else if (data.type === 'ACC') {
-                        this.pendingConn = null;
-                        const st = await this._getHW(outConf);
-                        const call = st ? this.peer.call(pid, st) : null;
-                        if (call) this._setupMedia(call);
-                        this.sessions.set(pid, { conn, call, config: outConf, lastSeen: Date.now() });
-                        this.emit('joined', pid);
-                    } else if (data.type === 'MSG') {
-                        this.emit('msg', { id: pid, msg: data.content });
+                    if(s) s.lastSeen = Date.now();
+
+                    switch(data.type) {
+                        case 'REQ':
+                            this.emit('invite', {
+                                id: pid, config: data.config,
+                                accept: async () => {
+                                    conn.send({ type: 'ACC', config: data.config });
+                                    this.sessions.set(pid, { conn, config: data.config, lastSeen: Date.now() });
+                                    this.emit('joined', pid);
+                                },
+                                reject: () => { conn.send({ type: 'REJ' }); conn.close(); }
+                            });
+                            break;
+                        case 'ACC':
+                            const st = await this._getHardware(outConf);
+                            const call = st ? this.peer.call(pid, st) : null;
+                            if(call) this._setupMedia(call);
+                            this.sessions.set(pid, { conn, call, config: outConf, lastSeen: Date.now() });
+                            this.emit('joined', pid);
+                            break;
+                        case 'REJ': this.emit('rejected', pid); conn.close(); break;
+                        case 'MSG': this.emit('msg', { id: pid, msg: data.content }); break;
+                        case 'PING': conn.send({ type: 'PONG' }); break;
                     }
                 });
-                
+
                 conn.on('close', () => this.terminate(conn.peer));
+                conn.on('error', () => this.terminate(conn.peer));
             }
-            
+
             _setupMedia(call) {
                 call.on('stream', st => this.emit('remote_stream', { id: call.peer, stream: st }));
+                call.on('close', () => this.terminate(call.peer));
             }
-            
+
             terminate(id) {
                 const s = this.sessions.get(id);
-                if (!s) return;
-                if (s.conn) s.conn.close();
-                if (s.call) s.call.close();
+                if(!s) return;
+                if(s.conn) s.conn.close();
+                if(s.call) s.call.close();
                 this.sessions.delete(id);
-                this.byteStats.delete(id);
                 this.emit('left', id);
+                this._stopHardware(); // Stop camera als niemand meer kijkt
             }
-            
-            broadcast(m) {
-                this.sessions.forEach(s => {
-                    if (s.conn && s.conn.open) s.conn.send({ type: 'MSG', content: m });
+
+            _monitor() {
+                const now = Date.now();
+                this.sessions.forEach((s, id) => {
+                    if (now - s.lastSeen > 12000) return this.terminate(id);
+                    if (s.conn.open) s.conn.send({ type: 'PING' });
+                    
+                    if (s.call && s.call.peerConnection) {
+                        s.call.peerConnection.getStats().then(stats => {
+                            stats.forEach(r => {
+                                if (r.type === 'inbound-rtp' && r.kind === 'video') {
+                                    const bit = Math.round(((r.bytesReceived - this.lastBytes) * 8) / 2000);
+                                    this.lastBytes = r.bytesReceived;
+                                    this.emit('stat_bitrate', bit);
+                                }
+                            });
+                        });
+                    }
                 });
             }
+
+            broadcast(m) {
+                this.sessions.forEach(s => { if(s.conn.open) s.conn.send({ type: 'MSG', content: m }); });
+            }
         }
-        
-        // === UI BINDING (supersnel) ===
+
         const net = new PulseNet();
-        
-        net.on('ready', id => {
-            const el = document.getElementById('my-id');
-            el.innerText = id;
-            el.style.borderLeftColor = '#10b981';
+
+        // UI Logic
+        net.on('ready', id => { document.getElementById('my-id').innerText = id; });
+        net.on('stat_bitrate', b => {
+            document.getElementById('val-bitrate').innerText = b + " kbps";
+            document.getElementById('bar-bitrate').style.width = Math.min(b/40, 100) + "%";
         });
-        
-        net.on('stat_bitrate', bit => {
-            document.getElementById('val-bitrate').innerText = bit + " kbps";
-            document.getElementById('bar-bitrate').style.width = Math.min(Math.max(bit / 120, 0), 100) + "%";
-        });
-        
+
         net.on('invite', inv => {
             const t = document.createElement('div');
             t.className = 'toast';
-            t.id = `inv-${inv.id}`;
-            t.innerHTML = `
-                <div style="color:var(--accent); font-weight:bold; margin-bottom:5px;">INCOMING HANDSHAKE</div>
-                <div style="font-size:10px; color:var(--meta)">REQ: ${inv.config.res}p @ ${inv.config.fps}fps</div>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="btn" style="height:28px; margin:0; background:var(--success); color:#000; font-size:9px;" onclick="uiRespond('${inv.id}', true)">ACCEPT</button>
-                    <button class="btn" style="height:28px; margin:0; background:var(--danger); color:#000; font-size:9px;" onclick="uiRespond('${inv.id}', false)">REJECT</button>
-                </div>`;
+            t.innerHTML = `<b>HANDSHAKE REQ</b><br><span style="color:gray">${inv.id.substring(0,8)}</span>
+            <div style="margin-top:10px; display:flex; gap:5px;">
+                <button class="btn" style="background:var(--success); padding:5px" onclick="this.parentElement.parentElement.remove(); uiAccept('${inv.id}')">ACCEPT</button>
+                <button class="btn" style="background:var(--danger); padding:5px" onclick="this.parentElement.parentElement.remove(); uiReject('${inv.id}')">DECLINE</button>
+            </div>`;
             document.getElementById('toast-layer').appendChild(t);
-            
-            window.uiRespond = (id, acc) => {
-                const inv = Array.from(net.events.invite || []).pop(); // laatste invite
-                if (acc) inv.accept();
-                else inv.reject();
-                const toast = document.getElementById(`inv-${id}`);
-                if (toast) toast.remove();
-            };
+            window.uiAccept = () => inv.accept();
+            window.uiReject = () => inv.reject();
         });
-        
-        net.on('flatline', id => pushTerm('HEARTBEAT_LOST', `Node ${id.substring(0,6)} flatlined`, 'var(--danger)'));
-        net.on('remote_abort', id => {
-            const t = document.getElementById(`inv-${id}`);
-            if (t) t.remove();
-            pushTerm('HANDSHAKE_CANCELLED', `Remote aborted`, 'var(--danger)');
+
+        net.on('joined', id => { closeDial(); updateUI(); pushTerm('LINK_ESTABLISHED', id, 'var(--success)'); });
+        net.on('left', id => { 
+            const el = document.getElementById(`v-${id}`);
+            if(el) el.remove();
+            updateUI(); 
+            pushTerm('LINK_TERMINATED', id, 'var(--danger)'); 
         });
-        
-        net.on('joined', id => {
-            closeDial();
-            updateList();
-            pushTerm('PEER_CONNECTED', `Node ${id.substring(0,8)} locked in`, 'var(--success)');
-        });
-        
-        net.on('left', id => {
-            updateList();
-            const v = document.getElementById(`v-${id}`);
-            if (v) v.remove();
-            pushTerm('PEER_DISCONNECTED', `Carrier lost`, 'var(--danger)');
-        });
-        
-        net.on('local_stream', st => renderVideo('HOST_LOCAL', st));
-        net.on('remote_stream', d => renderVideo(d.id, d.stream));
-        net.on('msg', d => pushTerm(d.id.substring(0,6), d.msg, '#fff'));
-        
-        function renderVideo(id, stream) {
+
+        net.on('local_stream', st => renderVid('LOCAL', st));
+        net.on('local_stream_stop', () => { if(document.getElementById('v-LOCAL')) document.getElementById('v-LOCAL').remove(); });
+        net.on('remote_stream', d => renderVid(d.id, d.stream));
+        net.on('msg', d => pushTerm(d.id.substring(0,5), d.msg));
+
+        function renderVid(id, stream) {
             let b = document.getElementById(`v-${id}`);
-            const isLocal = id === 'HOST_LOCAL';
-            
-            if (!b) {
-                b = document.createElement('div');
-                b.id = `v-${id}`;
-                b.className = 'v-box';
-                b.innerHTML = `<video autoplay playsinline ${isLocal ? 'muted' : ''} id="vid-${id}"></video>
-                               <div class="v-overlay">
-                                   <div style="font-size:8px; background:rgba(0,0,0,0.7); padding:2px 6px; border:1px solid var(--border); width:fit-content;">${isLocal ? 'LOCAL_KERNEL' : 'REMOTE_NODE'}</div>
-                               </div>`;
+            if(!b) {
+                b = document.createElement('div'); b.id = `v-${id}`; b.className = 'v-box';
+                b.innerHTML = `<video autoplay playsinline ${id==='LOCAL'?'muted':''}></video><div class="v-overlay"><span style="font-size:8px; background:#000; padding:2px 4px; border:1px solid var(--border)">${id}</span></div>`;
                 document.getElementById('video-grid').appendChild(b);
             }
-            document.getElementById(`vid-${id}`).srcObject = stream;
+            b.querySelector('video').srcObject = stream;
         }
-        
-        function updateList() {
-            const l = document.getElementById('node-list');
-            l.innerHTML = '';
-            let hasData = false;
-            
+
+        function updateUI() {
+            const l = document.getElementById('node-list'); l.innerHTML = '';
+            let canChat = false;
             net.sessions.forEach((s, id) => {
-                if (s.config && s.config.txt) hasData = true;
-                l.innerHTML += `
-                <div style="font-size:10px; padding:10px; border:1px solid #222; margin-bottom:5px; display:flex; justify-content:space-between; background:#000; border-radius:4px;">
-                    <span>● ${id.substring(0,8)}...</span>
-                    <span style="color:var(--danger); cursor:pointer; font-size:12px;" onclick="net.terminate('${id}')">[KILL]</span>
+                if(s.config.txt) canChat = true;
+                l.innerHTML += `<div style="font-size:10px; padding:8px; border:1px solid #111; margin-bottom:4px; display:flex; justify-content:space-between; background:#000;">
+                    <span>${id.substring(0,8)}</span><span style="color:var(--danger); cursor:pointer" onclick="net.terminate('${id}')">DROP</span>
                 </div>`;
             });
-            
-            const input = document.getElementById('msg-input');
-            input.disabled = !hasData;
-            input.placeholder = hasData ? "Broadcast packet..." : "Awaiting data channel";
+            document.getElementById('msg-input').disabled = !canChat;
         }
-        
+
         function pushTerm(tag, m, c = 'var(--accent)') {
             const f = document.getElementById('term-feed');
-            const time = new Date().toLocaleTimeString([], {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
-            f.innerHTML += `<div><span style="color:#444">[${time}]</span> <b style="color:${c}">${tag}</b>: ${m}</div>`;
+            f.innerHTML += `<div><span style="color:#333">[${new Date().toLocaleTimeString()}]</span> <b style="color:${c}">${tag}</b>: ${m}</div>`;
             f.scrollTop = f.scrollHeight;
-            
-            // Max 80 regels om memory laag te houden op mobiel
-            if (f.children.length > 80) f.removeChild(f.children[0]);
         }
-        
+
         function uiDial() {
-            const tid = document.getElementById('target-id').value.trim();
-            if (!tid) return;
-            
-            const btn = document.getElementById('dial-exe');
-            btn.innerText = "HANDSHAKING...";
-            btn.disabled = true;
-            
-            net.dial(tid, {
+            const id = document.getElementById('target-id').value;
+            if(!id) return;
+            net.dial(id, {
                 video: document.getElementById('sw-vid').checked,
                 audio: document.getElementById('sw-aud').checked,
                 txt: document.getElementById('sw-txt').checked,
                 res: document.getElementById('cfg-res').value,
                 fps: document.getElementById('cfg-fps').value
             });
+            document.getElementById('dial-exe').innerText = "CONNECTING...";
         }
-        
-        function uiAbortOutgoing() {
-            net.abortOutgoing();
-            closeDial();
-        }
-        
+
         function uiSend() {
             const i = document.getElementById('msg-input');
-            if (!i.value) return;
             net.broadcast(i.value);
-            pushTerm('LOCAL_DATA', i.value, '#fff');
+            pushTerm('LOCAL', i.value, '#eee');
             i.value = '';
         }
-        
+
         function copyId() {
-            const id = document.getElementById('my-id').innerText;
-            if (id === 'INITIALIZING...') return;
-            navigator.clipboard.writeText(id).then(() => {
-                pushTerm('CLIPBOARD', 'Local ID copied to clipboard', 'var(--warn)');
-            });
+            navigator.clipboard.writeText(document.getElementById('my-id').innerText);
+            pushTerm('SYSTEM', 'ID copied to clipboard');
         }
-        
-        function openDial() {
-            const modal = document.getElementById('dial-modal');
-            modal.style.display = 'flex';
-            const btn = document.getElementById('dial-exe');
-            btn.innerText = "CONNECT • GODSPEED";
-            btn.disabled = false;
-        }
-        
-        function closeDial() {
-            document.getElementById('dial-modal').style.display = 'none';
-        }
-        
-        // START
+
+        function openDial() { document.getElementById('dial-modal').style.display = 'flex'; }
+        function closeDial() { document.getElementById('dial-modal').style.display = 'none'; }
+
         window.onload = () => net.start();
     </script>
 </body>
