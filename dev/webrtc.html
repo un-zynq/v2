@@ -214,7 +214,7 @@
         </div>
     </main>
 
-    <!-- ID SETUP MODAL (super simpel) -->
+    <!-- ID SETUP MODAL -->
     <div id="id-setup-modal" class="modal">
         <div class="modal-content">
             <h2 style="margin-bottom:15px;">Kies je Node ID</h2>
@@ -234,7 +234,7 @@
         </div>
     </div>
 
-    <!-- DIAL MODAL (simpel) -->
+    <!-- DIAL MODAL -->
     <div id="dial-modal" class="modal">
         <div class="modal-content">
             <h2 style="margin-bottom:15px;">Nieuwe link starten</h2>
@@ -261,7 +261,7 @@
                 this.pendingCalls = new Map();
                 this.preferredId = null;
                 this.reconnectAttempts = 0;
-                this.maxReconnects = 20;        // veel meer pogingen
+                this.maxReconnects = 20;
                 this.isReclaiming = false;
             }
 
@@ -270,7 +270,6 @@
                     if (desiredId) this.preferredId = desiredId;
                     const idToUse = this.preferredId || undefined;
 
-                    // Oude peer altijd eerst volledig destroyen
                     if (this.peer) {
                         this.peer.destroy();
                         this.peer = null;
@@ -307,9 +306,8 @@
                                 return;
                             }
 
-                            // LANGERE WACHTTIJD zodat oude instantie écht kan doodgaan
                             const delay = 6500 + Math.random() * 3500;
-                            showToast(`🔄 ID <b>${this.preferredId}</b> nog bezet door oude instantie...<br>Wachten ${Math.round(delay/1000)} seconden (poging ${this.reconnectAttempts}/${this.maxReconnects})`, "error");
+                            showToast(`🔄 ID <b>${this.preferredId}</b> nog bezet...<br>Wachten ${Math.round(delay/1000)}s (poging ${this.reconnectAttempts}/${this.maxReconnects})`, "error");
 
                             setTimeout(() => {
                                 if (this.peer) this.peer.destroy();
@@ -348,13 +346,15 @@
                 this.peer.on('disconnected', () => this.handleLostConnection());
                 this.peer.on('close', () => this.handleLostConnection());
 
-                // Heartbeat
+                // Heartbeat voor sessies (nu met langere timeout)
                 setInterval(() => {
                     const now = Date.now();
                     this.sessions.forEach((s, pid) => {
-                        if (now - s.lastSeen > 20000) this.terminate(pid, true, "Verbinding verloren");
+                        if (now - s.lastSeen > 45000) {   // 45 seconden ipv 20 → veel stabieler
+                            this.terminate(pid, true, "Verbinding verloren (timeout)");
+                        }
                     });
-                }, 5000);
+                }, 6000);
             }
 
             handleLostConnection() {
@@ -433,13 +433,27 @@
             _handleData(conn, config, isInit = false) {
                 conn.on('open', () => {
                     if (isInit) conn.send({ type: 'REQ', config });
+
+                    // === FIX: KEEP-ALIVE PING op ELKE verbinding (zowel inkomend als uitgaand) ===
+                    const heartbeat = setInterval(() => {
+                        if (conn.open) {
+                            conn.send({ type: 'PING' });
+                        } else {
+                            clearInterval(heartbeat);
+                        }
+                    }, 8000);   // elke 8 seconden een ping
                 });
+
                 conn.on('data', async data => {
                     const pid = conn.peer;
-                    if (this.sessions.has(pid)) this.sessions.get(pid).lastSeen = Date.now();
+                    // Update lastSeen bij ELK bericht (inclusief PING)
+                    if (this.sessions.has(pid)) {
+                        this.sessions.get(pid).lastSeen = Date.now();
+                    }
 
-                    if (data.type === 'REQ') this._showInvite(pid, data.config, conn);
-                    else if (data.type === 'ACCEPT') {
+                    if (data.type === 'REQ') {
+                        this._showInvite(pid, data.config, conn);
+                    } else if (data.type === 'ACCEPT') {
                         showToast("Link gemaakt", "success");
                         const stream = await this._getOutgoingStream(config);
                         const call = stream ? this.peer.call(pid, stream) : null;
@@ -454,7 +468,9 @@
                     } else if (typeof data === 'string') {
                         logChat(pid.substring(0,8), data);
                     }
+                    // PING wordt automatisch afgehandeld via de lastSeen update hierboven
                 });
+
                 conn.on('close', () => this.terminate(conn.peer, true));
             }
 
@@ -475,7 +491,7 @@
             terminate(pid, remote, reason) {
                 const s = this.sessions.get(pid);
                 if (!s) return;
-                if (!remote && s.conn.open) s.conn.send({ type: 'BYE' });
+                if (!remote && s.conn && s.conn.open) s.conn.send({ type: 'BYE' });
                 s.conn.close();
                 if (s.call) s.call.close();
                 this.sessions.delete(pid);
@@ -501,6 +517,7 @@
                     </div>`;
                 document.getElementById('notification-stack').appendChild(t);
                 setTimeout(() => t.remove(), 20000);
+
                 window.acceptInvite = (p) => {
                     conn.send({ type: 'ACCEPT' });
                     this.sessions.set(p, { conn, config, lastSeen: Date.now() });
@@ -571,7 +588,7 @@
             const txt = input.value.trim();
             if (!txt) return;
             core.sessions.forEach(s => {
-                if (s.config.chat && s.conn.open) s.conn.send(txt);
+                if (s.config.chat && s.conn && s.conn.open) s.conn.send(txt);
             });
             logChat('JIJ', txt);
             input.value = '';
@@ -612,16 +629,13 @@
             }
         }
 
-        // START
         window.onload = () => {
             document.getElementById('id-setup-modal').style.display = 'flex';
             
-            // Zorg dat oude tab altijd netjes afsluit
             window.addEventListener('beforeunload', () => {
                 if (core.peer) core.peer.destroy();
             });
             
-            // Extra knop in sidebar voor dial (simpel)
             const aside = document.querySelector('aside');
             const dialBtn = document.createElement('button');
             dialBtn.className = 'btn';
