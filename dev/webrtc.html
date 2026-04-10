@@ -3,379 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PulseNet • Simpel</title>
+    <title>PulseNet Pro • Real-Time Telemetry Edition</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #111111; --text: #ffffff; --accent: #00ffff; --danger: #ff4444; }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        aside { width: 260px; background: #1a1a1a; border-right: 1px solid #333; display: flex; flex-direction: column; padding: 20px; }
-        main { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 15px; }
-        .title { font-size: 22px; font-weight: bold; margin-bottom: 20px; text-align: center; }
-        .id-box { background: #222; padding: 14px; border: 2px solid #444; border-radius: 8px; font-family: monospace; font-size: 15px; word-break: break-all; cursor: pointer; margin-bottom: 15px; text-align: center; }
-        .id-box:hover { border-color: var(--accent); }
-        .btn { padding: 12px; background: var(--accent); color: #000; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 8px; width: 100%; }
-        .btn-danger { background: transparent; color: var(--danger); border: 2px solid var(--danger); }
-        .section { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin: 15px 0 8px; }
-        #active-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .node-item { background: #222; padding: 12px; border-radius: 6px; font-size: 13px; }
-        .badge { font-size: 10px; padding: 2px 6px; background: #333; border-radius: 3px; margin-right: 4px; }
-        .badge.on { background: #00ffff; color: #000; }
-        #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; flex: 1; overflow-y: auto; }
-        .v-box { background: #000; aspect-ratio: 16/9; border: 2px solid #333; position: relative; }
+        :root { 
+            --bg: #050506; --card: #0c0c0e; --accent: #22d3ee; 
+            --danger: #f43f5e; --border: #1e1e22; --success: #10b981; 
+            --warn: #fbbf24; --meta: #52525b;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'JetBrains Mono', monospace; }
+        body { background: var(--bg); color: #e4e4e7; display: flex; height: 100vh; overflow: hidden; border: 1px solid var(--border); }
+
+        /* Sidebar */
+        aside { width: 340px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; z-index: 50; }
+        .title { font-size: 18px; font-weight: 900; color: var(--accent); margin-bottom: 5px; }
+        .version { font-size: 8px; color: var(--meta); margin-bottom: 20px; letter-spacing: 2px; }
+        
+        .id-box { background: #000; padding: 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 10px; cursor: pointer; border-left: 3px solid var(--accent); margin-bottom: 20px; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Real-Time Telemetry Bars */
+        .telemetry-unit { margin-bottom: 15px; background: #000; border: 1px solid var(--border); padding: 10px; }
+        .tel-label { font-size: 8px; color: var(--meta); margin-bottom: 5px; display: flex; justify-content: space-between; text-transform: uppercase; }
+        .tel-val { color: var(--accent); font-weight: bold; }
+        .progress-bg { height: 4px; background: #1a1a1e; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s ease; }
+
+        .btn { padding: 12px; background: var(--accent); color: #000; border: none; border-radius: 4px; font-weight: 800; cursor: pointer; width: 100%; font-size: 10px; text-transform: uppercase; margin-bottom: 8px; transition: 0.2s; }
+        .btn:hover { filter: brightness(1.2); }
+        .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #000; }
+
+        /* Main Area */
+        main { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 15px; position: relative; }
+        #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; flex: 1; overflow-y: auto; }
+        .v-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        .v-label { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 10px; font-size: 12px; border-radius: 4px; }
-        #chat-wrap { height: 200px; background: #1a1a1a; border: 1px solid #333; display: flex; flex-direction: column; }
-        #chat-feed { flex: 1; padding: 12px; overflow-y: auto; font-size: 14px; }
-        .chat-in { padding: 10px; display: flex; gap: 8px; border-top: 1px solid #333; }
-        .chat-in input { flex: 1; background: #222; border: 1px solid #444; color: white; padding: 10px; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 9999; }
-        .modal-content { background: #222; width: 100%; max-width: 380px; padding: 25px; border: 2px solid #444; }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #222; color: white; padding: 14px 20px; border-left: 5px solid var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 10000; max-width: 320px; }
-        .toast.error { border-left-color: var(--danger); }
+        .v-overlay { position: absolute; inset: 0; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%); }
+
+        /* Terminal Chat */
+        #term-wrap { height: 200px; background: #000; border: 1px solid var(--border); display: flex; flex-direction: column; border-radius: 4px; }
+        #term-feed { flex: 1; padding: 12px; overflow-y: auto; font-size: 11px; line-height: 1.5; color: #a1a1aa; }
+        .term-in { padding: 10px; display: flex; border-top: 1px solid var(--border); gap: 10px; }
+        .term-in input { flex: 1; background: transparent; border: none; color: var(--accent); outline: none; font-size: 11px; }
+
+        /* Modals & Toasts */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal-card { background: var(--card); padding: 30px; border: 1px solid var(--border); width: 400px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .toast-stack { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--card); border: 1px solid var(--border); padding: 15px; width: 300px; font-size: 11px; border-left: 4px solid var(--warn); }
     </style>
 </head>
 <body>
 
     <aside>
-        <div class="title">PULSE<span style="color:#00ffff">NET</span></div>
-        <div style="margin-bottom:10px;">Jouw ID</div>
-        <div id="my-id" class="id-box" onclick="copyId()">WACHTEN...</div>
-        
-        <button onclick="forceReclaim()" class="btn">🔄 RECLAIM ID</button>
-        <button onclick="switchToRandom()" class="btn" style="background:#444;color:white;">NIEUWE RANDOM ID</button>
+        <div class="title">PULSE_NET // PRO</div>
+        <div class="version">LIVE_BITSTREAM_MONITOR</div>
 
-        <div class="section">Actieve verbindingen</div>
-        <div id="active-list"></div>
+        <div id="my-id" class="id-box" onclick="copyId()">INITIALIZING_PEER_JS...</div>
+
+        <div class="telemetry-unit">
+            <div class="tel-label"><span>Net_Latency (RTT)</span><span class="tel-val" id="val-rtt">0ms</span></div>
+            <div class="progress-bg"><div class="progress-fill" id="bar-rtt"></div></div>
+        </div>
+        <div class="telemetry-unit">
+            <div class="tel-label"><span>Packet_Loss</span><span class="tel-val" id="val-loss">0%</span></div>
+            <div class="progress-bg"><div class="progress-fill" id="bar-loss" style="background:var(--danger)"></div></div>
+        </div>
+        <div class="telemetry-unit">
+            <div class="tel-label"><span>Bitrate_Inbound</span><span class="tel-val" id="val-bitrate">0 kbps</span></div>
+            <div class="progress-bg"><div class="progress-fill" id="bar-bitrate" style="background:var(--success)"></div></div>
+        </div>
+
+        <button onclick="openDial()" class="btn">Establish Handshake</button>
+        <button onclick="location.reload()" class="btn btn-danger">Emergency Killswitch</button>
+
+        <div style="font-size: 9px; color: var(--meta); margin-top: 15px; margin-bottom: 5px;">ACTIVE_DATA_NODES</div>
+        <div id="node-list" style="flex:1; overflow-y:auto;"></div>
     </aside>
 
     <main>
         <div id="video-grid"></div>
-        <div id="chat-wrap">
-            <div id="chat-feed"></div>
-            <div class="chat-in">
-                <input id="msg-input" placeholder="Bericht versturen..." onkeypress="if(event.key==='Enter') sendMsg()" disabled>
-                <button onclick="sendMsg()" class="btn" style="width:80px">SEND</button>
+        <div id="term-wrap">
+            <div id="term-feed"></div>
+            <div class="term-in">
+                <span style="color:var(--accent)">>></span>
+                <input id="msg-input" placeholder="No active data stream..." onkeypress="if(event.key==='Enter') uiSend()" disabled>
             </div>
         </div>
     </main>
 
-    <!-- ID SETUP -->
-    <div id="id-setup-modal" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-bottom:15px;">Kies je Node ID</h2>
-            <p style="font-size:14px;color:#aaa;margin-bottom:20px;">PulseNet probeert je ID automatisch terug te nemen als hij verloren gaat.</p>
-            <input id="custom-id-input" type="text" placeholder="bijv. mijnhuis42" style="width:100%;padding:14px;background:#111;border:2px solid #555;color:white;font-family:monospace;font-size:16px;margin-bottom:20px;">
-            <div style="display:flex;gap:10px;">
-                <button onclick="useRandomId()" class="btn" style="flex:1;background:#444;color:white;">RANDOM ID</button>
-                <button onclick="claimCustomId()" class="btn" style="flex:1;">CLAIM</button>
-            </div>
-            <div style="margin-top:20px;font-size:12px;color:#666;text-align:center;">4-20 tekens • a-z 0-9 _ -</div>
-        </div>
-    </div>
-
-    <!-- DIAL MODAL -->
     <div id="dial-modal" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-bottom:15px;">Nieuwe link starten</h2>
-            <input id="target-id" type="text" placeholder="Andere Node ID" style="width:100%;padding:14px;background:#111;border:2px solid #555;color:white;font-family:monospace;font-size:16px;margin-bottom:20px;">
-            <label style="display:block;margin:8px 0;"><input type="checkbox" id="sw-video" checked> Video</label>
-            <label style="display:block;margin:8px 0;"><input type="checkbox" id="sw-audio" checked> Audio</label>
-            <label style="display:block;margin:8px 0;"><input type="checkbox" id="sw-chat" checked> Chat</label>
-            <button onclick="startDial()" class="btn" style="margin-top:15px;width:100%;">START LINK</button>
-            <button onclick="closeDial()" style="margin-top:8px;width:100%;background:transparent;color:#888;border:none;">Annuleren</button>
+        <div class="modal-card">
+            <h3 style="margin-bottom:20px; font-size:14px; color:var(--accent);">INITIATE_P2P_HANDSHAKE</h3>
+            <input id="target-id" type="text" placeholder="Remote Peer ID..." style="width:100%; padding:12px; background:#000; border:1px solid var(--border); color:var(--accent); margin-bottom:20px; outline:none;">
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
+                <label style="font-size:9px;"><input type="checkbox" id="sw-vid" checked> VIDEO</label>
+                <label style="font-size:9px;"><input type="checkbox" id="sw-aud" checked> AUDIO</label>
+                <label style="font-size:9px;"><input type="checkbox" id="sw-txt" checked> DATA</label>
+            </div>
+
+            <button id="dial-exe" onclick="uiDial()" class="btn">Execute</button>
+            <button onclick="closeDial()" class="btn btn-danger" style="margin:0;">Abort</button>
         </div>
     </div>
 
-    <div id="notification-stack"></div>
+    <div id="toast-layer" class="toast-stack"></div>
 
     <script>
-        class PulseCore {
+        class PulseNet {
             constructor() {
                 this.peer = null;
                 this.sessions = new Map();
-                this.masterLocalStream = null;
-                this.pendingCalls = new Map();
-                this.preferredId = null;
-                this.isInitializing = false;
-                this.reclaimAttempts = 0;
-                this.maxReclaimAttempts = 6;
-                this.reclaimTimer = null;
+                this.localStream = null;
+                this.events = {};
+                this.statsInterval = null;
+                this.lastBytesReceived = 0;
             }
 
-            init(desiredId = null) {
-                if (this.isInitializing) return Promise.resolve();
-                this.isInitializing = true;
+            on(e, cb) { if(!this.events[e]) this.events[e] = []; this.events[e].push(cb); }
+            emit(e, d) { if(this.events[e]) this.events[e].forEach(cb => cb(d)); }
 
-                return new Promise((resolve, reject) => {
-                    if (desiredId) this.preferredId = desiredId;
-                    const idToUse = this.preferredId || undefined;
-
-                    // Oude peer netjes opruimen
-                    if (this.peer) {
-                        this.peer.destroy();
-                        this.peer = null;
-                    }
-
-                    this.peer = new Peer(idToUse);
-
-                    this._attachListeners();
-
-                    this.peer.on('open', (id) => {
-                        this.isInitializing = false;
-                        this.reclaimAttempts = 0;
-                        clearTimeout(this.reclaimTimer);
-
-                        document.getElementById('my-id').innerHTML = `<strong>${id}</strong> <span style="background:#00ffff;color:#000;padding:2px 8px;border-radius:4px;font-size:12px;">LIVE</span>`;
-                        document.getElementById('my-id').style.borderColor = '#00ffff';
-                        
-                        showToast(`✅ ID <b>${id}</b> actief`, "success");
-                        this._syncUI();
-                        resolve(id);
-                    });
-
-                    this.peer.on('error', (err) => {
-                        this.isInitializing = false;
-
-                        if (err.type === 'unavailable-id' && this.preferredId) {
-                            this.reclaimAttempts++;
-                            if (this.reclaimAttempts >= this.maxReclaimAttempts) {
-                                showToast("ID kon niet worden teruggeclaimd na 6 pogingen.<br>Automatisch random ID gebruikt.", "error");
-                                this.preferredId = null;
-                                this.init();
-                                return;
-                            }
-
-                            const delay = 4000 + (this.reclaimAttempts * 3000);
-                            showToast(`🔄 ID <b>${this.preferredId}</b> nog bezet...<br>Wachten ${Math.round(delay/1000)}s (poging ${this.reclaimAttempts}/${this.maxReclaimAttempts})`, "error");
-
-                            this.reclaimTimer = setTimeout(() => {
-                                this.init(this.preferredId).catch(() => {});
-                            }, delay);
-                            return;
-                        }
-
-                        if (err.type === 'disconnected' || err.type === 'server-error') {
-                            this.handleLostConnection();
-                        } else {
-                            showToast(`Fout: ${err.type}`, "error");
-                        }
-                        reject(err);
-                    });
-                });
-            }
-
-            _attachListeners() {
-                this.peer.on('connection', conn => this._handleData(conn));
+            start() {
+                this.peer = new Peer({ debug: 1 });
+                this.peer.on('open', id => this.emit('ready', id));
+                this.peer.on('connection', c => this._setupData(c));
                 this.peer.on('call', async call => {
-                    const pid = call.peer;
-                    const s = this.sessions.get(pid);
-                    if (s) await this._answerCall(call, s.config);
-                    else this.pendingCalls.set(pid, call);
-                });
-
-                this.peer.on('disconnected', () => this.handleLostConnection());
-                this.peer.on('close', () => this.handleLostConnection());
-
-                setInterval(() => {
-                    const now = Date.now();
-                    this.sessions.forEach((s, pid) => {
-                        if (now - s.lastSeen > 50000) this.terminate(pid, true, "Timeout");
-                    });
-                }, 7000);
-            }
-
-            handleLostConnection() {
-                if (this.isInitializing) return;
-                showToast(this.preferredId ? `🔥 ID ${this.preferredId} verloren → reclaim...` : "Verbinding verloren", "error");
-                if (this.peer) this.peer.destroy();
-                setTimeout(() => this.init(this.preferredId), 1500);
-            }
-
-            // === DE REST VAN DE CODE (onveranderd maar stabiel) ===
-            async _reconcileLocalStream(needsVideo, needsAudio) { /* ...zelfde als vorige versie... */ 
-                if (this.masterLocalStream) {
-                    const hasV = !!this.masterLocalStream.getVideoTracks().length;
-                    const hasA = !!this.masterLocalStream.getAudioTracks().length;
-                    if (hasV === needsVideo && hasA === needsAudio) return this.masterLocalStream;
-                }
-                this._stopHardware();
-                if (!needsVideo && !needsAudio) return null;
-                try {
-                    this.masterLocalStream = await navigator.mediaDevices.getUserMedia({ video: needsVideo ? { width: 1280, height: 720 } : false, audio: needsAudio });
-                    let box = document.getElementById('local-box');
-                    if (!box) {
-                        box = document.createElement('div'); box.className = 'v-box'; box.id = 'local-box';
-                        box.innerHTML = `<video id="local-video" autoplay muted playsinline></video><div class="v-label">JIJ</div>`;
-                        document.getElementById('video-grid').appendChild(box);
+                    const s = this.sessions.get(call.peer);
+                    if(s) {
+                        const st = await this._getHW(s.config);
+                        call.answer(st);
+                        this._setupMedia(call);
+                        s.call = call;
                     }
-                    document.getElementById('local-video').srcObject = this.masterLocalStream;
-                    return this.masterLocalStream;
-                } catch(e) { showToast("Camera/microfoon niet toegestaan", "error"); return null; }
-            }
-            _stopHardware() { if (this.masterLocalStream) this.masterLocalStream.getTracks().forEach(t => t.stop()); this.masterLocalStream = null; document.getElementById('local-box')?.remove(); }
-            async _getOutgoingStream(config) { /* ...zelfde... */ 
-                const anyVideo = Array.from(this.sessions.values()).some(s => s.config.video) || config.video;
-                const anyAudio = Array.from(this.sessions.values()).some(s => s.config.audio) || config.audio;
-                await this._reconcileLocalStream(anyVideo, anyAudio);
-                if (!this.masterLocalStream) return null;
-                const out = new MediaStream();
-                if (config.video) this.masterLocalStream.getVideoTracks().forEach(t => out.addTrack(t));
-                if (config.audio) this.masterLocalStream.getAudioTracks().forEach(t => out.addTrack(t));
-                return out;
-            }
-            async _answerCall(call, config) { /* ...zelfde... */ 
-                const stream = await this._getOutgoingStream(config);
-                call.answer(stream || undefined);
-                this._handleMedia(call);
-                const s = this.sessions.get(call.peer);
-                if (s) s.call = call;
-            }
-            dial(id, config) {
-                if (this.peer.id === id) return showToast("Niet naar jezelf bellen", "error");
-                if (this.sessions.has(id)) return;
-                const conn = this.peer.connect(id);
-                this._handleData(conn, config, true);
-            }
-            _handleData(conn, config, isInit = false) {
-                conn.on('open', () => {
-                    if (isInit) conn.send({ type: 'REQ', config });
-                    const hb = setInterval(() => {
-                        if (conn.open) conn.send({ type: 'PING' });
-                        else clearInterval(hb);
-                    }, 9000);
                 });
+                
+                this.statsInterval = setInterval(() => this.collectStats(), 2000);
+            }
+
+            async collectStats() {
+                if (this.sessions.size === 0) return;
+                
+                this.sessions.forEach(async (session, id) => {
+                    if (!session.call || !session.call.peerConnection) return;
+                    
+                    const pc = session.call.peerConnection;
+                    const stats = await pc.getStats();
+                    
+                    stats.forEach(report => {
+                        // Latency / RTT
+                        if (report.type === 'remote-candidate' && report.roundTripTime) {
+                            const rtt = Math.round(report.roundTripTime * 1000);
+                            this.emit('stat_rtt', rtt);
+                        }
+                        // Inbound RTP (Bitrate & Loss)
+                        if (report.type === 'inbound-rtp' && report.kind === 'video') {
+                            const bytes = report.bytesReceived;
+                            const bitrate = Math.round(((bytes - this.lastBytesReceived) * 8) / 2000);
+                            this.lastBytesReceived = bytes;
+                            
+                            const loss = report.packetsLost || 0;
+                            const total = report.packetsReceived || 1;
+                            const lossPct = ((loss / (total + loss)) * 100).toFixed(1);
+                            
+                            this.emit('stat_network', { bitrate, lossPct });
+                        }
+                    });
+                });
+            }
+
+            async _getHW(conf) {
+                if(!conf.video && !conf.audio) return null;
+                if(!this.localStream) {
+                    try {
+                        this.localStream = await navigator.mediaDevices.getUserMedia({
+                            video: conf.video ? { width: { ideal: 1280 }, frameRate: 30 } : false,
+                            audio: conf.audio
+                        });
+                        this.emit('local_stream', this.localStream);
+                    } catch(e) { 
+                        this.emit('err', "Hardware access denied."); 
+                        return null; 
+                    }
+                }
+                return this.localStream;
+            }
+
+            dial(id, config) {
+                const conn = this.peer.connect(id);
+                this._setupData(conn, config, true);
+                
+                setTimeout(() => {
+                    if (!this.sessions.has(id)) {
+                        this.emit('rejected', { id, reason: 'TIMED_OUT' });
+                        conn.close();
+                    }
+                }, 10000);
+            }
+
+            _setupData(conn, outConf = null, isInit = false) {
+                conn.on('open', () => {
+                    if(isInit) conn.send({ type: 'REQ', config: outConf });
+                });
+
                 conn.on('data', async data => {
                     const pid = conn.peer;
-                    if (this.sessions.has(pid)) this.sessions.get(pid).lastSeen = Date.now();
-
-                    if (data.type === 'REQ') this._showInvite(pid, data.config, conn);
-                    else if (data.type === 'ACCEPT') {
-                        showToast("Link gemaakt", "success");
-                        const stream = await this._getOutgoingStream(config);
-                        const call = stream ? this.peer.call(pid, stream) : null;
-                        if (call) this._handleMedia(call);
-                        this.sessions.set(pid, { conn, call, config, lastSeen: Date.now() });
-                        this._syncUI();
-                    } else if (data.type === 'REJECT') { showToast("Link geweigerd", "error"); conn.close(); }
-                    else if (data.type === 'BYE') this.terminate(pid, true);
-                    else if (typeof data === 'string') logChat(pid.substring(0,8), data);
-                });
-                conn.on('close', () => this.terminate(conn.peer, true));
-            }
-            _handleMedia(call) { /* ...zelfde... */ 
-                call.on('stream', st => {
-                    let box = document.getElementById(`wrap-${call.peer}`);
-                    if (!box) {
-                        box = document.createElement('div'); box.className = 'v-box'; box.id = `wrap-${call.peer}`;
-                        box.innerHTML = `<video id="v-${call.peer}" autoplay playsinline></video><div class="v-label">${call.peer.substring(0,8)}</div>`;
-                        document.getElementById('video-grid').appendChild(box);
+                    if(data.type === 'REQ') {
+                        this.emit('invite', {
+                            id: pid, config: data.config,
+                            accept: () => {
+                                conn.send({ type: 'ACC', config: data.config });
+                                this.sessions.set(pid, { conn, config: data.config });
+                                this.emit('joined', pid);
+                            },
+                            reject: () => {
+                                conn.send({ type: 'REJ', reason: 'USER_DECLINED' });
+                                conn.close();
+                            }
+                        });
+                    } else if(data.type === 'ACC') {
+                        const st = await this._getHW(outConf);
+                        const call = st ? this.peer.call(pid, st) : null;
+                        if(call) this._setupMedia(call);
+                        this.sessions.set(pid, { conn, call, config: outConf });
+                        this.emit('joined', pid);
+                    } else if(data.type === 'REJ') {
+                        this.emit('rejected', {id: pid, reason: data.reason});
+                        conn.close();
+                    } else if(data.type === 'MSG') {
+                        this.emit('msg', { id: pid, msg: data.content });
                     }
-                    document.getElementById(`v-${call.peer}`).srcObject = st;
                 });
+
+                conn.on('close', () => this.terminate(conn.peer));
             }
-            terminate(pid, remote, reason) {
-                const s = this.sessions.get(pid);
-                if (!s) return;
-                if (!remote && s.conn && s.conn.open) s.conn.send({ type: 'BYE' });
-                s.conn.close();
-                if (s.call) s.call.close();
-                this.sessions.delete(pid);
-                document.getElementById(`wrap-${pid}`)?.remove();
-                this._reconcileLocalStream(
-                    Array.from(this.sessions.values()).some(x => x.config.video),
-                    Array.from(this.sessions.values()).some(x => x.config.audio)
-                );
-                this._syncUI();
+
+            _setupMedia(call) {
+                call.on('stream', st => this.emit('remote_stream', { id: call.peer, stream: st }));
             }
-            _showInvite(pid, config, conn) { /* ...zelfde... */ 
-                const t = document.createElement('div'); t.className = 'toast';
-                t.innerHTML = `<div>INCOMING LINK<br><span class="badge ${config.video?'on':''}">VID</span><span class="badge ${config.audio?'on':''}">AUD</span><span class="badge ${config.chat?'on':''}">TXT</span></div>
-                <div style="margin-top:12px;display:flex;gap:8px;">
-                    <button onclick="acceptInvite('${pid}')" class="btn" style="padding:8px 16px">ACCEPTEREN</button>
-                    <button onclick="rejectInvite('${pid}')" class="btn btn-danger" style="padding:8px 16px">WEIGEREN</button>
-                </div>`;
-                document.getElementById('notification-stack').appendChild(t);
-                setTimeout(() => t.remove(), 20000);
-                window.acceptInvite = p => { conn.send({ type: 'ACCEPT' }); this.sessions.set(p, { conn, config, lastSeen: Date.now() }); this._syncUI(); t.remove(); };
-                window.rejectInvite = p => { conn.send({ type: 'REJECT' }); conn.close(); t.remove(); };
+
+            terminate(id) {
+                const s = this.sessions.get(id);
+                if(!s) return;
+                s.conn.close(); if(s.call) s.call.close();
+                this.sessions.delete(id);
+                this.emit('left', id);
             }
-            _syncUI() { /* ...zelfde... */ 
-                const list = document.getElementById('active-list'); list.innerHTML = '';
-                let chatOn = false;
-                this.sessions.forEach((s, pid) => {
-                    if (s.config.chat) chatOn = true;
-                    const div = document.createElement('div'); div.className = 'node-item';
-                    div.innerHTML = `<div style="font-family:monospace;font-size:13px;">${pid}</div><div style="margin:6px 0;">
-                        <span class="badge ${s.config.video?'on':''}">VID</span>
-                        <span class="badge ${s.config.audio?'on':''}">AUD</span>
-                        <span class="badge ${s.config.chat?'on':''}">TXT</span>
-                    </div><button onclick="core.terminate('${pid}',false)" class="btn-danger" style="width:100%;padding:6px;font-size:12px;">VERBREKEN</button>`;
-                    list.appendChild(div);
+
+            broadcast(m) {
+                this.sessions.forEach(s => {
+                    if(s.conn.open) s.conn.send({ type: 'MSG', content: m });
                 });
-                document.getElementById('msg-input').disabled = !chatOn;
             }
         }
 
-        let core = new PulseCore();
+        const net = new PulseNet();
 
-        function useRandomId() { document.getElementById('id-setup-modal').style.display = 'none'; core.preferredId = null; core.init(); }
-        function claimCustomId() {
-            const val = document.getElementById('custom-id-input').value.trim();
-            if (!/^[a-zA-Z0-9_-]{4,20}$/.test(val)) return showToast("Ongeldige ID", "error");
-            document.getElementById('id-setup-modal').style.display = 'none';
-            core.init(val);
-        }
-        function showToast(msg, type = "success") {
-            const t = document.createElement('div'); t.className = `toast ${type}`; t.innerHTML = msg;
-            document.getElementById('notification-stack').appendChild(t);
-            setTimeout(() => t.remove(), 4500);
-        }
-        function startDial() {
-            const id = document.getElementById('target-id').value.trim();
-            if (!id) return;
-            core.dial(id, { video: document.getElementById('sw-video').checked, audio: document.getElementById('sw-audio').checked, chat: document.getElementById('sw-chat').checked });
+        // UI Handlers
+        net.on('ready', id => { document.getElementById('my-id').innerText = id; });
+
+        net.on('stat_rtt', rtt => {
+            document.getElementById('val-rtt').innerText = rtt + "ms";
+            document.getElementById('bar-rtt').style.width = Math.min(rtt / 5, 100) + "%";
+        });
+
+        net.on('stat_network', data => {
+            document.getElementById('val-bitrate').innerText = data.bitrate + " kbps";
+            document.getElementById('bar-bitrate').style.width = Math.min(data.bitrate / 50, 100) + "%";
+            document.getElementById('val-loss').innerText = data.lossPct + "%";
+            document.getElementById('bar-loss').style.width = Math.min(data.lossPct * 10, 100) + "%";
+        });
+
+        net.on('invite', inv => {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.id = `inv-${inv.id}`;
+            t.innerHTML = `
+                <div style="color:var(--accent); font-weight:bold; margin-bottom:5px;">INCOMING_HANDSHAKE</div>
+                <div style="font-size:10px;">ID: ${inv.id.substring(0,12)}...</div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="btn" style="height:25px; margin:0; background:var(--success); color:#000" onclick="uiRespond('${inv.id}', true)">ACCEPT</button>
+                    <button class="btn" style="height:25px; margin:0; background:var(--danger); color:#000" onclick="uiRespond('${inv.id}', false)">REJECT</button>
+                </div>
+            `;
+            document.getElementById('toast-layer').appendChild(t);
+            window.uiRespond = (id, acc) => { if(acc) inv.accept(); else inv.reject(); t.remove(); };
+        });
+
+        net.on('rejected', d => {
             closeDial();
-        }
-        function sendMsg() {
-            const input = document.getElementById('msg-input');
-            const txt = input.value.trim();
-            if (!txt) return;
-            core.sessions.forEach(s => { if (s.config.chat && s.conn && s.conn.open) s.conn.send(txt); });
-            logChat('JIJ', txt);
-            input.value = '';
-        }
-        function logChat(user, msg) {
-            const feed = document.getElementById('chat-feed');
-            const d = document.createElement('div'); d.innerHTML = `<b>${user}:</b> ${msg}`; feed.appendChild(d); feed.scrollTop = feed.scrollHeight;
-        }
-        function openDial() { document.getElementById('dial-modal').style.display = 'flex'; }
-        function closeDial() { document.getElementById('dial-modal').style.display = 'none'; }
-        function copyId() {
-            const id = document.getElementById('my-id').innerText.split(' ')[0];
-            navigator.clipboard.writeText(id); showToast("ID gekopieerd");
-        }
-        function forceReclaim() {
-            if (!core.preferredId) return showToast("Geen custom ID om terug te claimen", "error");
-            showToast("Force reclaim gestart...", "success");
-            core.reclaimAttempts = 0;
-            if (core.peer) core.peer.destroy();
-            core.init(core.preferredId);
-        }
-        function switchToRandom() {
-            if (confirm("Echt overschakelen naar random ID?")) {
-                core.preferredId = null;
-                if (core.peer) core.peer.destroy();
-                core.init();
+            pushTerm('SYS_ERROR', `CONNECTION_FAILED: ${d.reason}`, 'var(--danger)');
+        });
+
+        net.on('joined', id => {
+            closeDial();
+            updateList();
+            pushTerm('PEER_CONNECTED', `Node ${id.substring(0,8)} verified.`, 'var(--success)');
+        });
+
+        net.on('left', id => {
+            updateList();
+            if(document.getElementById(`v-${id}`)) document.getElementById(`v-${id}`).remove();
+            pushTerm('PEER_DISCONNECTED', `Carrier lost on node ${id.substring(0,8)}`, 'var(--danger)');
+        });
+
+        net.on('local_stream', st => renderVideo('HOST_LOCAL', st));
+        net.on('remote_stream', d => renderVideo(d.id, d.stream));
+        net.on('msg', d => pushTerm(d.id.substring(0,5), d.msg));
+
+        function renderVideo(id, stream) {
+            let b = document.getElementById(`v-${id}`);
+            if(!b) {
+                b = document.createElement('div'); b.id = `v-${id}`; b.className = 'v-box';
+                b.innerHTML = `<video autoplay playsinline id="vid-${id}"></video>
+                               <div class="v-overlay">
+                                  <div style="font-size:8px; background:rgba(0,0,0,0.7); padding:2px 5px; border:1px solid var(--border); width:fit-content;">
+                                     SOURCE::${id === 'HOST_LOCAL' ? 'LOCAL_KERNEL' : 'REMOTE_PEER'}
+                                  </div>
+                               </div>`;
+                document.getElementById('video-grid').appendChild(b);
             }
+            document.getElementById(`vid-${id}`).srcObject = stream;
         }
 
-        window.onload = () => {
-            document.getElementById('id-setup-modal').style.display = 'flex';
-            window.addEventListener('beforeunload', () => { if (core.peer) core.peer.destroy(); });
-            const aside = document.querySelector('aside');
-            const btn = document.createElement('button'); btn.className = 'btn'; btn.textContent = '✦ NIEUWE LINK'; btn.style.marginTop = 'auto'; btn.onclick = openDial; aside.appendChild(btn);
-        };
+        function updateList() {
+            const l = document.getElementById('node-list'); l.innerHTML = '';
+            let hasData = false;
+            net.sessions.forEach((s, id) => {
+                if(s.config.txt) hasData = true;
+                l.innerHTML += `<div style="font-size:10px; padding:10px; border:1px solid #222; margin-bottom:5px; display:flex; justify-content:space-between; background:#000;">
+                    <span>● ${id.substring(0,12)}</span>
+                    <span style="color:var(--danger); cursor:pointer;" onclick="net.terminate('${id}')">[X]</span>
+                </div>`;
+            });
+            document.getElementById('msg-input').disabled = !hasData;
+            document.getElementById('msg-input').placeholder = hasData ? "Broadcast packet..." : "No data channel available";
+        }
+
+        function pushTerm(tag, m, c = 'var(--accent)') {
+            const f = document.getElementById('term-feed');
+            const time = new Date().toLocaleTimeString([], {hour12:false});
+            f.innerHTML += `<div><span style="color:#444">[${time}]</span> <b style="color:${c}">${tag}</b>: ${m}</div>`;
+            f.scrollTop = f.scrollHeight;
+        }
+
+        function uiDial() {
+            const tid = document.getElementById('target-id').value;
+            if(!tid) return;
+            document.getElementById('dial-exe').innerText = "HANDSHAKING...";
+            document.getElementById('dial-exe').disabled = true;
+            net.dial(tid, {
+                video: document.getElementById('sw-vid').checked,
+                audio: document.getElementById('sw-aud').checked,
+                txt: document.getElementById('sw-txt').checked
+            });
+        }
+
+        function uiSend() {
+            const i = document.getElementById('msg-input');
+            if(!i.value) return;
+            net.broadcast(i.value);
+            pushTerm('LOCAL_DATA', i.value, '#fff');
+            i.value = '';
+        }
+
+        function copyId() {
+            navigator.clipboard.writeText(document.getElementById('my-id').innerText);
+            pushTerm('CLIPBOARD', 'Local PeerID copied to memory buffer.', 'var(--warn)');
+        }
+
+        function openDial() { 
+            document.getElementById('dial-modal').style.display = 'flex'; 
+            document.getElementById('dial-exe').innerText = "Execute";
+            document.getElementById('dial-exe').disabled = false;
+        }
+        function closeDial() { document.getElementById('dial-modal').style.display = 'none'; }
+
+        window.onload = () => net.start();
     </script>
 </body>
 </html>
