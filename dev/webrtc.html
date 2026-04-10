@@ -15,14 +15,12 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'JetBrains Mono', monospace; }
         body { background: var(--bg); color: #e4e4e7; display: flex; height: 100vh; overflow: hidden; border: 1px solid var(--border); }
 
-        /* Sidebar */
         aside { width: 340px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; z-index: 50; }
         .title { font-size: 18px; font-weight: 900; color: var(--accent); margin-bottom: 5px; }
         .version { font-size: 8px; color: var(--meta); margin-bottom: 20px; letter-spacing: 2px; }
         
         .id-box { background: #000; padding: 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 10px; cursor: pointer; border-left: 3px solid var(--accent); margin-bottom: 20px; overflow: hidden; text-overflow: ellipsis; }
         
-        /* Real-Time Telemetry Bars */
         .telemetry-unit { margin-bottom: 15px; background: #000; border: 1px solid var(--border); padding: 10px; }
         .tel-label { font-size: 8px; color: var(--meta); margin-bottom: 5px; display: flex; justify-content: space-between; text-transform: uppercase; }
         .tel-val { color: var(--accent); font-weight: bold; }
@@ -34,20 +32,17 @@
         .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .btn-danger:hover { background: var(--danger); color: #000; }
 
-        /* Main Area */
         main { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 15px; position: relative; }
         #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; flex: 1; overflow-y: auto; }
         .v-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; background: #000; }
         .v-overlay { position: absolute; inset: 0; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%); }
 
-        /* Terminal Chat */
         #term-wrap { height: 200px; background: #000; border: 1px solid var(--border); display: flex; flex-direction: column; border-radius: 4px; }
         #term-feed { flex: 1; padding: 12px; overflow-y: auto; font-size: 11px; line-height: 1.5; color: #a1a1aa; }
         .term-in { padding: 10px; display: flex; border-top: 1px solid var(--border); gap: 10px; }
         .term-in input { flex: 1; background: transparent; border: none; color: var(--accent); outline: none; font-size: 11px; }
 
-        /* Modals & Toasts */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(5px); }
         .modal-card { background: var(--card); padding: 30px; border: 1px solid var(--border); width: 400px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         .toast-stack { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
@@ -60,7 +55,7 @@
         <div class="title">PULSE_NET // PRO</div>
         <div class="version">LIVE_BITSTREAM_MONITOR</div>
 
-        <div id="my-id" class="id-box" onclick="copyId()">INITIALIZING_PEER_JS...</div>
+        <div id="my-id" class="id-box" onclick="copyId()">INITIALIZING...</div>
 
         <div class="telemetry-unit">
             <div class="tel-label"><span>Net_Latency (RTT)</span><span class="tel-val" id="val-rtt">0ms</span></div>
@@ -105,7 +100,7 @@
             </div>
 
             <button id="dial-exe" onclick="uiDial()" class="btn">Execute</button>
-            <button onclick="closeDial()" class="btn btn-danger" style="margin:0;">Abort</button>
+            <button onclick="uiAbortOutgoing()" class="btn btn-danger" style="margin:0;">Abort</button>
         </div>
     </div>
 
@@ -116,9 +111,9 @@
             constructor() {
                 this.peer = null;
                 this.sessions = new Map();
+                this.pendingConn = null; // Voor aborts tijdens handshake
                 this.localStream = null;
                 this.events = {};
-                this.statsInterval = null;
                 this.lastBytesReceived = 0;
             }
 
@@ -131,7 +126,6 @@
                 this.peer.on('connection', c => this._setupData(c));
                 this.peer.on('call', async call => {
                     const s = this.sessions.get(call.peer);
-                    // Als we al een sessie hebben (door data verbinding), antwoord direct
                     const config = s ? s.config : { video: true, audio: true };
                     const st = await this._getHW(config);
                     call.answer(st);
@@ -140,12 +134,12 @@
                     else this.sessions.set(call.peer, { call, config });
                 });
                 
-                this.statsInterval = setInterval(() => this.collectStats(), 2000);
+                setInterval(() => this.collectStats(), 2000);
             }
 
             async collectStats() {
                 if (this.sessions.size === 0) return;
-                this.sessions.forEach(async (session, id) => {
+                this.sessions.forEach(async (session) => {
                     if (!session.call || !session.call.peerConnection) return;
                     const pc = session.call.peerConnection;
                     const stats = await pc.getStats();
@@ -154,12 +148,9 @@
                             this.emit('stat_rtt', Math.round(report.roundTripTime * 1000));
                         }
                         if (report.type === 'inbound-rtp' && report.kind === 'video') {
-                            const bytes = report.bytesReceived;
-                            const bitrate = Math.round(((bytes - this.lastBytesReceived) * 8) / 2000);
-                            this.lastBytesReceived = bytes;
-                            const loss = report.packetsLost || 0;
-                            const total = report.packetsReceived || 1;
-                            const lossPct = ((loss / (total + loss)) * 100).toFixed(1);
+                            const bitrate = Math.round(((report.bytesReceived - this.lastBytesReceived) * 8) / 2000);
+                            this.lastBytesReceived = report.bytesReceived;
+                            const lossPct = ((report.packetsLost / (report.packetsReceived + report.packetsLost)) * 100).toFixed(1);
                             this.emit('stat_network', { bitrate, lossPct });
                         }
                     });
@@ -175,23 +166,24 @@
                             audio: conf.audio
                         });
                         this.emit('local_stream', this.localStream);
-                    } catch(e) { 
-                        this.emit('err', "Hardware access denied."); 
-                        return null; 
-                    }
+                    } catch(e) { this.emit('err', "Hardware access denied."); return null; }
                 }
                 return this.localStream;
             }
 
             dial(id, config) {
-                const conn = this.peer.connect(id);
-                this._setupData(conn, config, true);
-                setTimeout(() => {
-                    if (!this.sessions.has(id)) {
-                        this.emit('rejected', { id, reason: 'TIMED_OUT' });
-                        conn.close();
-                    }
-                }, 10000);
+                this.pendingConn = this.peer.connect(id);
+                this._setupData(this.pendingConn, config, true);
+            }
+
+            abortOutgoing() {
+                if (this.pendingConn) {
+                    this.pendingConn.send({ type: 'ABT' });
+                    setTimeout(() => {
+                        this.pendingConn.close();
+                        this.pendingConn = null;
+                    }, 100);
+                }
             }
 
             _setupData(conn, outConf = null, isInit = false) {
@@ -204,7 +196,7 @@
                     if(data.type === 'REQ') {
                         this.emit('invite', {
                             id: pid, config: data.config,
-                            accept: async () => {
+                            accept: () => {
                                 conn.send({ type: 'ACC', config: data.config });
                                 this.sessions.set(pid, { conn, config: data.config });
                                 this.emit('joined', pid);
@@ -214,13 +206,18 @@
                                 conn.close();
                             }
                         });
+                    } else if(data.type === 'ABT') {
+                        this.emit('remote_abort', pid);
+                        conn.close();
                     } else if(data.type === 'ACC') {
+                        this.pendingConn = null;
                         const st = await this._getHW(outConf);
                         const call = st ? this.peer.call(pid, st) : null;
                         if(call) this._setupMedia(call);
                         this.sessions.set(pid, { conn, call, config: outConf });
                         this.emit('joined', pid);
                     } else if(data.type === 'REJ') {
+                        this.pendingConn = null;
                         this.emit('rejected', {id: pid, reason: data.reason});
                         conn.close();
                     } else if(data.type === 'MSG') {
@@ -238,29 +235,23 @@
             terminate(id) {
                 const s = this.sessions.get(id);
                 if(!s) return;
-                if(s.conn) s.conn.close(); 
-                if(s.call) s.call.close();
+                s.conn.close(); if(s.call) s.call.close();
                 this.sessions.delete(id);
                 this.emit('left', id);
             }
 
             broadcast(m) {
-                this.sessions.forEach(s => {
-                    if(s.conn && s.conn.open) s.conn.send({ type: 'MSG', content: m });
-                });
+                this.sessions.forEach(s => { if(s.conn.open) s.conn.send({ type: 'MSG', content: m }); });
             }
         }
 
         const net = new PulseNet();
 
-        // UI Handlers
         net.on('ready', id => { document.getElementById('my-id').innerText = id; });
-
         net.on('stat_rtt', rtt => {
             document.getElementById('val-rtt').innerText = rtt + "ms";
             document.getElementById('bar-rtt').style.width = Math.min(rtt / 5, 100) + "%";
         });
-
         net.on('stat_network', data => {
             document.getElementById('val-bitrate').innerText = data.bitrate + " kbps";
             document.getElementById('bar-bitrate').style.width = Math.min(data.bitrate / 50, 100) + "%";
@@ -274,7 +265,7 @@
             t.id = `inv-${inv.id}`;
             t.innerHTML = `
                 <div style="color:var(--accent); font-weight:bold; margin-bottom:5px;">INCOMING_HANDSHAKE</div>
-                <div style="font-size:10px;">ID: ${inv.id.substring(0,12)}...</div>
+                <div style="font-size:10px;">ID: ${inv.id.substring(0,8)}...</div>
                 <div style="display:flex; gap:10px; margin-top:10px;">
                     <button class="btn" style="height:25px; margin:0; background:var(--success); color:#000" onclick="uiRespond('${inv.id}', true)">ACCEPT</button>
                     <button class="btn" style="height:25px; margin:0; background:var(--danger); color:#000" onclick="uiRespond('${inv.id}', false)">REJECT</button>
@@ -284,22 +275,18 @@
             window.uiRespond = (id, acc) => { if(acc) inv.accept(); else inv.reject(); t.remove(); };
         });
 
-        net.on('rejected', d => {
-            closeDial();
-            pushTerm('SYS_ERROR', `CONNECTION_FAILED: ${d.reason}`, 'var(--danger)');
+        net.on('remote_abort', id => {
+            const t = document.getElementById(`inv-${id}`);
+            if(t) t.remove();
+            pushTerm('HANDSHAKE_CANCELLED', `Remote peer (${id.substring(0,5)}) aborted the request.`, 'var(--danger)');
         });
 
-        net.on('joined', id => {
-            closeDial();
-            updateList();
-            pushTerm('PEER_CONNECTED', `Node ${id.substring(0,8)} verified.`, 'var(--success)');
-        });
-
-        net.on('left', id => {
-            updateList();
-            const node = document.getElementById(`v-${id}`);
-            if(node) node.remove();
-            pushTerm('PEER_DISCONNECTED', `Carrier lost on node ${id.substring(0,8)}`, 'var(--danger)');
+        net.on('rejected', d => { closeDial(); pushTerm('SYS_ERROR', `CONNECTION_REJECTED: ${d.reason}`, 'var(--danger)'); });
+        net.on('joined', id => { closeDial(); updateList(); pushTerm('PEER_CONNECTED', `Node ${id.substring(0,8)} verified.`, 'var(--success)'); });
+        net.on('left', id => { 
+            updateList(); 
+            if(document.getElementById(`v-${id}`)) document.getElementById(`v-${id}`).remove();
+            pushTerm('PEER_DISCONNECTED', `Carrier lost on node ${id.substring(0,8)}`, 'var(--danger)'); 
         });
 
         net.on('local_stream', st => renderVideo('HOST_LOCAL', st));
@@ -308,29 +295,27 @@
 
         function renderVideo(id, stream) {
             let b = document.getElementById(`v-${id}`);
+            const isLocal = id === 'HOST_LOCAL';
             if(!b) {
                 b = document.createElement('div'); b.id = `v-${id}`; b.className = 'v-box';
-                // CRITICAL FIX: Mute local stream to prevent echo
-                const isLocal = id === 'HOST_LOCAL';
                 b.innerHTML = `<video autoplay playsinline ${isLocal ? 'muted' : ''} id="vid-${id}"></video>
                                <div class="v-overlay">
                                   <div style="font-size:8px; background:rgba(0,0,0,0.7); padding:2px 5px; border:1px solid var(--border); width:fit-content;">
-                                      SOURCE::${isLocal ? 'LOCAL_KERNEL' : 'REMOTE_PEER'}
+                                      SOURCE::${isLocal ? 'LOCAL' : 'REMOTE'}
                                   </div>
                                </div>`;
                 document.getElementById('video-grid').appendChild(b);
             }
-            const v = document.getElementById(`vid-${id}`);
-            if (v.srcObject !== stream) v.srcObject = stream;
+            document.getElementById(`vid-${id}`).srcObject = stream;
         }
 
         function updateList() {
             const l = document.getElementById('node-list'); l.innerHTML = '';
             let hasData = false;
             net.sessions.forEach((s, id) => {
-                if(s.config && s.config.txt) hasData = true;
+                if(s.config.txt) hasData = true;
                 l.innerHTML += `<div style="font-size:10px; padding:10px; border:1px solid #222; margin-bottom:5px; display:flex; justify-content:space-between; background:#000;">
-                    <span>● ${id.substring(0,12)}</span>
+                    <span>● ${id.substring(0,8)}...</span>
                     <span style="color:var(--danger); cursor:pointer;" onclick="net.terminate('${id}')">[X]</span>
                 </div>`;
             });
@@ -357,6 +342,12 @@
             });
         }
 
+        function uiAbortOutgoing() {
+            net.abortOutgoing();
+            pushTerm('LOCAL_ABORT', 'Handshake attempt terminated by user.', 'var(--warn)');
+            closeDial();
+        }
+
         function uiSend() {
             const i = document.getElementById('msg-input');
             if(!i.value) return;
@@ -367,9 +358,9 @@
 
         function copyId() {
             const id = document.getElementById('my-id').innerText;
-            if(id.includes('INITIALIZING')) return;
+            if(id === 'INITIALIZING...') return;
             navigator.clipboard.writeText(id);
-            pushTerm('CLIPBOARD', 'Local PeerID copied to memory buffer.', 'var(--warn)');
+            pushTerm('CLIPBOARD', 'Local PeerID copied.', 'var(--warn)');
         }
 
         function openDial() { 
