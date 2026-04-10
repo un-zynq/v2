@@ -38,7 +38,7 @@
         main { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 15px; position: relative; }
         #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; flex: 1; overflow-y: auto; }
         .v-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; }
-        video { width: 100%; height: 100%; object-fit: cover; }
+        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
         .v-overlay { position: absolute; inset: 0; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%); }
 
         /* Terminal Chat */
@@ -131,12 +131,13 @@
                 this.peer.on('connection', c => this._setupData(c));
                 this.peer.on('call', async call => {
                     const s = this.sessions.get(call.peer);
-                    if(s) {
-                        const st = await this._getHW(s.config);
-                        call.answer(st);
-                        this._setupMedia(call);
-                        s.call = call;
-                    }
+                    // Als we al een sessie hebben (door data verbinding), antwoord direct
+                    const config = s ? s.config : { video: true, audio: true };
+                    const st = await this._getHW(config);
+                    call.answer(st);
+                    this._setupMedia(call);
+                    if(s) s.call = call;
+                    else this.sessions.set(call.peer, { call, config });
                 });
                 
                 this.statsInterval = setInterval(() => this.collectStats(), 2000);
@@ -144,29 +145,21 @@
 
             async collectStats() {
                 if (this.sessions.size === 0) return;
-                
                 this.sessions.forEach(async (session, id) => {
                     if (!session.call || !session.call.peerConnection) return;
-                    
                     const pc = session.call.peerConnection;
                     const stats = await pc.getStats();
-                    
                     stats.forEach(report => {
-                        // Latency / RTT
                         if (report.type === 'remote-candidate' && report.roundTripTime) {
-                            const rtt = Math.round(report.roundTripTime * 1000);
-                            this.emit('stat_rtt', rtt);
+                            this.emit('stat_rtt', Math.round(report.roundTripTime * 1000));
                         }
-                        // Inbound RTP (Bitrate & Loss)
                         if (report.type === 'inbound-rtp' && report.kind === 'video') {
                             const bytes = report.bytesReceived;
                             const bitrate = Math.round(((bytes - this.lastBytesReceived) * 8) / 2000);
                             this.lastBytesReceived = bytes;
-                            
                             const loss = report.packetsLost || 0;
                             const total = report.packetsReceived || 1;
                             const lossPct = ((loss / (total + loss)) * 100).toFixed(1);
-                            
                             this.emit('stat_network', { bitrate, lossPct });
                         }
                     });
@@ -193,7 +186,6 @@
             dial(id, config) {
                 const conn = this.peer.connect(id);
                 this._setupData(conn, config, true);
-                
                 setTimeout(() => {
                     if (!this.sessions.has(id)) {
                         this.emit('rejected', { id, reason: 'TIMED_OUT' });
@@ -212,7 +204,7 @@
                     if(data.type === 'REQ') {
                         this.emit('invite', {
                             id: pid, config: data.config,
-                            accept: () => {
+                            accept: async () => {
                                 conn.send({ type: 'ACC', config: data.config });
                                 this.sessions.set(pid, { conn, config: data.config });
                                 this.emit('joined', pid);
@@ -246,14 +238,15 @@
             terminate(id) {
                 const s = this.sessions.get(id);
                 if(!s) return;
-                s.conn.close(); if(s.call) s.call.close();
+                if(s.conn) s.conn.close(); 
+                if(s.call) s.call.close();
                 this.sessions.delete(id);
                 this.emit('left', id);
             }
 
             broadcast(m) {
                 this.sessions.forEach(s => {
-                    if(s.conn.open) s.conn.send({ type: 'MSG', content: m });
+                    if(s.conn && s.conn.open) s.conn.send({ type: 'MSG', content: m });
                 });
             }
         }
@@ -304,7 +297,8 @@
 
         net.on('left', id => {
             updateList();
-            if(document.getElementById(`v-${id}`)) document.getElementById(`v-${id}`).remove();
+            const node = document.getElementById(`v-${id}`);
+            if(node) node.remove();
             pushTerm('PEER_DISCONNECTED', `Carrier lost on node ${id.substring(0,8)}`, 'var(--danger)');
         });
 
@@ -316,22 +310,25 @@
             let b = document.getElementById(`v-${id}`);
             if(!b) {
                 b = document.createElement('div'); b.id = `v-${id}`; b.className = 'v-box';
-                b.innerHTML = `<video autoplay playsinline id="vid-${id}"></video>
+                // CRITICAL FIX: Mute local stream to prevent echo
+                const isLocal = id === 'HOST_LOCAL';
+                b.innerHTML = `<video autoplay playsinline ${isLocal ? 'muted' : ''} id="vid-${id}"></video>
                                <div class="v-overlay">
                                   <div style="font-size:8px; background:rgba(0,0,0,0.7); padding:2px 5px; border:1px solid var(--border); width:fit-content;">
-                                     SOURCE::${id === 'HOST_LOCAL' ? 'LOCAL_KERNEL' : 'REMOTE_PEER'}
+                                      SOURCE::${isLocal ? 'LOCAL_KERNEL' : 'REMOTE_PEER'}
                                   </div>
                                </div>`;
                 document.getElementById('video-grid').appendChild(b);
             }
-            document.getElementById(`vid-${id}`).srcObject = stream;
+            const v = document.getElementById(`vid-${id}`);
+            if (v.srcObject !== stream) v.srcObject = stream;
         }
 
         function updateList() {
             const l = document.getElementById('node-list'); l.innerHTML = '';
             let hasData = false;
             net.sessions.forEach((s, id) => {
-                if(s.config.txt) hasData = true;
+                if(s.config && s.config.txt) hasData = true;
                 l.innerHTML += `<div style="font-size:10px; padding:10px; border:1px solid #222; margin-bottom:5px; display:flex; justify-content:space-between; background:#000;">
                     <span>● ${id.substring(0,12)}</span>
                     <span style="color:var(--danger); cursor:pointer;" onclick="net.terminate('${id}')">[X]</span>
@@ -369,7 +366,9 @@
         }
 
         function copyId() {
-            navigator.clipboard.writeText(document.getElementById('my-id').innerText);
+            const id = document.getElementById('my-id').innerText;
+            if(id.includes('INITIALIZING')) return;
+            navigator.clipboard.writeText(id);
             pushTerm('CLIPBOARD', 'Local PeerID copied to memory buffer.', 'var(--warn)');
         }
 
