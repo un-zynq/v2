@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PulseNet Pro • High-Spec Telemetry</title>
+    <title>PulseNet Pro • Ultra Edition</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -15,6 +15,7 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'JetBrains Mono', monospace; }
         body { background: var(--bg); color: #e4e4e7; display: flex; height: 100vh; overflow: hidden; border: 1px solid var(--border); }
 
+        /* Sidebar & UI Components */
         aside { width: 340px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; z-index: 50; }
         .title { font-size: 18px; font-weight: 900; color: var(--accent); margin-bottom: 5px; }
         .version { font-size: 8px; color: var(--meta); margin-bottom: 20px; letter-spacing: 2px; }
@@ -32,21 +33,24 @@
         .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .btn-danger:hover { background: var(--danger); color: #000; }
 
+        /* Main Viewport */
         main { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 15px; position: relative; }
         #video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; flex: 1; overflow-y: auto; }
         .v-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; background: #000; }
         .v-overlay { position: absolute; inset: 0; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%); }
 
+        /* Terminal */
         #term-wrap { height: 200px; background: #000; border: 1px solid var(--border); display: flex; flex-direction: column; border-radius: 4px; }
         #term-feed { flex: 1; padding: 12px; overflow-y: auto; font-size: 11px; line-height: 1.5; color: #a1a1aa; }
         .term-in { padding: 10px; display: flex; border-top: 1px solid var(--border); gap: 10px; }
         .term-in input { flex: 1; background: transparent; border: none; color: var(--accent); outline: none; font-size: 11px; }
 
+        /* Modals & Toasts */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(5px); }
         .modal-card { background: var(--card); padding: 30px; border: 1px solid var(--border); width: 440px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         .toast-stack { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: var(--card); border: 1px solid var(--border); padding: 15px; width: 300px; font-size: 11px; border-left: 4px solid var(--warn); }
+        .toast { background: var(--card); border: 1px solid var(--border); padding: 15px; width: 300px; font-size: 11px; border-left: 4px solid var(--warn); box-shadow: 10px 10px 20px rgba(0,0,0,0.4); }
         
         select, input[type="text"] { width:100%; padding:10px; background:#000; border:1px solid var(--border); color:var(--accent); font-size:10px; outline:none; margin-bottom:10px; }
         .label-sm { font-size: 8px; color: var(--meta); margin-bottom: 4px; display: block; }
@@ -56,16 +60,16 @@
 
     <aside>
         <div class="title">PULSE_NET // PRO</div>
-        <div class="version">ULTRA_LOW_LATENCY_v2</div>
+        <div class="version">ESTABLISHED_CONNECTION_MONITOR</div>
 
         <div id="my-id" class="id-box" onclick="copyId()">INITIALIZING...</div>
 
         <div class="telemetry-unit">
-            <div class="tel-label"><span>Live_Bitrate</span><span class="tel-val" id="val-bitrate">0 kbps</span></div>
-            <div class="progress-bg"><div class="progress-fill" id="bar-bitrate" style="width: 0%"></div></div>
+            <div class="tel-label"><span>Active_Bitrate</span><span class="tel-val" id="val-bitrate">0 kbps</span></div>
+            <div class="progress-bg"><div class="progress-fill" id="bar-bitrate"></div></div>
         </div>
 
-        <button onclick="openDial()" class="btn">Initiate Handshake</button>
+        <button onclick="openDial()" class="btn">Establish Handshake</button>
         <button onclick="location.reload()" class="btn btn-danger">Emergency Killswitch</button>
 
         <div style="font-size: 9px; color: var(--meta); margin-top: 15px; margin-bottom: 5px;">ACTIVE_NODES</div>
@@ -78,21 +82,21 @@
             <div id="term-feed"></div>
             <div class="term-in">
                 <span style="color:var(--accent)">>></span>
-                <input id="msg-input" placeholder="Awaiting connection..." onkeypress="if(event.key==='Enter') uiSend()" disabled>
+                <input id="msg-input" placeholder="Awaiting handshake..." onkeypress="if(event.key==='Enter') uiSend()" disabled>
             </div>
         </div>
     </main>
 
     <div id="dial-modal" class="modal">
         <div class="modal-card">
-            <h3 style="margin-bottom:15px; font-size:12px; color:var(--accent);">CONNECTION_PARAMETERS</h3>
+            <h3 style="margin-bottom:15px; font-size:12px; color:var(--accent);">P2P_HANDSHAKE_INIT</h3>
             
-            <span class="label-sm">TARGET_ID</span>
-            <input id="target-id" type="text" placeholder="Paste Remote ID...">
+            <span class="label-sm">REMOTE_PEER_ID</span>
+            <input id="target-id" type="text" placeholder="Paste ID...">
             
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                 <div>
-                    <span class="label-sm">RESOLUTION</span>
+                    <span class="label-sm">STREAM_RES</span>
                     <select id="cfg-res">
                         <option value="720">720p (HD)</option>
                         <option value="1080">1080p (FHD)</option>
@@ -100,7 +104,7 @@
                     </select>
                 </div>
                 <div>
-                    <span class="label-sm">FRAME_RATE</span>
+                    <span class="label-sm">TARGET_FPS</span>
                     <select id="cfg-fps">
                         <option value="30">30 FPS</option>
                         <option value="60">60 FPS</option>
@@ -109,15 +113,15 @@
                 </div>
             </div>
 
-            <span class="label-sm">CHANNELS</span>
+            <span class="label-sm">DATA_CHANNELS</span>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
                 <label style="font-size:9px;"><input type="checkbox" id="sw-vid" checked> VIDEO</label>
                 <label style="font-size:9px;"><input type="checkbox" id="sw-aud" checked> AUDIO</label>
                 <label style="font-size:9px;"><input type="checkbox" id="sw-txt" checked> DATA</label>
             </div>
 
-            <button id="dial-exe" onclick="uiDial()" class="btn">Connect</button>
-            <button onclick="uiAbortOutgoing()" class="btn btn-danger" style="margin:0;">Cancel</button>
+            <button id="dial-exe" onclick="uiDial()" class="btn">Execute</button>
+            <button onclick="uiAbortOutgoing()" class="btn btn-danger" style="margin:0;">Abort</button>
         </div>
     </div>
 
@@ -162,7 +166,7 @@
                         this.terminate(id);
                         return;
                     }
-                    if (s.conn.open) s.conn.send({ type: 'PING' });
+                    if (s.conn && s.conn.open) s.conn.send({ type: 'PING' });
 
                     if (s.call && s.call.peerConnection) {
                         s.call.peerConnection.getStats().then(stats => {
@@ -181,13 +185,10 @@
             async _getHW(conf) {
                 if(!conf.video && !conf.audio) return null;
                 try {
-                    // Stop oude stream als settings veranderen
                     if(this.localStream) this.localStream.getTracks().forEach(t => t.stop());
-                    
                     this.localStream = await navigator.mediaDevices.getUserMedia({
                         video: conf.video ? { 
                             width: { ideal: parseInt(conf.res) === 1080 ? 1920 : 1280 }, 
-                            height: { ideal: parseInt(conf.res) === 1080 ? 1080 : 720 },
                             frameRate: { ideal: parseInt(conf.fps) } 
                         } : false,
                         audio: conf.audio
@@ -205,7 +206,7 @@
             abortOutgoing() {
                 if (this.pendingConn) {
                     this.pendingConn.send({ type: 'ABT' });
-                    setTimeout(() => { this.pendingConn.close(); this.pendingConn = null; }, 50);
+                    setTimeout(() => { if(this.pendingConn) this.pendingConn.close(); this.pendingConn = null; }, 100);
                 }
             }
 
@@ -221,15 +222,22 @@
                     } else if(data.type === 'REQ') {
                         this.emit('invite', {
                             id: pid, config: data.config,
-                            accept: async () => {
+                            accept: () => {
                                 conn.send({ type: 'ACC', config: data.config });
                                 this.sessions.set(pid, { conn, config: data.config, lastSeen: Date.now() });
                                 this.emit('joined', pid);
                             },
-                            reject: () => { conn.send({ type: 'REJ' }); conn.close(); }
+                            reject: (reason) => {
+                                conn.send({ type: 'REJ', reason: reason || 'USER_DECLINED' });
+                                setTimeout(() => conn.close(), 100);
+                            }
                         });
                     } else if(data.type === 'ABT') {
                         this.emit('remote_abort', pid);
+                        conn.close();
+                    } else if(data.type === 'REJ') {
+                        this.pendingConn = null;
+                        this.emit('rejected', { id: pid, reason: data.reason });
                         conn.close();
                     } else if(data.type === 'ACC') {
                         this.pendingConn = null;
@@ -259,16 +267,17 @@
             }
 
             broadcast(m) {
-                this.sessions.forEach(s => { if(s.conn.open) s.conn.send({ type: 'MSG', content: m }); });
+                this.sessions.forEach(s => { if(s.conn && s.conn.open) s.conn.send({ type: 'MSG', content: m }); });
             }
         }
 
         const net = new PulseNet();
 
+        // UI Handlers
         net.on('ready', id => { document.getElementById('my-id').innerText = id; });
         net.on('stat_bitrate', bit => {
             document.getElementById('val-bitrate').innerText = bit + " kbps";
-            document.getElementById('bar-bitrate').style.width = Math.min(bit / 100, 100) + "%";
+            document.getElementById('bar-bitrate').style.width = Math.min(bit / 50, 100) + "%";
         });
 
         net.on('invite', inv => {
@@ -276,27 +285,33 @@
             t.className = 'toast';
             t.id = `inv-${inv.id}`;
             t.innerHTML = `<div style="color:var(--accent); font-weight:bold; margin-bottom:5px;">INCOMING_HANDSHAKE</div>
-                <div style="font-size:10px; color:var(--meta)">REQ: ${inv.config.res}p@${inv.config.fps}fps</div>
+                <div style="font-size:10px; color:var(--meta)">STREAM: ${inv.config.res}p @ ${inv.config.fps}fps</div>
                 <div style="display:flex; gap:10px; margin-top:10px;">
                     <button class="btn" style="height:25px; margin:0; background:var(--success); color:#000" onclick="uiRespond('${inv.id}', true)">ACCEPT</button>
                     <button class="btn" style="height:25px; margin:0; background:var(--danger); color:#000" onclick="uiRespond('${inv.id}', false)">REJECT</button>
                 </div>`;
             document.getElementById('toast-layer').appendChild(t);
-            window.uiRespond = (id, acc) => { if(acc) inv.accept(); else inv.reject(); t.remove(); };
+            window.uiRespond = (id, acc) => { if(acc) inv.accept(); else inv.reject('USER_DECLINED'); t.remove(); };
+        });
+
+        net.on('rejected', d => { 
+            closeDial(); 
+            pushTerm('CONNECTION_REJECTED', `Remote node refused: ${d.reason}`, 'var(--danger)'); 
         });
 
         net.on('flatline', id => pushTerm('HEARTBEAT_LOST', `Node ${id.substring(0,5)} flatlined.`, 'var(--danger)'));
+        
         net.on('remote_abort', id => { 
             const t = document.getElementById(`inv-${id}`);
             if(t) t.remove();
-            pushTerm('HANDSHAKE_CANCELLED', `Remote peer aborted request.`, 'var(--danger)'); 
+            pushTerm('HANDSHAKE_ABORTED', `Peer ${id.substring(0,5)} cancelled the request.`, 'var(--warn)'); 
         });
 
-        net.on('joined', id => { closeDial(); updateList(); pushTerm('PEER_CONNECTED', `Handshake verified on node ${id.substring(0,8)}`, 'var(--success)'); });
+        net.on('joined', id => { closeDial(); updateList(); pushTerm('PEER_CONNECTED', `Node ${id.substring(0,8)} verified.`, 'var(--success)'); });
         net.on('left', id => { 
             updateList(); 
             if(document.getElementById(`v-${id}`)) document.getElementById(`v-${id}`).remove();
-            pushTerm('PEER_DISCONNECTED', `Carrier lost.`, 'var(--danger)'); 
+            pushTerm('PEER_DISCONNECTED', `Connection closed for ${id.substring(0,5)}`, 'var(--danger)'); 
         });
 
         net.on('local_stream', st => renderVideo('HOST_LOCAL', st));
@@ -326,7 +341,7 @@
                 </div>`;
             });
             document.getElementById('msg-input').disabled = !hasData;
-            document.getElementById('msg-input').placeholder = hasData ? "Broadcast packet..." : "Awaiting data channel";
+            document.getElementById('msg-input').placeholder = hasData ? "Broadcast packet..." : "No data channel";
         }
 
         function pushTerm(tag, m, c = 'var(--accent)') {
@@ -350,6 +365,7 @@
         }
 
         function uiAbortOutgoing() { net.abortOutgoing(); closeDial(); }
+        
         function uiSend() {
             const i = document.getElementById('msg-input');
             if(!i.value) return;
@@ -367,7 +383,7 @@
 
         function openDial() { 
             document.getElementById('dial-modal').style.display = 'flex'; 
-            document.getElementById('dial-exe').innerText = "Connect";
+            document.getElementById('dial-exe').innerText = "Execute";
             document.getElementById('dial-exe').disabled = false;
         }
         function closeDial() { document.getElementById('dial-modal').style.display = 'none'; }
