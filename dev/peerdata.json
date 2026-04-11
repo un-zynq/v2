@@ -19,7 +19,7 @@
           "id": "quickstart",
           "label": "Quick Start",
           "icon": "play-circle",
-          "content": "# Quick Start\n\n### Load the library\n```html\n<script type=\"module\">\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.3.2/index.min.js';\nawait ZYNQ.load('peer');\n</script>\n```\n\n### Simple mode (recommended)\n```javascript\nconst engine = new ZYNQ.peer({\n  video: false,\n  audio: false,\n  txt: true\n});\n\nengine.on('ready', id => {\n  console.log('My ID:', id);\n});\n\nengine.on('data', msg => {\n  console.log('Received:', msg);\n});\n```\n\n### Connect & send\n```javascript\nengine.connect('remote-peer-id');\nengine.send('hello world');\n```"
+          "content": "# Quick Start\n\n### Load the library\n```html\n<script type=\"module\">\nimport { peer } from 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0/index.min.js';\n</script>\n```\n\n### Simple mode (recommended)\n```javascript\nconst engine = new ZYNQ.peer({\n  video: false,\n  audio: false,\n  txt: true\n});\n\nengine.on('ready', id => {\n  console.log('My ID:', id);\n});\n\nengine.on('data', msg => {\n  console.log('Received:', msg);\n});\n```\n\n### Connect & send\n```javascript\nengine.connect('remote-peer-id');\nengine.send('hello world');\n```"
         }
       ]
     },
