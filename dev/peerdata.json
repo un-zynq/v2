@@ -19,7 +19,7 @@
           "id": "quickstart",
           "label": "Quick Start",
           "icon": "play-circle",
-          "content": "# Quick Start\n\n### 1. Import + Load\n```javascript:disable-run
+          "content": "# Quick Start\n\n### 1. Import + Load\n```javascript\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.2.5/index.min.js'\nawait ZYNQ.load(\"peer\")\nawait ZYNQ.peer.start() // random ID or pass your own ID\n```\n\n---\n\n### 2. Get your ID\n```javascript\nZYNQ.peer.on('ready', id => {\n  console.log('My Peer ID is:', id)\n})\n```\n\n---\n\n### 3. Connect to someone\n```javascript\nawait ZYNQ.peer.connect('other-peer-id')\n```\n\n---\n\n### 4. Send a message\n```javascript\nZYNQ.peer.sendTo('other-peer-id', 'Hello!')\n```\n\n---\n\n### 5. Receive messages\n```javascript\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(`Message from ${peerId}:`, message)\n})\n```"
         }
       ]
     },
