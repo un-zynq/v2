@@ -5,10 +5,10 @@
       "items": [
         {
           "id": "about",
-          "label": "About P2PEngine",
+          "label": "About ZYNQ.peer",
           "icon": "home",
           "badge": "v1.0",
-          "content": "# P2PEngine\n\nLightweight, secure and stable WebRTC P2P library built on PeerJS. Provides simple 1-to-1 messaging and optional audio/video streaming with zero backend.\n\n### Key Improvements\n- Factory + simple constructor compatibility (no API breakage)\n- Built-in abuse protection: rate limiting, max message size (64KB), non-string payload rejection\n- Connection state machine (DISCONNECTED → CONNECTING → CONNECTED → RECONNECTING → FAILED)\n- Exponential backoff + jitter auto-reconnect\n- Single shared `getUserMedia` stream (no duplicate calls)\n- Microtask / optional RAF data event batching\n- Full listener cleanup and memory-leak protection\n- Handshake-ready flag and safe `send()`\n- Debug mode with detailed lifecycle logging"
+          "content": "# ZYNQ.peer\n\nLightweight, secure and stable WebRTC P2P library built on PeerJS. Provides simple 1-to-1 messaging and optional audio/video streaming with zero backend.\n\n### Key Improvements\n- Factory + simple constructor compatibility (no API breakage)\n- Built-in abuse protection: rate limiting, max message size (64KB), non-string payload rejection\n- Connection state machine (DISCONNECTED → CONNECTING → CONNECTED → RECONNECTING → FAILED)\n- Exponential backoff + jitter auto-reconnect\n- Single shared `getUserMedia` stream (no duplicate calls)\n- Microtask / optional RAF data event batching\n- Full listener cleanup and memory-leak protection\n- Handshake-ready flag and safe `send()`\n- Debug mode with detailed lifecycle logging"
         }
       ]
     },
@@ -19,7 +19,7 @@
           "id": "quickstart",
           "label": "Quick Start",
           "icon": "play-circle",
-          "content": "# Quick Start\n\n### Simple mode (recommended)\n```javascript\nconst engine = new P2PEngine({\n  video: false,\n  audio: false,\n  txt: true\n});\n\nengine.on('ready', id => {\n  console.log('My ID:', id);\n});\n\nengine.on('data', msg => {\n  console.log('Received:', msg);\n});\n```\n\n### Connect & send\n```javascript\nengine.connect('remote-peer-id');\nengine.send('hello world');\n```"
+          "content": "# Quick Start\n\n### Load the library\n```html\n<script type=\"module\">\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.3.1/index.min.js';\nawait ZYNQ.load('peer');\n</script>\n```\n\n### Simple mode (recommended)\n```javascript\nconst engine = new ZYNQ.peer({\n  video: false,\n  audio: false,\n  txt: true\n});\n\nengine.on('ready', id => {\n  console.log('My ID:', id);\n});\n\nengine.on('data', msg => {\n  console.log('Received:', msg);\n});\n```\n\n### Connect & send\n```javascript\nengine.connect('remote-peer-id');\nengine.send('hello world');\n```"
         }
       ]
     },
@@ -30,7 +30,7 @@
           "id": "core",
           "label": "Core API",
           "icon": "power",
-          "content": "# Core API\n\n### Constructor (simple mode)\n```javascript\nnew P2PEngine(config)\n```\nConfig options:\n```javascript\n{\n  video: boolean,\n  audio: boolean,\n  txt: boolean,\n  autoReconnect: boolean,\n  maxReconnectAttempts: number,\n  debug: boolean,\n  rateLimit: number,      // messages per second\n  maxMsgSize: number,     // bytes (default 65536)\n  rafBatching: boolean    // use requestAnimationFrame for data events\n}\n```\n\n### Factory (advanced mode)\n```javascript\nP2PEngine.get(remoteId, config)\n```\nReturns the same instance for the same `remoteId`.\n\n### Connect\n```javascript\nengine.connect(remoteId?)  // remoteId only required in simple mode\n```\n\n### Send\n```javascript\nengine.send(message)  // string only, safe when closed\n```\n\n### Close / Destroy\n```javascript\nengine.close()     // stops reconnect, clears state\nengine.destroy()   // full cleanup + removes from global registry\n```"
+          "content": "# Core API\n\n### Constructor (simple mode)\n```javascript\nnew ZYNQ.peer(config)\n```\nConfig options:\n```javascript\n{\n  video: boolean,\n  audio: boolean,\n  txt: boolean,\n  autoReconnect: boolean,\n  maxReconnectAttempts: number,\n  debug: boolean,\n  rateLimit: number,      // messages per second\n  maxMsgSize: number,     // bytes (default 65536)\n  rafBatching: boolean    // use requestAnimationFrame for data events\n}\n```\n\n### Factory (advanced mode)\n```javascript\nZYNQ.peer.get(remoteId, config)\n```\nReturns the same instance for the same `remoteId`.\n\n### Connect\n```javascript\nengine.connect(remoteId?)  // remoteId only required in simple mode\n```\n\n### Send\n```javascript\nengine.send(message)  // string only, safe when closed\n```\n\n### Close / Destroy\n```javascript\nengine.close()     // stops reconnect, clears state\nengine.destroy()   // full cleanup + removes from global registry\n```"
         }
       ]
     },
@@ -41,7 +41,7 @@
           "id": "events",
           "label": "Events",
           "icon": "zap",
-          "content": "# Events\n\n### Listen\n```javascript\nengine.on('event-name', callback)\n```\n\n### Available Events\n\n| Event          | Data                              | Description |\n|----------------|-----------------------------------|-----------|\n| `ready`        | `id`                              | Local PeerJS ID assigned |\n| `open`         | `remoteId`                        | Data connection opened |\n| `data`         | `message`                         | Received data (batched) |\n| `stream`       | `MediaStream`                     | Incoming remote media stream |\n| `localStream`  | `MediaStream`                     | Local camera/mic stream created |\n| `close`        | `remoteId`                        | Connection closed |\n| `error`        | `{type, code, error?}`            | Any error (data/media/reconnect) |\n| `reconnecting` | `{attempt, delay}`                | Auto-reconnect started |\n| `sent`         | `message`                         | Message successfully sent |\n\n**Notes**\n- `data` events are automatically batched (microtask or RAF)\n- All events are safe after `destroy()`\n- `error` objects contain structured `type` and `code`"
+          "content": "# Events\n\n### Listen\n```javascript\nengine.on('event-name', callback)\n```\n\n### Available Events\n\n| Event | Data | Description |\n|----------------|-----------------------------------|-----------|\n| `ready` | `id` | Local PeerJS ID assigned |\n| `open` | `remoteId` | Data connection opened |\n| `data` | `message` | Received data (batched) |\n| `stream` | `MediaStream` | Incoming remote media stream |\n| `localStream` | `MediaStream` | Local camera/mic stream created |\n| `close` | `remoteId` | Connection closed |\n| `error` | `{type, code, error?}` | Any error (data/media/reconnect) |\n| `reconnecting` | `{attempt, delay}` | Auto-reconnect started |\n| `sent` | `message` | Message successfully sent |\n\n**Notes**\n- `data` events are automatically batched (microtask or RAF)\n- All events are safe after `destroy()`\n- `error` objects contain structured `type` and `code`"
         }
       ]
     },
@@ -63,7 +63,7 @@
           "id": "media",
           "label": "Audio & Video",
           "icon": "video",
-          "content": "# Media (Audio & Video)\n\n### Connect with media\n```javascript\nengine.connect(remoteId); // uses config set at creation\n// or when creating:\nnew P2PEngine({ video: true, audio: true });\n```\n\n### Handle streams\n```javascript\nengine.on('localStream', stream => {\n  localVideo.srcObject = stream;\n});\n\nengine.on('stream', remoteStream => {\n  remoteVideo.srcObject = remoteStream;\n});\n```\n\n**Stream Management**\n- Single shared `getUserMedia` call across the entire library\n- Streams are cached and reused automatically\n- Automatic cleanup on `close()` / `destroy()`"
+          "content": "# Media (Audio & Video)\n\n### Connect with media\n```javascript\nengine.connect(remoteId); // uses config set at creation\n// or when creating:\nnew ZYNQ.peer({ video: true, audio: true });\n```\n\n### Handle streams\n```javascript\nengine.on('localStream', stream => {\n  localVideo.srcObject = stream;\n});\n\nengine.on('stream', remoteStream => {\n  remoteVideo.srcObject = remoteStream;\n});\n```\n\n**Stream Management**\n- Single shared `getUserMedia` call across the entire library\n- Streams are cached and reused automatically\n- Automatic cleanup on `close()` / `destroy()`"
         }
       ]
     },
@@ -85,7 +85,7 @@
           "id": "system",
           "label": "System & Advanced",
           "icon": "settings",
-          "content": "# System & Advanced\n\n### Debug mode\n```javascript\nconst engine = new P2PEngine({ ..., debug: true });\n```\nLogs connection lifecycle, reconnect attempts, stream events and security violations.\n\n### Global cleanup\n```javascript\nengine.destroy();\nP2PEngine.destroyAll(); // destroys every engine + PeerJS instance\n```\n\n### Performance & Safety\n- Microtask batching for `data` events (or RAF when `rafBatching: true`)\n- All listeners removed on close/destroy\n- Race-condition safe async operations\n- `send()` never throws when connection is closed\n\n**Notes**\n- No backend or signaling server required\n- Fully compatible with existing simple-app usage\n- All improvements are internal – public API unchanged"
+          "content": "# System & Advanced\n\n### Debug mode\n```javascript\nconst engine = new ZYNQ.peer({ ..., debug: true });\n```\nLogs connection lifecycle, reconnect attempts, stream events and security violations.\n\n### Global cleanup\n```javascript\nengine.destroy();\nZYNQ.peer.destroyAll(); // destroys every engine + PeerJS instance\n```\n\n### Performance & Safety\n- Microtask batching for `data` events (or RAF when `rafBatching: true`)\n- All listeners removed on close/destroy\n- Race-condition safe async operations\n- `send()` never throws when connection is closed\n\n**Notes**\n- No backend or signaling server required\n- Fully compatible with existing simple-app usage\n- All improvements are internal – public API unchanged"
         }
       ]
     }
