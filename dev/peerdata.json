@@ -19,7 +19,7 @@
           "id": "quickstart",
           "label": "Quick Start",
           "icon": "play-circle",
-          "content": "# Quick Start\n\n### Setup\n```javascript\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.2.5/index.min.js'\nawait ZYNQ.load(\"peer\")\nawait ZYNQ.peer.start()\n```\n\n### Get your ID\n```javascript\nZYNQ.peer.on('ready', id => {\n  console.log('My ID:', id)\n})\n```\n\n### Connect\n```javascript\nawait ZYNQ.peer.connect('peer-id')\n```\n\n### Send message\n```javascript\nZYNQ.peer.sendTo('peer-id', 'Hello')\n```\n\n### Receive messages\n```javascript\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(peerId, message)\n})\n```"
+          "content": "# Quick Start\n\n### Setup\n```javascript\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.2.6/index.min.js'\nawait ZYNQ.load(\"peer\")\nawait ZYNQ.peer.start()\n```\n\n### Get your ID\n```javascript\nZYNQ.peer.on('ready', id => {\n  console.log('My ID:', id)\n})\n```\n\n### Connect\n```javascript\nawait ZYNQ.peer.connect('peer-id')\n```\n\n### Send message\n```javascript\nZYNQ.peer.sendTo('peer-id', 'Hello')\n```\n\n### Receive messages\n```javascript\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(peerId, message)\n})\n```"
         }
       ]
     },
@@ -81,6 +81,12 @@
           "label": "Connections",
           "icon": "users",
           "content": "# Connections\n\n### Disconnect peer\n```javascript\nZYNQ.peer.disconnect(peerId)\n```\n\n### Get your ID\n```javascript\nZYNQ.peer.getMyId()\n```\n\n### Active peers\n```javascript\nZYNQ.peer.getActivePeers()\n```\nReturns an array of peer IDs"
+        },
+        {
+          "id": "exists",
+          "label": "Exists",
+          "icon": "wifi",
+          "content": "# Exists\n\n### Check if peer is online\n```javascript\nconst online = await ZYNQ.peer.exists(peerId, 1500)\n```\n\n### Example\n```javascript\nif (await ZYNQ.peer.exists('peer-id')) {\n  console.log('Peer is reachable')\n} else {\n  console.log('Peer is not reachable')\n}\n```\n\nReturns `true` if peer responds within timeout, otherwise `false`."
         }
       ]
     },
