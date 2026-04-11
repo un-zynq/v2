@@ -7,7 +7,7 @@
           "id": "about",
           "label": "About ZYNQ.peer",
           "icon": "home",
-          "badge": "v0.2.8",
+          "badge": "v0.3.0",
           "content": "# ZYNQ.peer\n\nLightweight WebRTC wrapper built on PeerJS. Designed for fast peer-to-peer communication with messaging, audio, and video.\n\n### Features\n\n- Peer-to-peer messaging (1-to-1 + broadcast)\n- Audio & video calls (WebRTC via PeerJS)\n- Invite / accept / reject handshake system\n- Session-based connection management\n- Heartbeat + timeout system (auto disconnect stale peers)\n- Local stream caching with reference counting\n- Automatic stream reuse per configuration\n- Bitrate monitoring (video calls)\n- Event-driven API\n- No backend required"
         }
       ]
@@ -19,7 +19,7 @@
           "id": "quickstart",
           "label": "Quick Start",
           "icon": "play-circle",
-          "content": "# Quick Start\n\n### Setup\n```javascript\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.2.8/index.js'\nawait ZYNQ.load('peer')\nawait ZYNQ.peer.start()\n```\n\n### Get your ID\n```javascript\nZYNQ.peer.on('ready', id => {\n  console.log('My ID:', id)\n})\n```\n\n### Connect\n```javascript\nawait ZYNQ.peer.connect('peer-id', {\n  video: true,\n  audio: true\n})\n```\n\n### Send message\n```javascript\nZYNQ.peer.sendTo('peer-id', 'Hello')\n```\n\n### Receive messages\n```javascript\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(peerId, message)\n})\n```"
+          "content": "# Quick Start\n\n### Setup\n```javascript\nimport 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@0.3.0/index.js'\nawait ZYNQ.load('peer')\nawait ZYNQ.peer.start()\n```\n\n### Get your ID\n```javascript\nZYNQ.peer.on('ready', id => {\n  console.log('My ID:', id)\n})\n```\n\n### Connect\n```javascript\nawait ZYNQ.peer.connect('peer-id', {\n  video: true,\n  audio: true\n})\n```\n\n### Send message\n```javascript\nZYNQ.peer.sendTo('peer-id', 'Hello')\n```\n\n### Receive messages\n```javascript\nZYNQ.peer.on('message', ({ peerId, message }) => {\n  console.log(peerId, message)\n})\n```"
         }
       ]
     },
