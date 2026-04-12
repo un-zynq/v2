@@ -7,19 +7,19 @@
           "id": "install_title",
           "label": "Getting Started",
           "icon": "rocket",
-          "content": "## Welcome!\n\n**Welcome to ZYNQ!**\n\nThis library provides hundreds of games with rich metadata and thumbnails, alongside a robust WebRTC-powered real-time communication system.\n\nChoose your preferred way to install the library below."
+          "content": "## Welcome!\n\n**ZYNQ is a game + realtime communication library.**\n\nIt includes a game database and a WebRTC peer system for chat, calls, and streaming."
         },
         {
           "id": "install_script",
           "label": "Script Tag",
           "icon": "code",
-          "content": "### Script Tag\n\nUse this for the fastest setup via CDN.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"></script>\n```"
+          "content": "### Script Tag\nUse this when you want to load ZYNQ directly in the browser via CDN.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"></script>\n```"
         },
         {
           "id": "install_module",
           "label": "ES Module",
           "icon": "package",
-          "content": "### ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"\n```"
+          "content": "### ES Module\nImport ZYNQ as a side-effect module (it attaches to window.ZYNQ).\n\n```javascript\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"\n```"
         }
       ]
     },
@@ -30,7 +30,7 @@
           "id": "games_object",
           "label": "Game Object",
           "icon": "gamepad-2",
-          "content": "## ZYNQ.games\n### Game Object\n\nA game object returned by `ZYNQ.games` methods.\n\n```text\nGame:\n- name: string\n- category?: string\n- alias: string\n- url: string\n- thumb: string\n- devices?: number[]\n\nComputed:\n- isSupported: boolean\n- isFavorite: boolean\n```"
+          "content": "## Game Object\nRepresents a single game entry in the ZYNQ library with metadata like name, alias, URL, and device support."
         },
         {
           "id": "games_properties",
@@ -40,29 +40,107 @@
             {
               "id": "games_prop_list",
               "label": "list",
-              "content": "### ZYNQ.games.list\n```javascript\nZYNQ.games.list\n```"
+              "content": "### list\nCurrent filtered list of games used for UI rendering.\n\n```javascript\nZYNQ.games.list\n```"
             },
             {
               "id": "games_prop_total",
               "label": "total",
-              "content": "### ZYNQ.games.total\n```javascript\nZYNQ.games.total\n```"
+              "content": "### total\nTotal number of games loaded in the library.\n\n```javascript\nZYNQ.games.total\n```"
             },
             {
               "id": "games_prop_filtered",
               "label": "filteredCount",
-              "content": "### ZYNQ.games.filteredCount\n```javascript\nZYNQ.games.filteredCount\n```"
+              "content": "### filteredCount\nNumber of games after applying filters or search.\n\n```javascript\nZYNQ.games.filteredCount\n```"
             },
             {
               "id": "games_prop_history",
               "label": "history",
-              "content": "### ZYNQ.games.getHistory()\n```javascript\nZYNQ.games.getHistory()\n```"
+              "content": "### history\nList of recently played games stored locally.\n\n```javascript\nZYNQ.games.getHistory()\n```"
             },
             {
               "id": "games_prop_favorites",
-              "label": "favorites",
-              "content": "### ZYNQ.games.favorites\n```javascript\nZYNQ.games.favorites\n```"
+              "label": "favorites\nSet of user-marked favorite games.",
+              "content": "### favorites\nStored favorites list (persisted in localStorage).\n\n```javascript\nZYNQ.games.favorites\n```"
             }
           ]
+        },
+        {
+          "id": "games_methods",
+          "label": "Methods",
+          "icon": "cog",
+          "children": [
+            {
+              "id": "games_init",
+              "label": ".init()",
+              "content": "### init()\nLoads the game database and prepares filtering and device detection.\n\n```javascript\nawait ZYNQ.games.init()\n```"
+            },
+            {
+              "id": "games_search",
+              "label": ".search()",
+              "content": "### search()\nFilters games by name or alias.\n\n```javascript\nZYNQ.games.search(\"alien\")\n```"
+            },
+            {
+              "id": "games_random",
+              "label": ".random()",
+              "content": "### random()\nReturns a randomized subset of games.\n\n```javascript\nZYNQ.games.random(5)\n```"
+            },
+            {
+              "id": "games_get_random_one",
+              "label": ".getRandomOne()",
+              "content": "### getRandomOne()\nReturns one random game without modifying the list.\n\n```javascript\nconst game = ZYNQ.games.getRandomOne()\n```"
+            },
+            {
+              "id": "games_shuffle",
+              "label": ".shuffle()",
+              "content": "### shuffle()\nRandomizes the current filtered game list order.\n\n```javascript\nZYNQ.games.shuffle()\n```"
+            },
+            {
+              "id": "games_sort",
+              "label": ".sortBy()",
+              "content": "### sortBy()\nSorts games by a given property such as name.\n\n```javascript\nZYNQ.games.sortBy(\"name\")\n```"
+            },
+            {
+              "id": "games_sort_popularity",
+              "label": ".sortByPopularity()",
+              "content": "### sortByPopularity()\nSorts games based on play count (if available).\n\n```javascript\nZYNQ.games.sortByPopularity()\n```"
+            },
+            {
+              "id": "games_get_by_alias",
+              "label": ".getByAlias()",
+              "content": "### getByAlias()\nFinds a game using its unique alias.\n\n```javascript\nZYNQ.games.getByAlias(\"alien-hominid\")\n```"
+            },
+            {
+              "id": "games_category",
+              "label": ".getByCategory()",
+              "content": "### getByCategory()\nFilters games by category name.\n\n```javascript\nZYNQ.games.getByCategory(\"shooter\")\n```"
+            },
+            {
+              "id": "games_supported",
+              "label": ".filterSupported()",
+              "content": "### filterSupported()\nRemoves games that are not supported on the current device.\n\n```javascript\nZYNQ.games.filterSupported()\n```"
+            },
+            {
+              "id": "games_favorites",
+              "label": ".filterFavorites()",
+              "content": "### filterFavorites()\nShows only games marked as favorites.\n\n```javascript\nZYNQ.games.filterFavorites()\n```"
+            },
+            {
+              "id": "games_toggle_favorite",
+              "label": ".toggleFavorite()",
+              "content": "### toggleFavorite()\nAdds or removes a game from favorites.\n\n```javascript\nZYNQ.games.toggleFavorite(\"alien-hominid\")\n```"
+            },
+            {
+              "id": "games_add_history",
+              "label": ".addToHistory()",
+              "content": "### addToHistory()\nStores a played game in history (max 50 items).\n\n```javascript\nZYNQ.games.addToHistory(\"alien-hominid\")\n```"
+            }
+          ]
+        },
+        {
+          "id": "games_example",
+          "label": "Example",
+          "icon": "terminal",
+          "content": "### Example Usage\nShows how to load, search, filter, and display games.\n\n```javascript\nawait ZYNQ.games.init()\nconst results = ZYNQ.games.search(\"alien\").filterSupported().list\nconsole.log(results)\n```"
         }
       ]
     },
@@ -71,9 +149,9 @@
       "items": [
         {
           "id": "peer_constructor",
-          "label": "Constructor & Singleton",
+          "label": "Constructor",
           "icon": "plug",
-          "content": "## ZYNQ.peer / ZYNQPeer\n\n### Create a Peer\n\nWrapper around PeerJS with data + media + reconnect logic.\n\n```javascript\nconst peer = new ZYNQ.Peer({ video: true, audio: true, txt: true })\n```"
+          "content": "## Peer System\nZYNQ Peer is a WebRTC wrapper for chat, calls, and streaming with automatic reconnection."
         },
         {
           "id": "peer_methods",
@@ -82,33 +160,33 @@
           "children": [
             {
               "id": "peer_connect",
-              "label": ".connect(id)",
-              "content": "### connect(id)\n```javascript\npeer.connect(\"id\")\n```"
+              "label": ".connect()",
+              "content": "### connect()\nOpens a data connection to another peer.\n\n```javascript\npeer.connect(\"id\")\n```"
             },
             {
               "id": "peer_send",
-              "label": ".send(id, data)",
-              "content": "### send(id, data)\n```javascript\npeer.send(\"id\", \"hello\")\n```"
+              "label": ".send()",
+              "content": "### send()\nSends data to a peer or broadcast.\n\n```javascript\npeer.send(\"id\", \"hello\")\n```"
             },
             {
               "id": "peer_call",
-              "label": ".call(id)",
-              "content": "### call(id)\n```javascript\npeer.call(\"id\")\n```"
+              "label": ".call()",
+              "content": "### call()\nStarts a video/audio call.\n\n```javascript\npeer.call(\"id\")\n```"
             },
             {
               "id": "peer_disconnect",
-              "label": ".disconnect(id)",
-              "content": "### disconnect(id)\n\nCloses BOTH data + media connection and disables auto-reconnect for that peer.\n\n```javascript\npeer.disconnect(\"id\")\n```"
+              "label": ".disconnect()",
+              "content": "### disconnect()\nFully closes both data and media connections and disables auto-reconnect for that peer.\n\n```javascript\npeer.disconnect(\"id\")\n```"
             },
             {
               "id": "peer_close",
               "label": ".close()",
-              "content": "### close()\n\nCloses all connections but keeps instance alive.\n\n```javascript\npeer.close()\n```"
+              "content": "### close()\nCloses all active connections but keeps the peer instance alive.\n\n```javascript\npeer.close()\n```"
             },
             {
               "id": "peer_destroy",
               "label": ".destroy()",
-              "content": "### destroy()\n\nFully destroys peer instance.\n\n```javascript\npeer.destroy()\n```"
+              "content": "### destroy()\nCompletely destroys the peer instance and clears all state.\n\n```javascript\npeer.destroy()\n```"
             }
           ]
         },
@@ -120,37 +198,37 @@
             {
               "id": "peer_event_ready",
               "label": "ready",
-              "content": "### ready\n```javascript\npeer.on(\"ready\", id => {})\n```"
+              "content": "### ready\nFired when the peer gets its ID from the signaling server.\n\n```javascript\npeer.on(\"ready\", id => {})\n```"
             },
             {
               "id": "peer_event_open",
               "label": "open",
-              "content": "### open\nFired when a DATA connection is opened with a remote peer.\n```javascript\npeer.on(\"open\", id => {})\n```"
+              "content": "### open\nFired when a data connection is opened with a remote peer.\n\n```javascript\npeer.on(\"open\", id => {})\n```"
             },
             {
               "id": "peer_event_message",
               "label": "message",
-              "content": "### message\n```javascript\npeer.on(\"message\", msg => {})\n```"
+              "content": "### message\nTriggered when a data message is received.\n\n```javascript\npeer.on(\"message\", msg => {})\n```"
             },
             {
               "id": "peer_event_stream",
               "label": "stream",
-              "content": "### stream\n```javascript\npeer.on(\"stream\", data => {})\n```"
+              "content": "### stream\nTriggered when a remote media stream arrives.\n\n```javascript\npeer.on(\"stream\", data => {})\n```"
             },
             {
               "id": "peer_event_close",
               "label": "close",
-              "content": "### close\n```javascript\npeer.on(\"close\", data => {})\n```"
+              "content": "### close\nTriggered when a connection is closed.\n\n```javascript\npeer.on(\"close\", data => {})\n```"
             },
             {
               "id": "peer_event_reconnecting",
               "label": "reconnecting",
-              "content": "### reconnecting\n```javascript\npeer.on(\"reconnecting\", data => {})\n```"
+              "content": "### reconnecting\nTriggered during automatic reconnection attempts.\n\n```javascript\npeer.on(\"reconnecting\", data => {})\n```"
             },
             {
               "id": "peer_event_error",
               "label": "error",
-              "content": "### error\n```javascript\npeer.on(\"error\", err => {})\n```"
+              "content": "### error\nTriggered when any PeerJS or network error occurs.\n\n```javascript\npeer.on(\"error\", err => {})\n```"
             }
           ]
         }
