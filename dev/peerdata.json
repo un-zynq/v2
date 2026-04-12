@@ -1,91 +1,96 @@
 {
   "groups": [
     {
-      "title": "Introduction",
+      "title": "ZYNQ Peer",
       "items": [
         {
-          "id": "about",
-          "label": "About ZYNQ.peer",
-          "icon": "home",
-          "badge": "v1.0",
-          "content": "# ZYNQ.peer\n\nLightweight, secure and stable WebRTC P2P library built on PeerJS. Provides simple 1-to-1 messaging and optional audio/video streaming with zero backend.\n\n### Key Improvements\n- Factory + simple constructor compatibility (no API breakage)\n- Built-in abuse protection: rate limiting, max message size (64KB), non-string payload rejection\n- Connection state machine (DISCONNECTED → CONNECTING → CONNECTED → RECONNECTING → FAILED)\n- Exponential backoff + jitter auto-reconnect\n- Single shared `getUserMedia` stream (no duplicate calls)\n- Microtask / optional RAF data event batching\n- Full listener cleanup and memory-leak protection\n- Handshake-ready flag and safe `send()`\n- Debug mode with detailed lifecycle logging"
-        }
-      ]
-    },
-    {
-      "title": "Quick Start",
-      "items": [
+          "id": "peer-overview",
+          "label": "Overview",
+          "icon": "radio",
+          "badge": "WebRTC",
+          "content": "# ZYNQ Peer\n\nZYNQ Peer is a lightweight WebRTC wrapper built on top of PeerJS.\n\nIt enables:\n\n- 📡 Peer-to-peer messaging\n- 🎥 Video & audio streaming\n- 🔁 Automatic reconnection\n- ⚡ Rate-limited messaging\n\n## Quick Start\n\n```js\nconst peer = ZYNQ.peer.get('remote-id');\n\npeer.on('open', () => {\n  peer.send('Hello 👋');\n});\n\npeer.on('data', console.log);\n\npeer.connect();\n```"
+        },
         {
-          "id": "quickstart",
-          "label": "Quick Start",
-          "icon": "play-circle",
-          "content": "# Quick Start\n\n### Load the library\n```html\n<script type=\"module\">\nimport { peer } from 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0/index.min.js';\n</script>\n```\n\n### Simple mode (recommended)\n```javascript\nconst engine = new ZYNQ.peer({\n  video: false,\n  audio: false,\n  txt: true\n});\n\nengine.on('ready', id => {\n  console.log('My ID:', id);\n});\n\nengine.on('data', msg => {\n  console.log('Received:', msg);\n});\n```\n\n### Connect & send\n```javascript\nengine.connect('remote-peer-id');\nengine.send('hello world');\n```"
-        }
-      ]
-    },
-    {
-      "title": "Core API",
-      "items": [
+          "id": "peer-config",
+          "label": "Configuration",
+          "icon": "settings",
+          "badge": "Options",
+          "content": "# Configuration\n\n```js\nnew ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true,\n  debug: false,\n  rateLimit: 30,\n  maxMsgSize: 65536,\n  autoReconnect: true,\n  maxReconnectAttempts: 5,\n  rafBatching: false,\n  id: null\n});\n```\n\n## Highlights\n\n- `rateLimit` → max messages/sec\n- `maxMsgSize` → prevents large payload abuse\n- `autoReconnect` → keeps connection alive\n- `rafBatching` → smoother event batching"
+        },
         {
-          "id": "core",
-          "label": "Core API",
-          "icon": "power",
-          "content": "# Core API\n\n### Constructor (simple mode)\n```javascript\nnew ZYNQ.peer(config)\n```\nConfig options:\n```javascript\n{\n  video: boolean,\n  audio: boolean,\n  txt: boolean,\n  autoReconnect: boolean,\n  maxReconnectAttempts: number,\n  debug: boolean,\n  rateLimit: number,      // messages per second\n  maxMsgSize: number,     // bytes (default 65536)\n  rafBatching: boolean    // use requestAnimationFrame for data events\n}\n```\n\n### Factory (advanced mode)\n```javascript\nZYNQ.peer.get(remoteId, config)\n```\nReturns the same instance for the same `remoteId`.\n\n### Connect\n```javascript\nengine.connect(remoteId?)  // remoteId only required in simple mode\n```\n\n### Send\n```javascript\nengine.send(message)  // string only, safe when closed\n```\n\n### Close / Destroy\n```javascript\nengine.close()     // stops reconnect, clears state\nengine.destroy()   // full cleanup + removes from global registry\n```"
-        }
-      ]
-    },
-    {
-      "title": "Events",
-      "items": [
+          "id": "peer-lifecycle",
+          "label": "Lifecycle",
+          "icon": "activity",
+          "badge": "Flow",
+          "content": "# Lifecycle\n\n## States\n\n- `DISCONNECTED`\n- `CONNECTING`\n- `CONNECTED`\n- `RECONNECTING`\n- `FAILED`\n\n## Flow\n\n1. Peer initializes\n2. `ready` event fires\n3. Call `connect(remoteId)`\n4. `open` event fires\n5. Data/media exchange begins\n\n## Example\n\n```js\npeer.on('ready', id => console.log('My ID:', id));\npeer.on('open', () => console.log('Connected'));\npeer.on('close', () => console.log('Disconnected'));\n```"
+        },
         {
-          "id": "events",
+          "id": "peer-events",
           "label": "Events",
           "icon": "zap",
-          "content": "# Events\n\n### Listen\n```javascript\nengine.on('event-name', callback)\n```\n\n### Available Events\n\n| Event | Data | Description |\n|----------------|-----------------------------------|-----------|\n| `ready` | `id` | Local PeerJS ID assigned |\n| `open` | `remoteId` | Data connection opened |\n| `data` | `message` | Received data (batched) |\n| `stream` | `MediaStream` | Incoming remote media stream |\n| `localStream` | `MediaStream` | Local camera/mic stream created |\n| `close` | `remoteId` | Connection closed |\n| `error` | `{type, code, error?}` | Any error (data/media/reconnect) |\n| `reconnecting` | `{attempt, delay}` | Auto-reconnect started |\n| `sent` | `message` | Message successfully sent |\n\n**Notes**\n- `data` events are automatically batched (microtask or RAF)\n- All events are safe after `destroy()`\n- `error` objects contain structured `type` and `code`"
+          "badge": "API",
+          "content": "# Events\n\n## Connection\n\n- `ready`\n- `open`\n- `close`\n\n## Data\n\n- `data`\n- `sent`\n\n## Media\n\n- `stream`\n- `localStream`\n\n## Errors\n\n- `error`\n- `reconnecting`\n\n---\n\n```js\npeer.on('data', msg => console.log(msg));\npeer.on('stream', stream => {\n  video.srcObject = stream;\n});\n```"
+        },
+        {
+          "id": "peer-methods",
+          "label": "Methods",
+          "icon": "terminal",
+          "badge": "API",
+          "content": "# Methods\n\n## Connection\n\n```js\npeer.connect(remoteId);\npeer.close();\npeer.destroy();\n```\n\n## Messaging\n\n```js\npeer.send('Hello');\n```\n\n## Media\n\n```js\nawait peer.getStream();\n```\n\n---\n\n## Static\n\n```js\nZYNQ.peer.get(id);\nZYNQ.peer.destroyAll();\n```"
         }
       ]
     },
     {
-      "title": "Messaging",
+      "title": "ZYNQ Games",
       "items": [
         {
-          "id": "messaging",
-          "label": "Messaging",
-          "icon": "message-circle",
-          "content": "# Messaging\n\n### Send message\n```javascript\nengine.send('Hello world');\nengine.send({ type: 'chat', text: 'Hi' }); // objects are supported by PeerJS\n```\n\n### Receive\n```javascript\nengine.on('data', msg => {\n  console.log('Received from peer:', msg);\n});\n```\n\n**Security**\n- Only strings pass by default (non-string payloads are silently rejected)\n- Automatic rate limiting (30 msgs/sec per connection)\n- Messages larger than 64KB are rejected"
-        }
-      ]
-    },
-    {
-      "title": "Media",
-      "items": [
+          "id": "games-overview",
+          "label": "Overview",
+          "icon": "gamepad-2",
+          "badge": "Games",
+          "content": "# ZYNQ Games\n\nZYNQ Games is a dynamic game loader and manager.\n\nIt provides:\n\n- 🔍 Smart search\n- 🎲 Random selection\n- ❤️ Favorites system\n- 📱 Device compatibility filtering\n\n## Init\n\n```js\nawait ZYNQ.games.init({\n  mode: 'all',\n  search: '',\n  sort: 'name'\n});\n```"
+        },
         {
-          "id": "media",
-          "label": "Audio & Video",
-          "icon": "video",
-          "content": "# Media (Audio & Video)\n\n### Connect with media\n```javascript\nengine.connect(remoteId); // uses config set at creation\n// or when creating:\nnew ZYNQ.peer({ video: true, audio: true });\n```\n\n### Handle streams\n```javascript\nengine.on('localStream', stream => {\n  localVideo.srcObject = stream;\n});\n\nengine.on('stream', remoteStream => {\n  remoteVideo.srcObject = remoteStream;\n});\n```\n\n**Stream Management**\n- Single shared `getUserMedia` call across the entire library\n- Streams are cached and reused automatically\n- Automatic cleanup on `close()` / `destroy()`"
-        }
-      ]
-    },
-    {
-      "title": "Connections",
-      "items": [
+          "id": "games-device",
+          "label": "Device Detection",
+          "icon": "smartphone",
+          "badge": "System",
+          "content": "# Device Detection\n\nZYNQ automatically detects device type:\n\n## Types\n\n- `1` → Hybrid (touch laptop)\n- `2` → Desktop\n- `3` → Mobile\n- `4` → Tablet\n\nAccessible via:\n\n```js\nZYNQ.deviceType\n```\n\nUsed internally for filtering supported games."
+        },
         {
-          "id": "connection",
-          "label": "Connections",
-          "icon": "users",
-          "content": "# Connection Management\n\n### State machine\n```javascript\nconsole.log(engine.state); // DISCONNECTED | CONNECTING | CONNECTED | RECONNECTING | FAILED\nengine.active // boolean (data or media connected)\n```\n\n### Disconnect\n```javascript\nengine.close(); // stops auto-reconnect\n```\n\n### Auto-reconnect\n- Exponential backoff with jitter (max 5 attempts by default)\n- Stops automatically if `close()` was called manually\n- Emits `reconnecting` and `error` events"
-        }
-      ]
-    },
-    {
-      "title": "System",
-      "items": [
+          "id": "games-filtering",
+          "label": "Filtering & Search",
+          "icon": "search",
+          "badge": "API",
+          "content": "# Filtering & Search\n\n## Search\n\n```js\ngames.search('car');\n```\n\n## Filters\n\n```js\ngames.filterSupported();\ngames.filterFavorites();\n```\n\n## Categories\n\n```js\ngames.getByCategory('arcade');\n```\n\n---\n\nSearch matches both name and alias."
+        },
         {
-          "id": "system",
-          "label": "System & Advanced",
-          "icon": "settings",
-          "content": "# System & Advanced\n\n### Debug mode\n```javascript\nconst engine = new ZYNQ.peer({ ..., debug: true });\n```\nLogs connection lifecycle, reconnect attempts, stream events and security violations.\n\n### Global cleanup\n```javascript\nengine.destroy();\nZYNQ.peer.destroyAll(); // destroys every engine + PeerJS instance\n```\n\n### Performance & Safety\n- Microtask batching for `data` events (or RAF when `rafBatching: true`)\n- All listeners removed on close/destroy\n- Race-condition safe async operations\n- `send()` never throws when connection is closed\n\n**Notes**\n- No backend or signaling server required\n- Fully compatible with existing simple-app usage\n- All improvements are internal – public API unchanged"
+          "id": "games-random",
+          "label": "Random & Shuffle",
+          "icon": "shuffle",
+          "badge": "Fun",
+          "content": "# Random & Shuffle\n\n## Random selection\n\n```js\ngames.random(3);\n```\n\n## Single random\n\n```js\ngames.getRandomOne();\n```\n\n## Shuffle list\n\n```js\ngames.shuffle();\n```"
+        },
+        {
+          "id": "games-sorting",
+          "label": "Sorting",
+          "icon": "arrow-down-up",
+          "badge": "API",
+          "content": "# Sorting\n\n## By name\n\n```js\ngames.sortBy('name');\n```\n\n## By popularity\n\n```js\ngames.sortByPopularity();\n```"
+        },
+        {
+          "id": "games-storage",
+          "label": "Favorites & History",
+          "icon": "heart",
+          "badge": "Storage",
+          "content": "# Favorites & History\n\n## Favorites\n\n```js\ngames.toggleFavorite('game-id');\ngames.isFavorite('game-id');\n```\n\n## History\n\n```js\ngames.addToHistory('game-id');\ngames.getHistory();\ngames.clearHistory();\n```\n\n- Stored in `localStorage`\n- History capped at 50 items"
+        },
+        {
+          "id": "games-data",
+          "label": "Game Object",
+          "icon": "database",
+          "badge": "Structure",
+          "content": "# Game Object\n\nEach game looks like:\n\n```js\n{\n  name: 'Game Name',\n  alias: 'game-id',\n  category: 'arcade',\n  url: 'provider/game-id',\n  thumb: 'cdn/provider/game-id.webp',\n  devices: [1,2,3],\n  isSupported: true,\n  isFavorite: false\n}\n```"
         }
       ]
     }
