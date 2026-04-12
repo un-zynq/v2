@@ -8,7 +8,7 @@
       "label": "Getting Started",
       "icon": "rocket",
       "badge": "Install",
-      "content": "## Installation\n\nWelcome to ZYNQ!\nThis library provides hundreds of games with rich metadata and thumbnails, alongside a separate WebRTC-powered social system for real-time interaction.\n\nChoose your preferred way to install the library below."
+      "content": "## Installation\n\n***Welcome to ZYNQ!***\nThis library provides hundreds of games with rich metadata and thumbnails, alongside a separate WebRTC-powered social system for real-time interaction.\n\nChoose your preferred way to install the library below."
     },
     {
       "id": "install_script",
