@@ -30,14 +30,14 @@
       "id": "games_init",
       "label": "Initialization",
       "icon": "plug",
-      "content": "### init(options?)\nInitializes the game engine and loads the CDN database.\n\n```js\nawait ZYNQ.games.init({\n  mode: \"all\",\n  search: \"\",\n  sort: \"name\",\n  src: \"...\",\n  cdn: \"...\"\n})\n```\n\nOptions:\n- mode: all | supported | favs\n- search: initial query\n- sort: name | category | etc\n- src: JSON database URL\n- cdn: thumbnail base URL\n"
+      "content": "## ZYNQ.games\n\n### init(options?)\nInitializes the game engine and loads the CDN database.\n\n```js\nawait ZYNQ.games.init({\n  mode: \"all\",\n  search: \"\",\n  sort: \"name\",\n  src: \"...\",\n  cdn: \"...\"\n})\n```\n\nOptions:\n- mode: all | supported | favs\n- search: initial query\n- sort: name | category | etc\n- src: JSON database URL\n- cdn: thumbnail base URL\n"
     },
 
     {
       "id": "games_model",
       "label": "Game Model",
       "icon": "box",
-      "content": "## Game\n\nCore entity used across the entire system.\n\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices?: number[],\n\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```\n\nRules:\n- `isSupported` depends on device detection\n- `isFavorite` is stored in localStorage\n- All collections strictly follow this structure\n"
+      "content": "### Game Schema\n\nCore entity schema used across the entire system.\n\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices?: number[],\n\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```\n\nRules:\n- `isSupported` depends on device detection\n- `isFavorite` is stored in localStorage\n- All collections strictly follow this structure\n"
     },
 
     {
