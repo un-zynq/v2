@@ -7,21 +7,18 @@
           "id": "install_title",
           "label": "Getting Started",
           "icon": "rocket",
-          "badge": "Install",
           "content": "## Installation\n\n**Welcome to ZYNQ!**\n\nThis library provides hundreds of games with rich metadata and thumbnails, alongside a separate WebRTC-powered social system for real-time interaction.\n\nChoose your preferred way to install the library below."
         },
         {
           "id": "install_script",
           "label": "Script Tag",
           "icon": "code",
-          "badge": "CDN",
           "content": "## Script Tag\n\nUse this if you want the fastest setup via CDN.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```"
         },
         {
           "id": "install_module",
           "label": "ES Module",
           "icon": "package",
-          "badge": "Modern",
           "content": "## ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport ZYNQ, { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"\n```"
         }
       ]
@@ -33,14 +30,12 @@
           "id": "games_object",
           "label": "Game Object",
           "icon": "gamepad-2",
-          "badge": "Core",
           "content": "## Game Object\n\nA game object returned by `ZYNQ.games` methods.\n\n```text\nGame:\n- name: string\n- category?: string\n- alias: string\n- url: string\n- thumb: string\n- devices?: number[]\n\nComputed:\n- isSupported: boolean\n- isFavorite: boolean\n```"
         },
         {
           "id": "games_properties",
           "label": "Properties",
           "icon": "database",
-          "badge": "API",
           "children": [
             {
               "id": "games_prop_list",
@@ -73,7 +68,6 @@
           "id": "games_methods",
           "label": "Methods",
           "icon": "cog",
-          "badge": "API",
           "children": [
             {
               "id": "games_init",
@@ -141,7 +135,6 @@
           "id": "games_example",
           "label": "Example",
           "icon": "terminal",
-          "badge": "Demo",
           "content": "## Games Example\n\n```javascript\nawait ZYNQ.games.init()\n\nconst results = ZYNQ.games\n  .search(\"alien\")\n  .filterSupported()\n  .sortBy(\"name\")\n  .list\n\nconsole.log(results)\n```"
         }
       ]
@@ -153,21 +146,18 @@
           "id": "peer_constructor",
           "label": "Constructor",
           "icon": "plug",
-          "badge": "Core",
           "content": "## Peer Constructor\n\n```javascript\nnew ZYNQ.peer(options)\n```"
         },
         {
           "id": "peer_options",
           "label": "Options",
           "icon": "sliders",
-          "badge": "Config",
           "content": "## Options\n\n- video: boolean\n- audio: boolean\n- txt: boolean\n- debug: boolean\n- rateLimit: number\n- maxMsgSize: number\n- autoReconnect: boolean\n- maxReconnectAttempts: number"
         },
         {
           "id": "peer_methods",
           "label": "Methods",
           "icon": "cog",
-          "badge": "API",
           "children": [
             {
               "id": "peer_connect",
@@ -200,7 +190,6 @@
           "id": "peer_events",
           "label": "Events",
           "icon": "radio",
-          "badge": "Events",
           "children": [
             {
               "id": "peer_event_open",
@@ -233,7 +222,6 @@
           "id": "peer_example",
           "label": "Example",
           "icon": "terminal",
-          "badge": "Demo",
           "content": "## Full Peer Example\n\n```javascript\nconst PeerInstance = new ZYNQ.peer({\n  video: true,\n  audio: true\n})\n\nPeerInstance.on(\"open\", id => {\n  console.log(\"My ID:\", id)\n})\n\nPeerInstance.on(\"data\", msg => {\n  console.log(msg)\n})\n\nPeerInstance.connect(\"other-id\")\nPeerInstance.send(\"hello 👽\")\n```"
         }
       ]
