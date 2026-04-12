@@ -4,11 +4,32 @@
       "title": "ZYNQ Games",
       "items": [
         {
-          "id": "games",
-          "label": "ZYNQ Games",
+          "id": "games-overview",
+          "label": "Overview",
           "icon": "gamepad-2",
           "badge": "Games",
-          "content": "# ZYNQ Games\n\nZYNQ Games is a stateful game manager that loads, filters, and transforms a dataset of games.\n\nAll operations modify an internal list, and the result is always accessed via:\n\n```js\ngames.list\n```\n\n---\n\n## Basic Usage\n\n```js\nawait ZYNQ.games.init();\n\n// full dataset\nconsole.log(ZYNQ.games.list);\n\n// filtered dataset\nconsole.log(ZYNQ.games.search('eggy').list);\n```\n\n---\n\n## How It Works\n\nEach method updates the internal filtered list.\n\n```js\nZYNQ.games.search('car');\nZYNQ.games.list; // now contains only \"car\" results\n```\n\nChaining applies multiple transformations:\n\n```js\nZYNQ.games\n  .search('car')\n  .filterSupported()\n  .sortBy('name')\n  .list\n```\n\nReset restores the full dataset:\n\n```js\nZYNQ.games.reset().list\n```\n\n---\n\n## Initialization\n\n```js\nawait ZYNQ.games.init({\n  mode: 'all',\n  search: '',\n  sort: 'name'\n});\n```\n\n### Returns\n\n```js\nPromise<ZYNQGames>\n```\n\n---\n\n## Core Methods\n\n### Search\n\n```js\ngames.search(query)\n```\n\n- Matches `name` and `alias`\n- Case-insensitive\n\n### Filters\n\n```js\ngames.filterSupported();\ngames.filterFavorites();\n```\n\n### Category\n\n```js\ngames.getByCategory('arcade');\n```\n\n### Sorting\n\n```js\ngames.sortBy('name');\ngames.sortByPopularity();\n```\n\n### Random\n\n```js\ngames.random(3).list;\nconst game = games.getRandomOne();\n```\n\n### Shuffle\n\n```js\ngames.shuffle().list;\n```\n\n---\n\n## Data Access\n\n```js\ngames.list           // GameObject[] (current state)\ngames.total          // number (all games)\ngames.filteredCount  // number (current list)\n```\n\n---\n\n## Game Object\n\n```js\n{\n  name: 'Game Name',\n  alias: 'game-id',\n  category: 'arcade',\n  url: 'provider/game-id',\n  thumb: 'cdn/provider/game-id.webp',\n  devices: [1,2,3],\n\n  isSupported: true,\n  isFavorite: false\n}\n```\n\n### Notes\n\n- Thumbnails are **400x300**\n- `devices` may be missing → treated as supported on all devices\n- `isSupported` is computed dynamically\n- `isFavorite` uses localStorage\n\n---\n\n## Favorites & History\n\n### Favorites\n\n```js\ngames.toggleFavorite('game-id');\ngames.isFavorite('game-id');\n```\n\n### History\n\n```js\ngames.addToHistory('game-id');\ngames.getHistory();\ngames.clearHistory();\n```\n\n- Stored in `localStorage`\n- History max: 50 items\n\n---\n\n## Device Detection\n\n```js\nZYNQ.deviceType\n```\n\n### Types\n\n- `1` → Hybrid\n- `2` → Desktop\n- `3` → Mobile\n- `4` → Tablet\n\nUsed automatically in `filterSupported()`"
+          "content": "# ZYNQ Games\n\nZYNQ Games is a **stateful game manager**.\n\nIt loads a full dataset (e.g. 533 games) and keeps an internal *filtered state*.\n\n---\n\n## Core idea\n\nAll methods modify the current list.\n\nYou always read results from:\n\n```js\ngames.list\n```\n\n---\n\n## Example\n\n```js\nZYNQ.games.search('eggy').list;\n```\n\n→ returns only matching games"
+        },
+        {
+          "id": "games-state",
+          "label": "State Model",
+          "icon": "workflow",
+          "badge": "Core",
+          "content": "# State Model\n\nZYNQ Games works like a pipeline:\n\n1. Start with full dataset\n2. Apply transformations\n3. Store result internally\n4. Read via `.list`\n\n---\n\n## Example flow\n\n```js\nZYNQ.games.search('car');\nZYNQ.games.filterSupported();\n\nconsole.log(ZYNQ.games.list);\n```\n\n---\n\n## Reset state\n\n```js\nZYNQ.games.reset();\n```\n\n→ restores full dataset"
+        },
+        {
+          "id": "games-api",
+          "label": "API Methods",
+          "icon": "terminal",
+          "badge": "API",
+          "content": "# API Methods\n\n## Search\n```js\ngames.search(query);\n```\n\n## Filters\n```js\ngames.filterSupported();\ngames.filterFavorites();\n```\n\n## Sorting\n```js\ngames.sortBy('name');\ngames.sortByPopularity();\n```\n\n## Random\n```js\ngames.random(3);\ngames.getRandomOne();\n```\n\n---\n\nAll methods (except `getRandomOne`) are **chainable**."
+        },
+        {
+          "id": "games-data",
+          "label": "Data & Rules",
+          "icon": "database",
+          "badge": "Structure",
+          "content": "# Data Rules\n\n## Game object\n\n```js\n{\n  name,\n  alias,\n  category,\n  url,\n  thumb, // 400x300\n  devices?, // optional\n  isSupported,\n  isFavorite\n}\n```\n\n---\n\n## Important rules\n\n- `devices` may be missing → treated as **supported everywhere**\n- `isSupported` is computed automatically\n- `thumb` size is always **400x300**\n\n---\n\n## Data access\n\n```js\ngames.list\n```\n\n→ current filtered results\n\n```js\ngames.total\n```\n\n→ full dataset size\n\n```js\ngames.filteredCount\n```\n\n→ current filtered size"
         }
       ]
     },
@@ -16,11 +37,32 @@
       "title": "ZYNQ Peer",
       "items": [
         {
-          "id": "peer",
-          "label": "ZYNQ Peer",
+          "id": "peer-overview",
+          "label": "Overview",
           "icon": "radio",
           "badge": "WebRTC",
-          "content": "# ZYNQ Peer\n\nZYNQ Peer is a WebRTC-based communication layer built on PeerJS.\n\nIt provides peer-to-peer:\n\n- Messaging\n- Audio/video streaming\n- Automatic reconnection\n\n---\n\n## Basic Usage\n\n```js\nconst peer = ZYNQ.peer.get('remote-id');\n\npeer.on('open', () => {\n  peer.send('Hello');\n});\n\npeer.on('data', console.log);\n\npeer.connect();\n```\n\n---\n\n## Configuration\n\n```js\nnew ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true,\n  debug: false,\n  rateLimit: 30,\n  maxMsgSize: 65536,\n  autoReconnect: true,\n  maxReconnectAttempts: 5,\n  rafBatching: false,\n  id: null\n});\n```\n\n### Returns\n\n```js\nZYNQPeer\n```\n\n---\n\n## States\n\n- `DISCONNECTED`\n- `CONNECTING`\n- `CONNECTED`\n- `RECONNECTING`\n- `FAILED`\n\n---\n\n## Events\n\n### Connection\n\n- `ready`\n- `open`\n- `close`\n\n### Data\n\n- `data`\n- `sent`\n\n### Media\n\n- `stream`\n- `localStream`\n\n### Errors\n\n- `error`\n- `reconnecting`\n\n---\n\n## Methods\n\n### Connection\n\n```js\npeer.connect(remoteId);\npeer.close();\npeer.destroy();\n```\n\n### Messaging\n\n```js\npeer.send(data);\n```\n\n### Media\n\n```js\nawait peer.getStream();\n```\n\n---\n\n## Returns\n\n- `connect()` → ZYNQPeer\n- `send()` → void\n- `close()` → void\n- `destroy()` → void\n- `getStream()` → Promise<MediaStream | null>\n\n---\n\n## Static Methods\n\n```js\nZYNQ.peer.get(id);\nZYNQ.peer.destroyAll();\n```\n\n- `get()` → ZYNQPeer (singleton per id)\n- `destroyAll()` → void\n\n---\n\n## Example: Stream Handling\n\n```js\npeer.on('stream', stream => {\n  video.srcObject = stream;\n});\n```"
+          "content": "# ZYNQ Peer\n\nZYNQ Peer is a WebRTC wrapper built on PeerJS.\n\nIt enables:\n\n- 📡 Data messaging\n- 🎥 Media streaming\n- 🔁 Auto reconnect\n\n---\n\n## Quick start\n\n```js\nconst peer = ZYNQ.peer.get('remote-id');\npeer.connect();\n```\n\n---\n\n## Events example\n\n```js\npeer.on('data', console.log);\n```\n"
+        },
+        {
+          "id": "peer-config",
+          "label": "Configuration",
+          "icon": "settings",
+          "badge": "Setup",
+          "content": "# Configuration\n\n```js\nnew ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true,\n  rateLimit: 30,\n  autoReconnect: true\n});\n```\n\n---\n\n## Notes\n\n- `rateLimit` prevents spam\n- `autoReconnect` keeps connection alive\n\n---\n\n## Returns\n\n```js\nZYNQPeer\n```"
+        },
+        {
+          "id": "peer-events",
+          "label": "Events",
+          "icon": "activity",
+          "badge": "API",
+          "content": "# Events\n\n## Connection\n- ready\n- open\n- close\n\n## Data\n- data\n- sent\n\n## Media\n- stream\n- localStream\n\n## Errors\n- error\n- reconnecting\n\n---\n\n```js\npeer.on('stream', stream => {\n  video.srcObject = stream;\n});\n```"
+        },
+        {
+          "id": "peer-methods",
+          "label": "Methods",
+          "icon": "terminal",
+          "badge": "API",
+          "content": "# Methods\n\n## Connection\n```js\npeer.connect(id);\npeer.close();\npeer.destroy();\n```\n\n## Messaging\n```js\npeer.send(data);\n```\n\n## Media\n```js\nawait peer.getStream();\n```\n\n---\n\n## Static\n```js\nZYNQ.peer.get(id);\nZYNQ.peer.destroyAll();\n```"
         }
       ]
     }
