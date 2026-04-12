@@ -7,29 +7,29 @@
           "id": "games_overview",
           "label": "Overview",
           "icon": "gamepad-2",
-          "badge": "Core",
-          "content": "# ZYNQ Games Overview\n\nZYNQ Games is a registry-based system that manages a large catalog of games (currently 533+ entries).\n\nThe system is **not return-based per function call**. Instead, it uses a shared state model:\n\n- `ZYNQ.games.list` → always holds the latest resolved result set\n- `ZYNQ.games.search(query)` → filters internal registry and updates `.list`\n\nThis means methods mutate or update state rather than returning data directly.\n\n## Key Concept\n\nYou never rely on return values like:\n```ts\nconst result = ZYNQ.games.search('car') // ❌ incorrect assumption\n```\n\nInstead:\n```ts\nZYNQ.games.search('car')\nconsole.log(ZYNQ.games.list) // ✅ correct usage\n```\n\nThe `.list` property is the **single source of truth after operations**."
+          "badge": "System",
+          "content": "# ZYNQ Games System\n\nZYNQ Games is a registry-based dataset containing all games (533+ entries).\n\nThe system is state-driven, meaning data is not returned directly from methods.\nInstead, everything resolves through shared state via `ZYNQ.games.list`.\n\nThis makes the system predictable and consistent across operations."
         },
         {
           "id": "games_search",
-          "label": "Search System",
+          "label": "Search",
           "icon": "search",
           "badge": "API",
-          "content": "# Games Search System\n\nThe search system is designed for fast filtering over a large dataset (533+ games).\n\n## Usage\n\n```ts\nZYNQ.games.search(\"eggy\")\n```\n\nAfter execution:\n\n```ts\nZYNQ.games.list\n```\n\n## Behavior\n\n- Search is **case-insensitive**\n- Matches against:\n  - game name\n  - tags\n  - internal identifiers\n\n## Important Rule ⚠️\n\nSearch does NOT return results directly.\nIt only updates internal state:\n\n- `search()` → triggers filter\n- `.list` → contains result set\n\nThis design keeps chaining predictable and avoids duplicated return handling."
+          "content": "# Search Behavior\n\n```ts\nZYNQ.games.search(\"eggy\")\n```\n\n⚠️ Important rule:\nSearch does NOT return results.\n\nInstead, it updates internal state:\n\n```ts\nZYNQ.games.list\n```\n\n## Behavior\n- case-insensitive matching\n- matches name, tags, identifiers\n- filters full registry (533+ games)\n\nThe result is always accessed through `.list`, never through a return value."
         },
         {
-          "id": "games_featured",
-          "label": "Featured Games",
-          "icon": "star",
-          "badge": "Curated",
-          "content": "# Featured Games\n\nFeatured games are a curated subset of the full registry.\n\nThey are used for:\n\n- homepage highlights\n- trending selection\n- quick access shortcuts\n\n## Structure\n\nEach featured game includes:\n\n- id\n- name\n- image (400x300)\n- supported devices (optional)\n\n⚠️ Not all featured entries have device mappings yet.\nThose entries will return `devices: []` or `undefined`.\n\n## Example Flow\n\n```ts\nZYNQ.games.search('featured')\nconsole.log(ZYNQ.games.list)\n```\n\nThis will resolve only curated entries, not full registry data."
-        },
-        {
-          "id": "games_all",
-          "label": "All Games",
+          "id": "games_list",
+          "label": "List State",
           "icon": "list",
-          "badge": "Registry",
-          "content": "# All Games Registry\n\nThis is the full dataset entry point (533+ games).\n\n⚠️ Important:\nDo NOT try to render all games in sidebar or navigation.\nThis dataset is too large for UI traversal.\n\n## Correct Access Pattern\n\n```ts\nZYNQ.games.search(\"\")\nconsole.log(ZYNQ.games.list)\n```\n\nor directly:\n\n```ts\nconsole.log(ZYNQ.games.list)\n```\n\n## Data Shape\n\nEach game object typically contains:\n\n- id: unique identifier\n- name: display name\n- image: 400x300 thumbnail\n- tags: string[]\n- devices: string[] (optional)\n\n## Performance Note\n\nAlways use `search()` before iterating large subsets to avoid unnecessary full-list rendering."
+          "badge": "Core",
+          "content": "# Games List State\n\n`ZYNQ.games.list` is the single source of truth after any operation.\n\n## Example Flow\n\n```ts\nZYNQ.games.search(\"car\")\nconsole.log(ZYNQ.games.list)\n```\n\n## Key Rule\n\n- Methods modify internal state\n- `.list` always reflects the latest result set\n- No method-based return values should be assumed\n\nThis design prevents duplicated result handling and keeps UI rendering stable."
+        },
+        {
+          "id": "games_model",
+          "label": "Data Model",
+          "icon": "database",
+          "badge": "Schema",
+          "content": "# Game Data Model\n\nEach game entry follows a consistent structure:\n\n```ts\n{\n  id: string,\n  name: string,\n  image: string, // 400x300\n  tags: string[],\n  devices?: string[]\n}\n```\n\n## Notes\n- Not all games have `devices` assigned yet\n- Images are standardized at 400x300 resolution\n- Registry is optimized for fast filtering and UI rendering"
         }
       ]
     },
@@ -40,29 +40,29 @@
           "id": "peer_overview",
           "label": "Overview",
           "icon": "users",
-          "badge": "Core",
-          "content": "# ZYNQ Peer System\n\nThe Peer system manages connections, metadata exchange, and relational data between users or nodes.\n\nIt is designed as a **state-synced network layer**, not a request/response API.\n\nPeers are stored in a centralized registry accessible via `ZYNQ.peer`."
+          "badge": "System",
+          "content": "# ZYNQ Peer System\n\nThe Peer system manages nodes, relationships, and synced metadata between entities.\n\nIt behaves like a shared state network layer rather than a request-response API."
         },
         {
           "id": "peer_search",
-          "label": "Search Peers",
+          "label": "Search",
           "icon": "search",
           "badge": "API",
-          "content": "# Peer Search\n\nPeer search works identically to Games search in architecture.\n\n## Usage\n\n```ts\nZYNQ.peer.search(\"nodeA\")\nconsole.log(ZYNQ.peer.list)\n```\n\n## Behavior\n\n- filters peer registry\n- updates shared `.list` state\n- does NOT return results directly\n\n⚠️ Never assume return values from search methods."
+          "content": "# Peer Search\n\n```ts\nZYNQ.peer.search(\"nodeA\")\n```\n\n⚠️ Important:\nSearch does NOT return results directly.\n\nInstead it updates:\n\n```ts\nZYNQ.peer.list\n```\n\n## Behavior\n- filters peer registry\n- updates global state list\n- supports partial matching"
         },
         {
           "id": "peer_connections",
           "label": "Connections",
           "icon": "link",
           "badge": "Network",
-          "content": "# Peer Connections\n\nConnections represent active links between nodes.\n\nEach connection contains:\n\n- source peer\n- target peer\n- state (active / idle / dropped)\n- latency metadata\n\nConnections are reactive: updates propagate automatically into `.list`."
+          "content": "# Peer Connections\n\nConnections represent active relationships between nodes.\n\nEach connection includes:\n\n- source peer\n- target peer\n- state (active, idle, dropped)\n- optional latency metadata\n\nUpdates are reactive and reflected automatically in `.list`."
         },
         {
           "id": "peer_model",
           "label": "Data Model",
           "icon": "database",
           "badge": "Schema",
-          "content": "# Peer Data Model\n\nPeers follow a structured schema:\n\n```ts\n{\n  id: string,\n  name: string,\n  status: 'online' | 'offline',\n  metadata: object,\n  connections: string[]\n}\n```\n\n## Key Principle\n\nAll peer operations mutate shared state.\nYou always read final results from:\n\n```ts\nZYNQ.peer.list\n```"
+          "content": "# Peer Data Model\n\n```ts\n{\n  id: string,\n  name: string,\n  status: 'online' | 'offline',\n  metadata: Record<string, any>,\n  connections: string[]\n}\n```\n\n## Core Principle\nAll peer operations mutate shared state.\nFinal output is always read from:\n\n```ts\nZYNQ.peer.list\n```"
         }
       ]
     }
