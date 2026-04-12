@@ -125,13 +125,15 @@
 
     {
   "title": "ZYNQ Peer",
+  "description": "Lightweight peer-to-peer wrapper over PeerJS with event-based API for connections, messaging, and media streams.",
   "items": [
     {
       "id": "peer_constructor",
       "label": "Constructor",
       "icon": "plug",
-      "content": "## ZYNQ.Peer\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true\n})\n```"
+      "content": "## ZYNQ.Peer\nCreates a new peer instance.\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: false,\n  audio: false,\n  txt: true\n})\n```\n\n### Options\n- video: enable video stream\n- audio: enable audio stream\n- txt: enable data connections\n- id: optional custom peer id"
     },
+
     {
       "id": "peer_methods",
       "label": "Methods",
@@ -139,36 +141,27 @@
       "children": [
         {
           "id": "peer_connect",
-          "label": ".connect()",
-          "content": "## connect(peerId)\n```js\npeer.connect(\"abc-123\")\n```"
+          "label": "connect(peerId)",
+          "content": "Establishes a data connection to another peer.\n\n```js\npeer.connect(\"abc-123\")\n```"
         },
         {
           "id": "peer_send",
-          "label": ".send()",
-          "content": "## send(peerId, data)\n```js\npeer.send(\"abc-123\", \"hello\")\n```"
+          "label": "send(peerId, data)",
+          "content": "Sends a message to a connected peer. If not connected yet, it queues and auto-connects.\n\n```js\npeer.send(\"abc-123\", \"hello\")\n```"
         },
         {
           "id": "peer_call",
-          "label": ".call()",
-          "content": "## call(peerId)\n```js\npeer.call(\"abc-123\", { video: true, audio: true })\n```"
+          "label": "call(peerId)",
+          "content": "Starts a media call (audio/video) with another peer.\n\n```js\npeer.call(\"abc-123\", { video: true, audio: true })\n```"
         },
         {
           "id": "peer_disconnect",
-          "label": ".disconnect()",
-          "content": "## disconnect(peerId)\n```js\npeer.disconnect(\"abc-123\")\n```"
-        },
-        {
-          "id": "peer_close",
-          "label": ".close()",
-          "content": "## close()\n```js\npeer.close()\n```"
-        },
-        {
-          "id": "peer_destroy",
-          "label": ".destroy()",
-          "content": "## destroy()\n```js\npeer.destroy()\n```"
+          "label": "disconnect(peerId)",
+          "content": "Closes connection and disables auto-reconnect for that peer.\n\n```js\npeer.disconnect(\"abc-123\")\n```"
         }
       ]
     },
+
     {
       "id": "peer_events",
       "label": "Events",
@@ -177,37 +170,49 @@
         {
           "id": "peer_ready",
           "label": "ready",
-          "content": "## ready\n```js\npeer.on('ready', id => {})\n```"
+          "content": "Fired once the peer is fully initialized and has a local ID.\n\n### Callback\n```js\npeer.on('ready', (id) => {\n  // id = your own peer id\n})\n```\n\n### Returns\n- id: string (your assigned peer ID)"
         },
+
+        {
+          "id": "peer_open",
+          "label": "open",
+          "content": "Fired when a data connection to another peer is successfully opened.\n\n### Callback\n```js\npeer.on('open', (peerId) => {\n  // peerId = the remote peer you are connected to\n})\n```\n\n### Returns\n- peerId: string (remote peer ID that just opened a connection)\n\n⚠️ Note: This event can fire multiple times for different peers or reconnections."
+        },
+
         {
           "id": "peer_message",
           "label": "message",
-          "content": "## message\n```js\npeer.on('message', msg => {})\n```\n👉 msg = { from, type: 'data', data }"
+          "content": "Triggered when a message is received from another peer.\n\n```js\npeer.on('message', ({ from, data }) => {\n  // from: sender peerId\n  // data: message payload\n})\n```"
         },
+
         {
           "id": "peer_stream",
           "label": "stream",
-          "content": "## stream\n```js\npeer.on('stream', ({ from, stream }) => {})\n```"
+          "content": "Triggered when a media stream is received from a peer call.\n\n```js\npeer.on('stream', ({ from, stream }) => {\n  // from: peerId\n  // stream: MediaStream\n})\n```"
         },
+
         {
           "id": "peer_close",
           "label": "close",
-          "content": "## close\n```js\npeer.on('close', ({ id }) => {})\n```"
+          "content": "Triggered when a connection with a peer is closed.\n\n```js\npeer.on('close', ({ id }) => {\n  // id: peerId that disconnected\n})\n```"
         },
+
         {
           "id": "peer_disconnect",
           "label": "disconnect",
-          "content": "## disconnect\n```js\npeer.on('disconnect', ({ id }) => {})\n```"
+          "content": "Triggered when a peer fully disconnects and auto-reconnect is disabled or failed.\n\n```js\npeer.on('disconnect', ({ id }) => {})\n```"
         },
-        {
-          "id": "peer_reconnecting",
-          "label": "reconnecting",
-          "content": "## reconnecting\n```js\npeer.on('reconnecting', ({ id, attempt, delay }) => {})\n```"
-        },
+
         {
           "id": "peer_error",
           "label": "error",
-          "content": "## error\n```js\npeer.on('error', err => {})\n```\n👉 err = { type, error }"
+          "content": "Triggered when an internal error occurs.\n\n```js\npeer.on('error', (err) => {\n  // err.type: 'peer' | 'data' | 'media' | 'reconnect_failed'\n  // err.error: original error\n})\n```"
+        },
+
+        {
+          "id": "peer_reconnecting",
+          "label": "reconnecting",
+          "content": "Triggered when the library attempts to reconnect to a peer.\n\n```js\npeer.on('reconnecting', ({ id, attempt, delay }) => {\n  // id: peerId being reconnected\n  // attempt: retry number\n  // delay: ms before retry\n})\n```"
         }
       ]
     }
