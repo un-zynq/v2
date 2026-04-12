@@ -8,28 +8,28 @@
           "label": "Overview",
           "icon": "gamepad-2",
           "badge": "Core",
-          "content": "# Games Module\nThe games module exposes a curated dataset of **533 games**, loaded remotely and normalized into a unified structure.\n\nEach game entry includes:\n- Name and alias\n- Category (optional)\n- Device compatibility flags\n- Thumbnail URL\n- Internal URL key\n\n### Behavior\n- Data is immutable at source level\n- Filtering creates a derived internal array (`filtered`)\n- Designed for fast chaining and UI rendering"
+          "content": "# Games Module\nCurated dataset of 533 games.\n\n## What it does\n- Loads remote game data\n- Normalizes entries\n- Supports filtering without mutating source\n\n## Game structure\n- name, alias\n- category (optional)\n- devices\n- thumbnail\n- url key"
         },
         {
           "id": "games_search",
           "label": "Search & Filter",
           "icon": "search",
           "badge": "API",
-          "content": "# Search System\nSearch operates directly on the full dataset and updates `filtered` in-place.\n\n### What it does\n- Filters games by `name` or `alias`\n- Performs case-insensitive matching\n- Updates internal `filtered` array\n- Returns `this` for chaining\n\n### What it expects\n- `query: string` (optional)\n  - empty → resets to full dataset\n  - string → search term\n\n### What it returns\n- `this` (ZYNQGames instance)\n- Enables chaining\n\n### Example\n```js\nZYNQ.games.search(\"eggy\")\nconsole.log(ZYNQ.games.list)\n```\n\n### Internal behavior\n- Does NOT mutate `all`\n- Only replaces `filtered`\n- Safe to chain with other filters"
+          "content": "# search(query)\n\n```js\nZYNQ.games.search(query)\n```\n\n## What it does\nFilters games by name or alias.\n\n## Input\n```ts\nquery?: string\n```\n\n## Returns\n```ts\nZYNQGames\n```\n\n## Behavior\n- case-insensitive\n- updates `filtered`\n- does not touch `all`\n- returns `this` (chainable)\n\n## Empty query\nReturns full dataset (533 games)"
         },
         {
           "id": "games_device",
           "label": "Device Support",
           "icon": "smartphone",
           "badge": "System",
-          "content": "# Device Detection\nEach game can declare supported device types:\n- 1 → Mobile\n- 2 → Desktop\n- 3 → Phone\n- 4 → Tablet\n\n### What it does\n- Detects device type once at runtime\n- Stores result globally in `window.ZYNQ.deviceType`\n- Uses heuristics (UA, GPU, touch, hover)\n\n### What it expects\n- Browser environment (window, navigator)\n- Optional GPU/WebGL support\n\n### What it returns\n- No return value\n- Side effect only (sets `deviceType`)\n\n### Game-level usage\n```js\ngame.isSupported\n```\n\n### What `isSupported` does\n- Checks if current device type exists in `game.devices`\n- Falls back to `true` if device list is missing\n- Dynamically evaluated getter"
+          "content": "# Device support\n\n## Types\n- 1 mobile\n- 2 desktop\n- 3 phone\n- 4 tablet\n\n## Detection\nRuns once at init using:\n- user agent\n- touch support\n- GPU hints\n\n## Usage\n```js\ngame.isSupported\n```\n\n## Behavior\nChecks if current device matches game.device list.\nReturns boolean (computed getter)."
         },
         {
           "id": "games_api",
-          "label": "API Reference",
+          "label": "API",
           "icon": "code",
           "badge": "Reference",
-          "content": "# Games API\n\n## Core properties\n\n### ZYNQ.games.list\n- **What it is:** current filtered dataset\n- **Returns:** Array<Game>\n- **Updated by:** search, filter, sort, reset\n\n### ZYNQ.games.total\n- **What it is:** total loaded games\n- **Returns:** number (533)\n\n### ZYNQ.games.filteredCount\n- **What it is:** size of filtered dataset\n- **Returns:** number\n\n---\n\n## Methods\n\n### search(query)\n- **What it does:** filters games by name/alias\n- **Input:** string\n- **Returns:** this\n- **Side effects:** updates `filtered`\n\n### reset()\n- **What it does:** resets filters\n- **Input:** none\n- **Returns:** this\n- **Result:** restores full dataset\n\n### sortBy(field)\n- **What it does:** sorts filtered array\n- **Input:** string field (e.g. \"name\")\n- **Returns:** this\n- **Mutates:** `filtered`\n\n### sortByPopularity()\n- **What it does:** sorts by playCount\n- **Input:** none\n- **Returns:** this\n- **Fallback:** missing playCount treated as 0\n\n### getByAlias(alias)\n- **What it does:** finds single game\n- **Input:** string alias\n- **Returns:** Game | null\n- **Does NOT mutate state**\n\n### getByCategory(category)\n- **What it does:** filters by category\n- **Input:** string\n- **Returns:** this\n- **Mutates:** filtered array\n\n### filterSupported()\n- **What it does:** keeps only supported games\n- **Input:** none\n- **Returns:** this\n\n### toggleFavorite(alias)\n- **What it does:** adds/removes favorite\n- **Input:** string alias\n- **Returns:** this\n- **Side effects:** updates localStorage\n\n---\n\n## Chaining behavior\nAll mutating methods return `this`:\n```js\nZYNQ.games.search(\"car\").filterSupported().sortBy(\"name\")\n```\n- Enables pipeline filtering\n- Avoids intermediate copies"
+          "content": "# Games API\n\n## Properties\n\n```js\nZYNQ.games.list           // filtered array\nZYNQ.games.total          // 533\nZYNQ.games.filteredCount  // current size\n```\n\n## Methods\n\n### search\n```js\nZYNQ.games.search(query)\n// filters games\n// returns this\n```\n\n### reset\n```js\nZYNQ.games.reset()\n// restores full list\n// returns this\n```\n\n### sortBy\n```js\nZYNQ.games.sortBy(field)\n// sorts filtered list\n// returns this\n```\n\n### sortByPopularity\n```js\nZYNQ.games.sortByPopularity()\n// sorts by playCount\n// returns this\n```\n\n### getByAlias\n```js\nZYNQ.games.getByAlias(alias)\n// returns Game | null\n```\n\n### getByCategory\n```js\nZYNQ.games.getByCategory(category)\n// filters by category\n// returns this\n```\n\n### filterSupported\n```js\nZYNQ.games.filterSupported()\n// keeps supported games only\n// returns this\n```\n\n### toggleFavorite\n```js\nZYNQ.games.toggleFavorite(alias)\n// adds/removes favorite\n// updates storage\n// returns this\n```\n\n## Chaining\n```js\nZYNQ.games.search(\"car\").filterSupported().sortBy(\"name\")\n```"
         }
       ]
     },
@@ -41,28 +41,28 @@
           "label": "Overview",
           "icon": "network",
           "badge": "Core",
-          "content": "# Peer System\nZYNQPeer is a wrapper around PeerJS.\n\n### What it does\n- Manages peer-to-peer connections\n- Handles auto reconnect\n- Buffers and rate-limits messages\n- Supports media + data streams\n\n### State machine\nDISCONNECTED → CONNECTING → CONNECTED → RECONNECTING → FAILED\n\n### What it returns\n- EventEmitter-based instance\n- Persistent connection manager"
+          "content": "# Peer System\nWrapper around PeerJS.\n\n## What it does\n- peer connections\n- auto reconnect\n- rate limited messaging\n- media + data support\n\n## State\n```txt\nDISCONNECTED → CONNECTING → CONNECTED → RECONNECTING → FAILED\n```"
         },
         {
           "id": "peer_connect",
           "label": "Connection",
           "icon": "plug",
           "badge": "Lifecycle",
-          "content": "# connect(remoteId)\n\n### What it does\n- Initiates connection to remote peer\n- Creates data channel if enabled\n- Starts media call if video/audio enabled\n- Handles reconnect logic if needed\n\n### Input\n- remoteId: string (required)\n\n### Returns\n- this (ZYNQPeer instance)\n\n### Side effects\n- Sets internal `_remoteId`\n- Changes state to CONNECTING\n- May trigger media permission prompt\n\n### Example\n```js\npeer.connect(\"peer-id-123\")\n```\n\n### Notes\n- Self-connections are ignored\n- Replaces previous connection if active"
+          "content": "# connect(remoteId)\n\n```js\npeer.connect(remoteId)\n```\n\n## Input\n```ts\nremoteId: string\n```\n\n## Returns\n```ts\nZYNQPeer\n```\n\n## What it does\n- opens data channel\n- starts media call (if enabled)\n- syncs peer state\n\n## Notes\n- self connect ignored\n- reconnect safe\n- replaces active session"
         },
         {
           "id": "peer_data",
           "label": "Data & Media",
           "icon": "message-square",
           "badge": "Streams",
-          "content": "# Communication Layer\n\n## send(data)\n### What it does\n- Sends data to connected peer\n- Emits local `sent` event\n\n### Input\n- string | object (serialized externally recommended)\n\n### Returns\n- void\n\n### Requirements\n- Active data connection\n\n---\n\n## getStream()\n### What it does\n- Requests local media stream\n- Uses `getUserMedia`\n- Caches result\n\n### Input\n- none\n\n### Returns\n- MediaStream | null\n\n### Side effects\n- Prompts user for camera/microphone\n- Emits `localStream`\n\n---\n\n## Incoming streams\n- Emits `stream` event\n- Contains MediaStream object"
+          "content": "# send(data)\n\n```js\npeer.send(data)\n```\n\n## Input\n```ts\nstring | object\n```\n\n## Behavior\n- sends to peer\n- emits \"sent\"\n\n## getStream()\n```js\npeer.getStream()\n```\n\n## Returns\n```ts\nMediaStream | null\n```\n\n## Behavior\n- requests camera/mic\n- cached after first call\n- emits \"localStream\"\n\n## Incoming media\n- emits \"stream\""
         },
         {
           "id": "peer_events",
-          "label": "Events & Errors",
+          "label": "Events",
           "icon": "zap",
           "badge": "System",
-          "content": "# Event System\nZYNQPeer extends EventEmitter.\n\n## on(event, handler)\n### What it does\n- Registers event listener\n\n### Input\n- event: string\n- handler: function\n\n### Returns\n- this\n\n---\n\n## emit(event, data)\n### What it does\n- Emits event to listeners\n- Deduplicates rapid repeats (500ms window)\n\n### Input\n- event: string\n- data: any\n\n### Returns\n- void\n\n---\n\n## Core events\n- ready → peer ID created\n- open → connection active\n- data → message received\n- stream → media received\n- close → connection closed\n- error → error occurred\n- reconnecting → retry attempt\n\n---\n\n## Error types\n- peer → PeerJS errors\n- data → connection errors\n- media → stream errors\n- reconnect_failed → max retries reached\n\n---\n\n## Example\n```js\npeer.on(\"data\", (msg) => {\n  console.log(msg)\n})\n```"
+          "content": "# Events\n\n## on(event)\n```js\npeer.on(event, handler)\n```\n\n## emit(event)\nInternal, rate limited (500ms dedupe)\n\n## Core events\n```txt\nready\nopen\ndata\nstream\nclose\nerror\nreconnecting\n```\n\n## Errors\n```txt\npeer\ndata\nmedia\nreconnect_failed\n```\n\n## Example\n```js\npeer.on(\"data\", msg => console.log(msg))\n```"
         }
       ]
     }
