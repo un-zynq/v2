@@ -124,86 +124,94 @@
     },
 
     {
-      "title": "ZYNQ Peer",
-      "items": [
+  "title": "ZYNQ Peer",
+  "items": [
+    {
+      "id": "peer_constructor",
+      "label": "Constructor",
+      "icon": "plug",
+      "content": "## ZYNQ.Peer\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true\n})\n```"
+    },
+    {
+      "id": "peer_methods",
+      "label": "Methods",
+      "icon": "cog",
+      "children": [
         {
-          "id": "peer_constructor",
-          "label": "Constructor",
-          "icon": "plug",
-          "content": "# ZYNQ\n\n## ZYNQ.Peer\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true\n})\n```"
+          "id": "peer_connect",
+          "label": ".connect()",
+          "content": "## connect(peerId)\n```js\npeer.connect(\"abc-123\")\n```"
         },
-
         {
-          "id": "peer_methods",
-          "label": "Methods",
-          "icon": "cog",
-          "children": [
-            {
-              "id": "peer_connect",
-              "label": ".connect()",
-              "content": "## connect(peerId)\n```js\npeer.connect(\"abc-123\")\n```"
-            },
-            {
-              "id": "peer_send",
-              "label": ".send()",
-              "content": "## send(peerId, data)\n```js\npeer.send(\"abc-123\", \"hello\")\n```"
-            },
-            {
-              "id": "peer_call",
-              "label": ".call()",
-              "content": "## call(peerId)\n```js\npeer.call(\"abc-123\", { video: true, audio: true })\n```"
-            },
-            {
-              "id": "peer_hangup",
-              "label": ".hangup()",
-              "content": "## hangup(peerId)\n```js\npeer.hangup(\"abc-123\")\n```"
-            }
-          ]
+          "id": "peer_send",
+          "label": ".send()",
+          "content": "## send(peerId, data)\n```js\npeer.send(\"abc-123\", \"hello\")\n```"
         },
-
         {
-          "id": "peer_events",
-          "label": "Events",
-          "icon": "radio",
-          "children": [
-            {
-              "id": "peer_ready",
-              "label": "ready",
-              "content": "## ready\n```js\npeer.on('ready', id => {})\n```"
-            },
-            {
-              "id": "peer_open",
-              "label": "open",
-              "content": "## open\n```js\npeer.on('open', id => {})\n```"
-            },
-            {
-              "id": "peer_message",
-              "label": "message",
-              "content": "## message\n```js\npeer.on('message', msg => {})\n```"
-            },
-            {
-              "id": "peer_stream",
-              "label": "stream",
-              "content": "## stream\n```js\npeer.on('stream', ({ from, stream }) => {})\n```"
-            },
-            {
-              "id": "peer_close",
-              "label": "close",
-              "content": "## close\n```js\npeer.on('close', ({ id }) => {})\n```"
-            },
-            {
-              "id": "peer_error",
-              "label": "error",
-              "content": "## error\n```js\npeer.on('error', err => {})\n```"
-            },
-            {
-              "id": "peer_reconnecting",
-              "label": "reconnecting",
-              "content": "## reconnecting\n```js\npeer.on('reconnecting', ({ id, attempt, delay }) => {})\n```"
-            }
-          ]
+          "id": "peer_call",
+          "label": ".call()",
+          "content": "## call(peerId)\n```js\npeer.call(\"abc-123\", { video: true, audio: true })\n```"
+        },
+        {
+          "id": "peer_disconnect",
+          "label": ".disconnect()",
+          "content": "## disconnect(peerId)\n```js\npeer.disconnect(\"abc-123\")\n```"
+        },
+        {
+          "id": "peer_close",
+          "label": ".close()",
+          "content": "## close()\n```js\npeer.close()\n```"
+        },
+        {
+          "id": "peer_destroy",
+          "label": ".destroy()",
+          "content": "## destroy()\n```js\npeer.destroy()\n```"
+        }
+      ]
+    },
+    {
+      "id": "peer_events",
+      "label": "Events",
+      "icon": "radio",
+      "children": [
+        {
+          "id": "peer_ready",
+          "label": "ready",
+          "content": "## ready\n```js\npeer.on('ready', id => {})\n```"
+        },
+        {
+          "id": "peer_message",
+          "label": "message",
+          "content": "## message\n```js\npeer.on('message', msg => {})\n```\n👉 msg = { from, type: 'data', data }"
+        },
+        {
+          "id": "peer_stream",
+          "label": "stream",
+          "content": "## stream\n```js\npeer.on('stream', ({ from, stream }) => {})\n```"
+        },
+        {
+          "id": "peer_close",
+          "label": "close",
+          "content": "## close\n```js\npeer.on('close', ({ id }) => {})\n```"
+        },
+        {
+          "id": "peer_disconnect",
+          "label": "disconnect",
+          "content": "## disconnect\n```js\npeer.on('disconnect', ({ id }) => {})\n```"
+        },
+        {
+          "id": "peer_reconnecting",
+          "label": "reconnecting",
+          "content": "## reconnecting\n```js\npeer.on('reconnecting', ({ id, attempt, delay }) => {})\n```"
+        },
+        {
+          "id": "peer_error",
+          "label": "error",
+          "content": "## error\n```js\npeer.on('error', err => {})\n```\n👉 err = { type, error }"
         }
       ]
     }
+  ]
+}
   ]
 }
