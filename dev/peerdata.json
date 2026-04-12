@@ -37,7 +37,7 @@
       "id": "games_model",
       "label": "Game Model",
       "icon": "box",
-      "content": "### Game Schema\n\nCore entity schema used across the entire system.\n\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices?: number[],\n\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```\n\nRules:\n- `isSupported` depends on device detection\n- `isFavorite` is stored in localStorage\n- All collections strictly follow this structure\n"
+      "content": "## Game Schema\n\nCore entity schema used across the entire system.\n\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices?: number[],\n\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```\n\nRules:\n- `isSupported` depends on device detection\n- `isFavorite` is stored in localStorage\n- All collections strictly follow this structure\n"
     },
 
     {
