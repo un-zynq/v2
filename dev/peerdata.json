@@ -1,38 +1,31 @@
 {
   "groups": [
     {
-      "title": "ZYNQ.Peer",
+      "title": "ZYNQ.peer",
       "items": [
         {
-          "id": "peer-intro",
-          "label": "Getting Started",
-          "badge": "Guide",
-          "icon": "book-open",
-          "content": "ZYNQPeer simplifies peer-to-peer data, video, and audio communication.\n\nThis guide explains how to create connections and exchange data between peers."
-        },
-        {
-          "id": "peer-setup",
-          "label": "Setup",
+          "id": "peer-install",
+          "label": "Install",
           "icon": "download",
-          "content": "## 1. Create a Peer\n\nStart by creating a new Peer instance.\n\n```js\nvar peer = new ZYNQ.Peer();\n```\n\nEach peer is assigned a unique ID automatically when it is ready.\n\n## 2. Get your Peer ID\n\n```js\npeer.on('ready', function(id) {\n  console.log('My peer ID is: ' + id);\n});\n```\n\nYou will use this ID to connect with other peers."
+          "content": "# ZYNQ.peer\n\n## Install\n\n### Global Script Tag\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```\n\nThis automatically makes **ZYNQ.peer** and **ZYNQ.games** available globally.\n\n---\n\n### ES Module Import\n```js\n<script type=\"module\">\nimport ZYNQ from 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js'\n</script>\n```\n\n---\n\n## Methods exposed\n- peer\n- games\n\nThese are available globally via `ZYNQ.peer` and `ZYNQ.games`."
         },
         {
           "id": "peer-usage",
           "label": "Usage",
-          "icon": "play",
-          "content": "To connect to another peer, you need their peer ID.\n\n```js\npeer.on('ready', (id) => {\n  console.log('Share this ID:', id);\n});\n```\n\nYou are responsible for sharing IDs between clients (via server, chat, etc)."
+          "icon": "terminal",
+          "content": "## Create a peer\n```js\nconst peer = new ZYNQ.Peer();\n```\n\n## Listen for ready\n```js\npeer.on('ready', (id) => {\n  console.log('Peer ID:', id);\n});\n```\n\nYou use this ID to connect with other users."
         },
         {
-          "id": "peer-data",
-          "label": "Data Connections",
-          "icon": "send",
-          "content": "## Start a connection\n\n```js\nvar conn = peer.connect('dest-peer-id');\n```\n\n## Receive a connection\n\n```js\npeer.on('connection', function(conn) {\n  conn.on('open', function() {\n\n    // Receive data\n    conn.on('data', function(data) {\n      console.log('Received:', data);\n    });\n\n    // Send data\n    conn.send('Hello!');\n  });\n});\n```\n\nData connections allow real-time messaging between peers."
+          "id": "peer-connect",
+          "label": "Connect",
+          "icon": "link",
+          "content": "## Connect to peer\n```js\nconst conn = peer.connect('remote-id');\n```\n\n## Receive connection\n```js\npeer.on('connection', (conn) => {\n  conn.on('open', () => {\n    conn.send('Hello!');\n\n    conn.on('data', (data) => {\n      console.log('Received:', data);\n    });\n  });\n});\n```"
         },
         {
           "id": "peer-media",
-          "label": "Video & Audio Calls",
+          "label": "Video / Audio",
           "icon": "video",
-          "content": "## Start a call\n\n```js\nvar call = peer.call('dest-peer-id', mediaStream);\n```\n\n## Answer a call\n\n```js\npeer.on('call', function(call) {\n  call.answer(mediaStream);\n});\n```\n\n## Receive remote stream\n\n```js\ncall.on('stream', function(stream) {\n  video.srcObject = stream;\n});\n```\n\nMedia streams are provided via getUserMedia and enable video/audio communication."
+          "content": "## Start call\n```js\nconst call = peer.call('remote-id', mediaStream);\n```\n\n## Answer call\n```js\npeer.on('call', (call) => {\n  call.answer(mediaStream);\n});\n```\n\n## Receive stream\n```js\ncall.on('stream', (stream) => {\n  video.srcObject = stream;\n});\n```"
         }
       ]
     },
@@ -40,35 +33,28 @@
       "title": "ZYNQ.games",
       "items": [
         {
-          "id": "games-intro",
-          "label": "Getting Started",
-          "badge": "Guide",
-          "icon": "gamepad-2",
-          "content": "ZYNQGames is a game library system with search, filters, favorites, and device-aware compatibility."
-        },
-        {
-          "id": "games-setup",
-          "label": "Setup",
+          "id": "games-install",
+          "label": "Install",
           "icon": "download",
-          "content": "```js\nconst games = new ZYNQ.games();\n\nawait games.init();\n```\n\nAfter initialization, the full game list is available in `.list`."
+          "content": "# ZYNQ.games\n\n## Install\n\n### Global Script Tag\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```\n\nThis exposes `ZYNQ.games` globally.\n\n---\n\n### ES Module\n```js\nimport ZYNQ from 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js'\n```\n\n---\n\n## Available API\n- games\n- peer"
         },
         {
-          "id": "games-usage",
-          "label": "Usage",
-          "icon": "play",
-          "content": "## Search games\n\n```js\ngames.search('minecraft');\nconsole.log(games.list);\n```\n\n## Reset filters\n\n```js\ngames.reset();\n```\n\n## Get random game\n\n```js\nconst game = games.getRandomOne();\n```"
+          "id": "games-basic",
+          "label": "Basic Usage",
+          "icon": "gamepad-2",
+          "content": "## Init games\n```js\nconst games = new ZYNQ.games();\nawait games.init();\n```\n\n## Search games\n```js\ngames.search('minecraft');\nconsole.log(games.list);\n```\n\n## Reset\n```js\ngames.reset();\n```"
         },
         {
-          "id": "games-filtering",
+          "id": "games-features",
+          "label": "Features",
+          "icon": "star",
+          "content": "## Favorites\n```js\ngames.toggleFavorite('game-alias');\n```\n\n## History\n```js\ngames.addToHistory('game-alias');\nconsole.log(games.getHistory());\n```\n\n## Random game\n```js\nconst game = games.getRandomOne();\n```"
+        },
+        {
+          "id": "games-filter",
           "label": "Filtering",
           "icon": "filter",
-          "content": "## Filter by category\n\n```js\ngames.getByCategory('action');\n```\n\n## Only supported devices\n\n```js\ngames.filterSupported();\n```\n\n## Favorites\n\n```js\ngames.toggleFavorite('game-alias');\ngames.filterFavorites();\n```"
-        },
-        {
-          "id": "games-history",
-          "label": "History",
-          "icon": "clock",
-          "content": "## Add to history\n\n```js\ngames.addToHistory('game-alias');\n```\n\n## Get history\n\n```js\nconsole.log(games.getHistory());\n```\n\n## Clear history\n\n```js\ngames.clearHistory();\n```"
+          "content": "## Filter by category\n```js\ngames.getByCategory('action');\n```\n\n## Supported devices only\n```js\ngames.filterSupported();\n```\n\n## Favorites only\n```js\ngames.filterFavorites();\n```"
         }
       ]
     }
