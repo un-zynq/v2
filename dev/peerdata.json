@@ -1,31 +1,31 @@
 {
   "groups": [
     {
-  "title": "Installation",
-  "items": [
-    {
-      "id": "install_title",
-      "label": "Getting Started",
-      "icon": "rocket",
-      "badge": "Install",
-      "content": "## Installation\n\n**Welcome to ZYNQ!**\n\nThis library provides hundreds of games with rich metadata and thumbnails, alongside a separate WebRTC-powered social system for real-time interaction.\n\nChoose your preferred way to install the library below."
+      "title": "Installation",
+      "items": [
+        {
+          "id": "install_title",
+          "label": "Getting Started",
+          "icon": "rocket",
+          "badge": "Install",
+          "content": "## Installation\n\n**Welcome to ZYNQ!**\n\nThis library provides hundreds of games with rich metadata and thumbnails, alongside a separate WebRTC-powered social system for real-time interaction.\n\nChoose your preferred way to install the library below."
+        },
+        {
+          "id": "install_script",
+          "label": "Script Tag",
+          "icon": "code",
+          "badge": "CDN",
+          "content": "## Script Tag\n\nUse this if you want the fastest setup via CDN.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```"
+        },
+        {
+          "id": "install_module",
+          "label": "ES Module",
+          "icon": "package",
+          "badge": "Modern",
+          "content": "## ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport ZYNQ, { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"\n```"
+        }
+      ]
     },
-    {
-      "id": "install_script",
-      "label": "Script Tag",
-      "icon": "code",
-      "badge": "CDN",
-      "content": "## Script Tag\n\nUse this if you want the fastest setup via CDN.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```"
-    },
-    {
-      "id": "install_module",
-      "label": "ES Module",
-      "icon": "package",
-      "badge": "Modern",
-      "content": "## ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport ZYNQ, { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"\n```"
-    }
-  ]
-},
     {
       "title": "ZYNQ Games",
       "items": [
@@ -136,6 +136,13 @@
               "content": "## toggleFavorite()\nToggle favorite state.\n\n```javascript\nZYNQ.games.toggleFavorite(\"alien-hominid\")\n```"
             }
           ]
+        },
+        {
+          "id": "games_example",
+          "label": "Example",
+          "icon": "terminal",
+          "badge": "Demo",
+          "content": "## Games Example\n\n```javascript\nawait ZYNQ.games.init()\n\nconst results = ZYNQ.games\n  .search(\"alien\")\n  .filterSupported()\n  .sortBy(\"name\")\n  .list\n\nconsole.log(results)\n```"
         }
       ]
     },
@@ -165,27 +172,27 @@
             {
               "id": "peer_connect",
               "label": ".connect()",
-              "content": "## connect()\nConnect to another peer.\n\n```javascript\npeer.connect(\"peer-id\")\n```"
+              "content": "## connect()\nConnect to another peer.\n\n```javascript\nPeerInstance.connect(\"peer-id\")\n```"
             },
             {
               "id": "peer_send",
               "label": ".send()",
-              "content": "## send()\nSend data to peer.\n\n```javascript\npeer.send(\"hello\")\n```"
+              "content": "## send()\nSend data to peer.\n\n```javascript\nPeerInstance.send(\"hello\")\n```"
             },
             {
               "id": "peer_stream",
               "label": ".getStream()",
-              "content": "## getStream()\nGet media stream.\n\n```javascript\nawait peer.getStream()\n```"
+              "content": "## getStream()\nGet media stream.\n\n```javascript\nawait PeerInstance.getStream()\n```"
             },
             {
               "id": "peer_close",
               "label": ".close()",
-              "content": "## close()\nClose connection.\n\n```javascript\npeer.close()\n```"
+              "content": "## close()\nClose connection.\n\n```javascript\nPeerInstance.close()\n```"
             },
             {
               "id": "peer_destroy",
               "label": ".destroy()",
-              "content": "## destroy()\nDestroy peer instance.\n\n```javascript\npeer.destroy()\n```"
+              "content": "## destroy()\nDestroy peer instance.\n\n```javascript\nPeerInstance.destroy()\n```"
             }
           ]
         },
@@ -198,27 +205,27 @@
             {
               "id": "peer_event_open",
               "label": "open",
-              "content": "## open event\n\n```javascript\npeer.on(\"open\", id => {})\n```"
+              "content": "## open event\n\n```javascript\nPeerInstance.on(\"open\", id => {})\n```"
             },
             {
               "id": "peer_event_data",
               "label": "data",
-              "content": "## data event\n\n```javascript\npeer.on(\"data\", msg => {})\n```"
+              "content": "## data event\n\n```javascript\nPeerInstance.on(\"data\", msg => {})\n```"
             },
             {
               "id": "peer_event_stream",
               "label": "stream",
-              "content": "## stream event\n\n```javascript\npeer.on(\"stream\", stream => {})\n```"
+              "content": "## stream event\n\n```javascript\nPeerInstance.on(\"stream\", stream => {})\n```"
             },
             {
               "id": "peer_event_close",
               "label": "close",
-              "content": "## close event\n\n```javascript\npeer.on(\"close\", () => {})\n```"
+              "content": "## close event\n\n```javascript\nPeerInstance.on(\"close\", () => {})\n```"
             },
             {
               "id": "peer_event_error",
               "label": "error",
-              "content": "## error event\n\n```javascript\npeer.on(\"error\", err => {})\n```"
+              "content": "## error event\n\n```javascript\nPeerInstance.on(\"error\", err => {})\n```"
             }
           ]
         },
@@ -227,7 +234,7 @@
           "label": "Example",
           "icon": "terminal",
           "badge": "Demo",
-          "content": "## Full Example\n\n```javascript\nconst peer = new ZYNQ.peer({\n  video: true,\n  audio: true\n})\n\npeer.on(\"open\", id => {\n  console.log(\"My ID:\", id)\n})\n\npeer.on(\"data\", msg => {\n  console.log(msg)\n})\n\npeer.connect(\"other-id\")\npeer.send(\"hello 👽\")\n```"
+          "content": "## Full Peer Example\n\n```javascript\nconst PeerInstance = new ZYNQ.peer({\n  video: true,\n  audio: true\n})\n\nPeerInstance.on(\"open\", id => {\n  console.log(\"My ID:\", id)\n})\n\nPeerInstance.on(\"data\", msg => {\n  console.log(msg)\n})\n\nPeerInstance.connect(\"other-id\")\nPeerInstance.send(\"hello 👽\")\n```"
         }
       ]
     }
