@@ -130,7 +130,7 @@
       "id": "peer_constructor",
       "label": "Constructor",
       "icon": "plug",
-      "content": "# ZYNQ\n\n## ZYNQ.Peer\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: false,\n  audio: false,\n  txt: true\n})\n```\n\nCreates a new peer instance.\n\n- video: enable video calls\n- audio: enable audio calls\n- txt: enable data connections\n- id: optional fixed peer id"
+      "content": "## ZYNQ.Peer\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: false,\n  audio: false,\n  txt: true\n})\n```\n\nCreates a new peer instance.\n\n- video: enable video calls\n- audio: enable audio calls\n- txt: enable data connections\n- id: optional fixed peer id"
     },
 
     {
@@ -141,22 +141,22 @@
         {
           "id": "peer_connect",
           "label": ".connect()",
-          "content": "Connects to another peer for data messaging.\n\n```js\npeer.connect(\"abc-123\")\n```"
+          "content": "### .connect()\nConnects to another peer for data messaging.\n\n```js\npeer.connect(\"abc-123\")\n```"
         },
         {
           "id": "peer_send",
           "label": ".send()",
-          "content": "Sends a message to a peer (auto-connects if needed).\n\n```js\npeer.send(\"abc-123\", \"hello\")\n```\n\n- supports \"*\" for broadcast"
+          "content": "### .send()\nSends a message to a peer (auto-connects if needed).\n\n```js\npeer.send(\"abc-123\", \"hello\")\n```\n\n- supports \"*\" for broadcast"
         },
         {
           "id": "peer_call",
           "label": ".call()",
-          "content": "Starts a media call (video/audio).\n\n```js\npeer.call(\"abc-123\", { video: true, audio: true })\n```"
+          "content": "### .call()\nStarts a media call (video/audio).\n\n```js\npeer.call(\"abc-123\", { video: true, audio: true })\n```"
         },
         {
           "id": "peer_disconnect",
           "label": ".disconnect()",
-          "content": "Closes connection to a peer and disables reconnect.\n\n```js\npeer.disconnect(\"abc-123\")\n```"
+          "content": "### .disconnect()\nCloses connection to a peer and disables reconnect.\n\n```js\npeer.disconnect(\"abc-123\")\n```"
         }
       ]
     },
@@ -169,49 +169,49 @@
         {
           "id": "peer_ready",
           "label": "ready",
-          "content": "Fired when the peer is fully initialized and has its own ID.\n\n```js\npeer.on('ready', (id) => {\n  // id = YOUR peer id\n})\n```\n\nReturns:\n- id (string) → your own peer id"
+          "content": "### Ready\nFired when the peer is fully initialized and has its own ID.\n\n```js\npeer.on('ready', (id) => {\n  // id = YOUR peer id\n})\n```\n\nReturns:\n- id (string) → your own peer id"
         },
 
         {
           "id": "peer_open",
           "label": "open",
-          "content": "Fired when a DATA connection is successfully opened to another peer.\n\n```js\npeer.on('open', (peerId) => {\n  // peerId = remote peer you just connected to\n})\n```\n\nReturns:\n- peerId (string) → the peer you are now connected with\n\n⚠️ This is NOT your own id. That is 'ready'."
+          "content": "### Open\nFired when a DATA connection is successfully opened to another peer.\n\n```js\npeer.on('open', (peerId) => {\n  // peerId = remote peer you just connected to\n})\n```\n\nReturns:\n- peerId (string) → the peer you are now connected with\n\n⚠️ This is NOT your own id. That is 'ready'."
         },
 
         {
           "id": "peer_message",
           "label": "message",
-          "content": "Triggered when a message arrives.\n\n```js\npeer.on('message', ({ from, data }) => {})\n```\n\nReturns:\n- from: sender peer id\n- data: message payload"
+          "content": "### Message\nTriggered when a message arrives.\n\n```js\npeer.on('message', ({ from, data }) => {})\n```\n\nReturns:\n- from: sender peer id\n- data: message payload"
         },
 
         {
           "id": "peer_stream",
           "label": "stream",
-          "content": "Triggered when receiving a media stream.\n\n```js\npeer.on('stream', ({ from, stream }) => {})\n```"
+          "content": "### Stream\nTriggered when receiving a media stream.\n\n```js\npeer.on('stream', ({ from, stream }) => {})\n```"
         },
 
         {
           "id": "peer_close",
           "label": "close",
-          "content": "Triggered when a connection fully closes.\n\n```js\npeer.on('close', ({ id }) => {})\n```"
+          "content": "### Close\nTriggered when a connection fully closes.\n\n```js\npeer.on('close', ({ id }) => {})\n```"
         },
 
         {
           "id": "peer_disconnect",
           "label": "disconnect",
-          "content": "Triggered when a peer fully disconnects (or reconnect fails).\n\n```js\npeer.on('disconnect', ({ id }) => {})\n```"
+          "content": "### Disconnect\nTriggered when a peer fully disconnects (or reconnect fails).\n\n```js\npeer.on('disconnect', ({ id }) => {})\n```"
         },
 
         {
           "id": "peer_error",
           "label": "error",
-          "content": "Triggered when an error happens.\n\n```js\npeer.on('error', (err) => {})\n```\n\nerr.type can be:\n- peer\n- data\n- media\n- reconnect_failed"
+          "content": "### Error\nTriggered when an error happens.\n\n```js\npeer.on('error', (err) => {})\n```\n\nerr.type can be:\n- peer\n- data\n- media\n- reconnect_failed"
         },
 
         {
           "id": "peer_reconnecting",
           "label": "reconnecting",
-          "content": "Triggered when auto-reconnect starts.\n\n```js\npeer.on('reconnecting', ({ id, attempt, delay }) => {})\n```"
+          "content": "### Reconnecting\nTriggered when auto-reconnect starts.\n\n```js\npeer.on('reconnecting', ({ id, attempt, delay }) => {})\n```"
         }
       ]
     }
