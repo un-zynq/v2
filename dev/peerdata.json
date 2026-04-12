@@ -19,7 +19,7 @@
           "id": "install_module",
           "label": "ES Module",
           "icon": "package",
-          "content": "### ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport ZYNQ from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"\n// or\nimport { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"\n```"
+          "content": "### ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"\n```"
         }
       ]
     },
@@ -30,7 +30,7 @@
           "id": "games_object",
           "label": "Game Object",
           "icon": "gamepad-2",
-          "content": "## ZYNQ.games\n### Game Object\n\nA game object returned by `ZYNQ.games` methods.\n\n```text\nGame:\n- name: string          // Display name of the game\n- category?: string     // Optional category (e.g. \"shooter\", \"platformer\")\n- alias: string         // Unique identifier used in URLs and history\n- url: string           // Full playable URL\n- thumb: string         // Thumbnail image URL\n- devices?: number[]    // Supported device types (for filtering)\n\nComputed properties:\n- isSupported: boolean  // True if the game runs on the current device\n- isFavorite: boolean   // True if the user marked it as favorite\n```"
+          "content": "## ZYNQ.games\n### Game Object\n\nA game object returned by `ZYNQ.games` methods.\n\n```text\nGame:\n- name: string\n- category?: string\n- alias: string\n- url: string\n- thumb: string\n- devices?: number[]\n\nComputed:\n- isSupported: boolean\n- isFavorite: boolean\n```"
         },
         {
           "id": "games_properties",
@@ -40,107 +40,29 @@
             {
               "id": "games_prop_list",
               "label": "list",
-              "content": "### ZYNQ.games.list\n\nThe current filtered and/or sorted array of games. This is what you usually display in your UI.\n\n```javascript\nZYNQ.games.list\n```"
+              "content": "### ZYNQ.games.list\n```javascript\nZYNQ.games.list\n```"
             },
             {
               "id": "games_prop_total",
               "label": "total",
-              "content": "### ZYNQ.games.total\n\nTotal number of games loaded in the library.\n\n```javascript\nZYNQ.games.total\n```"
+              "content": "### ZYNQ.games.total\n```javascript\nZYNQ.games.total\n```"
             },
             {
               "id": "games_prop_filtered",
               "label": "filteredCount",
-              "content": "### ZYNQ.games.filteredCount\n\nNumber of games currently visible after search, filters, or sorting.\n\n```javascript\nZYNQ.games.filteredCount\n```"
+              "content": "### ZYNQ.games.filteredCount\n```javascript\nZYNQ.games.filteredCount\n```"
             },
             {
               "id": "games_prop_history",
               "label": "history",
-              "content": "### ZYNQ.games.getHistory()\n\nReturns array of recently played game aliases (max 50, persisted in localStorage).\n\n```javascript\nZYNQ.games.getHistory()\n```"
+              "content": "### ZYNQ.games.getHistory()\n```javascript\nZYNQ.games.getHistory()\n```"
             },
             {
               "id": "games_prop_favorites",
               "label": "favorites",
-              "content": "### ZYNQ.games.favorites\n\nSet of favorite game aliases (persisted in localStorage).\n\n```javascript\nZYNQ.games.favorites\n```"
+              "content": "### ZYNQ.games.favorites\n```javascript\nZYNQ.games.favorites\n```"
             }
           ]
-        },
-        {
-          "id": "games_methods",
-          "label": "Methods",
-          "icon": "cog",
-          "children": [
-            {
-              "id": "games_init",
-              "label": ".init()",
-              "content": "### init(options)\n\nInitialize the game system and load the game database. Call this first.\n\n```javascript\nawait ZYNQ.games.init()\n```"
-            },
-            {
-              "id": "games_search",
-              "label": ".search()",
-              "content": "### search(query)\n\nFilter games by name or alias. Returns the `ZYNQ.games` object for chaining.\n\n```javascript\nZYNQ.games.search(\"alien\")\n```"
-            },
-            {
-              "id": "games_random",
-              "label": ".random()",
-              "content": "### random(limit = 1)\n\nGet a random selection of games and update the filtered list.\n\n```javascript\nZYNQ.games.random(5)\n```"
-            },
-            {
-              "id": "games_get_random_one",
-              "label": ".getRandomOne()",
-              "content": "### getRandomOne()\n\nReturn a single random game object (does not change the filtered list).\n\n```javascript\nconst game = ZYNQ.games.getRandomOne()\n```"
-            },
-            {
-              "id": "games_shuffle",
-              "label": ".shuffle()",
-              "content": "### shuffle()\n\nRandomly shuffle the current filtered list.\n\n```javascript\nZYNQ.games.shuffle()\n```"
-            },
-            {
-              "id": "games_sort",
-              "label": ".sortBy()",
-              "content": "### sortBy(key = \"name\")\n\nSort the current filtered list by a property.\n\n```javascript\nZYNQ.games.sortBy(\"name\")\n```"
-            },
-            {
-              "id": "games_sort_popularity",
-              "label": ".sortByPopularity()",
-              "content": "### sortByPopularity()\n\nSort games by popularity score (if available in the data).\n\n```javascript\nZYNQ.games.sortByPopularity()\n```"
-            },
-            {
-              "id": "games_get_by_alias",
-              "label": ".getByAlias()",
-              "content": "### getByAlias(alias)\n\nFind and return a single game by its alias.\n\n```javascript\nconst game = ZYNQ.games.getByAlias(\"alien-hominid\")\n```"
-            },
-            {
-              "id": "games_category",
-              "label": ".getByCategory()",
-              "content": "### getByCategory(category)\n\nFilter games by category and update the list.\n\n```javascript\nZYNQ.games.getByCategory(\"shooter\")\n```"
-            },
-            {
-              "id": "games_supported",
-              "label": ".filterSupported()",
-              "content": "### filterSupported()\n\nKeep only games supported on the current device.\n\n```javascript\nZYNQ.games.filterSupported()\n```"
-            },
-            {
-              "id": "games_favorites",
-              "label": ".filterFavorites()",
-              "content": "### filterFavorites()\n\nKeep only the user's favorite games.\n\n```javascript\nZYNQ.games.filterFavorites()\n```"
-            },
-            {
-              "id": "games_toggle_favorite",
-              "label": ".toggleFavorite()",
-              "content": "### toggleFavorite(alias)\n\nAdd or remove a game from favorites (persisted automatically).\n\n```javascript\nZYNQ.games.toggleFavorite(\"alien-hominid\")\n```"
-            },
-            {
-              "id": "games_add_history",
-              "label": ".addToHistory()",
-              "content": "### addToHistory(alias)\n\nAdd a game alias to the play history (persisted in localStorage).\n\n```javascript\nZYNQ.games.addToHistory(\"alien-hominid\")\n```"
-            }
-          ]
-        },
-        {
-          "id": "games_example",
-          "label": "Example",
-          "icon": "terminal",
-          "content": "### Games Example\n\n```javascript\nawait ZYNQ.games.init()\n\nconst results = ZYNQ.games\n  .search(\"alien\")\n  .filterSupported()\n  .sortBy(\"name\")\n  .list\n\nconsole.log(results)\n```"
         }
       ]
     },
@@ -151,13 +73,7 @@
           "id": "peer_constructor",
           "label": "Constructor & Singleton",
           "icon": "plug",
-          "content": "## ZYNQ.peer / ZYNQPeer\n\n### Creating a Peer Instance\n\nZYNQ Peer is a clean, production-ready wrapper around **PeerJS** that unifies data channels and media streams with robust reconnection logic and race-condition protection.\n\nRecommended ways:\n\n- `new ZYNQ.Peer(config)` — full control\n- `ZYNQPeer.get()` — singleton (recommended for most apps)\n\n```javascript\nconst peer = new ZYNQ.Peer({ video: true, audio: true, txt: true })\n// or\nconst peer = ZYNQPeer.get()\n```"
-        },
-        {
-          "id": "peer_options",
-          "label": "Options",
-          "icon": "sliders",
-          "content": "### Constructor Options\n\n```javascript\n{\n  video: boolean,           // default: true\n  audio: boolean,           // default: true\n  txt: boolean,             // default: true\n  debug: boolean,           // default: false\n  rateLimit: number,        // messages per second, default: 30\n  maxMsgSize: number,       // default: 65536\n  autoReconnect: boolean,   // default: true\n  maxReconnectAttempts: number, // default: 5\n  rafBatching: boolean,     // default: false\n  id: string | null         // custom peer ID\n}\n```"
+          "content": "## ZYNQ.peer / ZYNQPeer\n\n### Create a Peer\n\nWrapper around PeerJS with data + media + reconnect logic.\n\n```javascript\nconst peer = new ZYNQ.Peer({ video: true, audio: true, txt: true })\n```"
         },
         {
           "id": "peer_methods",
@@ -167,37 +83,32 @@
             {
               "id": "peer_connect",
               "label": ".connect(id)",
-              "content": "### connect(id)\n\nInitiate a data connection to a remote peer. Automatically handles pending messages and reconnection.\n\n```javascript\npeer.connect(\"remote-peer-id\")\n```"
+              "content": "### connect(id)\n```javascript\npeer.connect(\"id\")\n```"
             },
             {
               "id": "peer_send",
               "label": ".send(id, data)",
-              "content": "### send(id, data)\n\nSend data to a specific peer (or \"*\" for all). Automatically queues and connects if needed. Rate-limited.\n\n```javascript\npeer.send(\"remote-peer-id\", \"Hello 👽\")\npeer.send(\"remote-peer-id\", { type: \"chat\", message: \"Hi!\" })\npeer.send(\"*\", \"broadcast message\")\n```"
+              "content": "### send(id, data)\n```javascript\npeer.send(\"id\", \"hello\")\n```"
             },
             {
               "id": "peer_call",
-              "label": ".call(id, opts)",
-              "content": "### call(id, options)\n\nStart a video/audio call to a remote peer.\n\n```javascript\npeer.call(\"remote-peer-id\", { video: true, audio: true })\n```"
+              "label": ".call(id)",
+              "content": "### call(id)\n```javascript\npeer.call(\"id\")\n```"
             },
             {
-              "id": "peer_hangup",
-              "label": ".hangup(id)",
-              "content": "### hangup(id)\n\nEnd an active call.\n\n```javascript\npeer.hangup(\"remote-peer-id\")\n```"
-            },
-            {
-              "id": "peer_getstream",
-              "label": ".getStream(opts)",
-              "content": "### getStream(options)\n\nRequest local camera/microphone access. Caches the stream when constraints are unchanged.\n\n```javascript\nconst stream = await peer.getStream({ video: true, audio: true })\n```"
+              "id": "peer_disconnect",
+              "label": ".disconnect(id)",
+              "content": "### disconnect(id)\n\nCloses BOTH data + media connection and disables auto-reconnect for that peer.\n\n```javascript\npeer.disconnect(\"id\")\n```"
             },
             {
               "id": "peer_close",
               "label": ".close()",
-              "content": "### close()\n\nClose all active connections gracefully (data + media).\n\n```javascript\npeer.close()\n```"
+              "content": "### close()\n\nCloses all connections but keeps instance alive.\n\n```javascript\npeer.close()\n```"
             },
             {
               "id": "peer_destroy",
               "label": ".destroy()",
-              "content": "### destroy()\n\nFully destroy the peer, stop all streams, clear all maps and timeouts.\n\n```javascript\npeer.destroy()\n```"
+              "content": "### destroy()\n\nFully destroys peer instance.\n\n```javascript\npeer.destroy()\n```"
             }
           ]
         },
@@ -209,50 +120,39 @@
             {
               "id": "peer_event_ready",
               "label": "ready",
-              "content": "### ready\n\nFired when the peer connects to the signaling server and receives its ID.\n\n```javascript\npeer.on(\"ready\", (id) => {\n  console.log(\"My Peer ID:\", id)\n})\n```"
+              "content": "### ready\n```javascript\npeer.on(\"ready\", id => {})\n```"
             },
             {
               "id": "peer_event_open",
               "label": "open",
-              "content": "### open\n\nFired when a data connection with a remote peer is established.\n\n```javascript\npeer.on(\"open\", (peerId) => {\n  console.log(\"Data connection open with\", peerId)\n})\n```"
+              "content": "### open\nFired when a DATA connection is opened with a remote peer.\n```javascript\npeer.on(\"open\", id => {})\n```"
             },
             {
               "id": "peer_event_message",
               "label": "message",
-              "content": "### message\n\nFired when data is received. Payload contains `{ from, type, data }`.\n\n```javascript\npeer.on(\"message\", (msg) => {\n  console.log(`From ${msg.from}:`, msg.data)\n})\n```"
+              "content": "### message\n```javascript\npeer.on(\"message\", msg => {})\n```"
             },
             {
               "id": "peer_event_stream",
               "label": "stream",
-              "content": "### stream\n\nFired when a remote media stream arrives.\n\n```javascript\npeer.on(\"stream\", ({ from, stream }) => {\n  remoteVideo.srcObject = stream\n})\n```"
+              "content": "### stream\n```javascript\npeer.on(\"stream\", data => {})\n```"
             },
             {
               "id": "peer_event_close",
               "label": "close",
-              "content": "### close\n\nFired when a connection (data or media) is closed.\n\n```javascript\npeer.on(\"close\", ({ id }) => {\n  console.log(\"Connection closed with\", id)\n})\n```"
-            },
-            {
-              "id": "peer_event_disconnect",
-              "label": "disconnect",
-              "content": "### disconnect\n\nFired when auto-reconnect is disabled and the peer disconnects.\n\n```javascript\npeer.on(\"disconnect\", ({ id }) => { ... })\n```"
+              "content": "### close\n```javascript\npeer.on(\"close\", data => {})\n```"
             },
             {
               "id": "peer_event_reconnecting",
               "label": "reconnecting",
-              "content": "### reconnecting\n\nFired during automatic reconnection attempts.\n\n```javascript\npeer.on(\"reconnecting\", ({ id, attempt, delay }) => { ... })\n```"
+              "content": "### reconnecting\n```javascript\npeer.on(\"reconnecting\", data => {})\n```"
             },
             {
               "id": "peer_event_error",
               "label": "error",
-              "content": "### error\n\nFired for any error (peer, data, media, reconnect failed).\n\n```javascript\npeer.on(\"error\", (err) => {\n  console.error(err.type, err.id, err.error)\n})\n```"
+              "content": "### error\n```javascript\npeer.on(\"error\", err => {})\n```"
             }
           ]
-        },
-        {
-          "id": "peer_example",
-          "label": "Full Example",
-          "icon": "terminal",
-          "content": "### Complete Peer Example\n\n```javascript\nconst peer = new ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true,\n  autoReconnect: true\n})\n\npeer.on(\"ready\", id => console.log(\"My ID:\", id))\n\npeer.on(\"message\", msg => {\n  console.log(`From ${msg.from}:`, msg.data)\n})\n\npeer.on(\"stream\", ({ from, stream }) => {\n  remoteVideo.srcObject = stream\n})\n\npeer.on(\"open\", peerId => console.log(\"Connected to\", peerId))\n\n// Connect & send\ndocument.getElementById(\"connectBtn\").onclick = () => {\n  peer.connect(\"friend-peer-id\")\n}\n\n// Send message\npeer.send(\"friend-peer-id\", \"Hello from ZYNQ! 👋\")\n\n// Start call\npeer.call(\"friend-peer-id\")\n```"
         }
       ]
     }
