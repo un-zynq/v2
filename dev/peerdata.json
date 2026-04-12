@@ -19,7 +19,7 @@
           "id": "install_module",
           "label": "ES Module",
           "icon": "package",
-          "content": "### ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport ZYNQ, { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"\n```"
+          "content": "### ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"\n```"
         }
       ]
     },
