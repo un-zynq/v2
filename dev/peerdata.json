@@ -38,7 +38,7 @@
           "id": "games_state",
           "label": "State & Getters",
           "icon": "database",
-          "content": "# ZYNQ\n\n## ZYNQ.games\n\n### State\n\n```ts\nconfig: {\n  src: string,\n  cdn: string\n}\n\nall: Game[]\nfiltered: Game[]\nfavorites: Set<string>\ndeviceType: number\nhistory: string[]\n```\n\n### Getters\n\n```ts\nlist: Game[]\ntotal: number\nfilteredCount: number\n```\n"
+          "content": "# ZYNQ\n\n## ZYNQ.games\n\n### State\n\n```ts\nconfig: {\n  src: string,\n  cdn: string\n}\n\nall: Game[]\nfiltered: Game[]\nfavorites: Set<string>\ndeviceType: number // 1: PC Touch, 2: PC No Touch, 3: Phone, 4: Tablet\nhistory: string[]\n```\n\n### Getters\n\n```ts\nlist: Game[]\ntotal: number\nfilteredCount: number\n```\n"
         },
 
         {
