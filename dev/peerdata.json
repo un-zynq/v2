@@ -7,22 +7,23 @@
           "id": "install_title",
           "label": "Getting Started",
           "icon": "rocket",
-          "content": "## Welcome!\n\nZYNQ bundles realtime WebRTC + games library in one system.\nFast setup, peer-to-peer communication, zero config."
+          "content": "## ZYNQ\n\nZYNQ is a WebRTC + games framework.\nIt combines peer-to-peer communication with a game library system.\n\nNo backend required."
         },
         {
           "id": "install_script",
           "label": "Script Tag",
           "icon": "code",
-          "content": "### Script Tag\n\nLoad ZYNQ globally via CDN.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"></script>\n```"
+          "content": "### Script Tag\n\nLoads ZYNQ globally into `window.ZYNQ`.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"></script>\n```\n\nAfter loading:\n```js\nwindow.ZYNQ\n```"
         },
         {
           "id": "install_module",
           "label": "ES Module",
           "icon": "package",
-          "content": "### ES Module\n\nSide-effect import only (sets `window.ZYNQ`).\n\n```javascript\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"\n```"
+          "content": "### ES Module (Side Effect Import)\n\nThis version does NOT export bindings. It only initializes global `window.ZYNQ`.\n\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.9/index.min.js\"\n```\n\nAfter import:\n```js\nwindow.ZYNQ.Peer\nwindow.ZYNQ.games\n```"
         }
       ]
     },
+
     {
       "title": "ZYNQ Games",
       "items": [
@@ -30,40 +31,9 @@
           "id": "games_object",
           "label": "Game Object",
           "icon": "gamepad-2",
-          "content": "### Game Object\nRepresents a single game entry.\n\nExample:\n```js\n{\n  name: \"Alien Hominid\",\n  alias: \"alien-hominid\",\n  url: \"arcade/alien-hominid\"\n}\n```"
+          "content": "## Game Object Structure\n\nRepresents a single game entry.\n\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices?: number[],\n\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```\n\nExample:\n```js\n{\n  name: \"Alien Hominid\",\n  alias: \"alien-hominid\",\n  url: \"arcade/alien-hominid\",\n  thumb: \"https://cdn/...\",\n  category: \"shooter\"\n}\n```"
         },
-        {
-          "id": "games_properties",
-          "label": "Properties",
-          "icon": "database",
-          "children": [
-            {
-              "id": "games_prop_list",
-              "label": "list",
-              "content": "### list\nCurrent filtered games array.\n\n```js\nZYNQ.games.list\n// [{name, alias, url}]\n```"
-            },
-            {
-              "id": "games_prop_total",
-              "label": "total",
-              "content": "### total\nTotal games in library.\n\n```js\nZYNQ.games.total\n// 1280\n```"
-            },
-            {
-              "id": "games_prop_filtered",
-              "label": "filteredCount",
-              "content": "### filteredCount\nNumber of visible games.\n\n```js\nZYNQ.games.filteredCount\n// 42\n```"
-            },
-            {
-              "id": "games_prop_history",
-              "label": "history",
-              "content": "### getHistory()\nRecently played games.\n\n```js\nZYNQ.games.getHistory()\n// [{alias, name, url}]\n```"
-            },
-            {
-              "id": "games_prop_favorites",
-              "label": "favorites",
-              "content": "### favorites\nSet of saved favorites.\n\n```js\nZYNQ.games.favorites\n// Set(['alien-hominid'])\n```"
-            }
-          ]
-        },
+
         {
           "id": "games_methods",
           "label": "Methods",
@@ -72,72 +42,37 @@
             {
               "id": "games_init",
               "label": ".init()",
-              "content": "### init()\nLoads game database.\n\nExample:\n```js\nawait ZYNQ.games.init()\n```\nCallback: none"
+              "content": "### init(options?)\nLoads full game database from CDN.\n\n```js\nawait ZYNQ.games.init()\n```\n\nOptions:\n```ts\n{\n  mode?: 'all' | 'supported' | 'favs',\n  search?: string,\n  sort?: string\n}\n```\n\nExample:\n```js\nawait ZYNQ.games.init({ search: \"alien\" })\n```"
             },
+
             {
               "id": "games_search",
               "label": ".search()",
-              "content": "### search(query)\nFilters games by name.\n\n```js\nZYNQ.games.search('alien')\n```\nReturns updated games list."
+              "content": "### search(query)\nFilters games by name or alias.\n\n```js\nZYNQ.games.search(\"alien\")\n```\n\nCallback result:\n```js\nZYNQ.games.list // filtered array\n```"
             },
+
             {
               "id": "games_random",
               "label": ".random()",
-              "content": "### random(limit)\nRandom selection.\n\n```js\nZYNQ.games.random(3)\n```"
+              "content": "### random(limit)\nReturns random subset.\n\n```js\nZYNQ.games.random(3)\n```\n\nResult:\n```js\nZYNQ.games.list // array<Game>\n```"
             },
+
             {
               "id": "games_get_random_one",
               "label": ".getRandomOne()",
-              "content": "### getRandomOne()\nReturns single random game.\n\n```js\nconst g = ZYNQ.games.getRandomOne()\n```"
+              "content": "### getRandomOne()\nReturns single random game.\n\n```js\nconst game = ZYNQ.games.getRandomOne()\n```\n\nReturns:\n```ts\nGame | null\n```"
             },
-            {
-              "id": "games_shuffle",
-              "label": ".shuffle()",
-              "content": "### shuffle()\nShuffles current list.\n\n```js\nZYNQ.games.shuffle()\n```"
-            },
-            {
-              "id": "games_sort",
-              "label": ".sortBy()",
-              "content": "### sortBy(key)\nSort by field.\n\n```js\nZYNQ.games.sortBy('name')\n```"
-            },
-            {
-              "id": "games_sort_popularity",
-              "label": ".sortByPopularity()",
-              "content": "### sortByPopularity()\nSort by play count.\n\n```js\nZYNQ.games.sortByPopularity()\n```"
-            },
+
             {
               "id": "games_get_by_alias",
               "label": ".getByAlias()",
-              "content": "### getByAlias(alias)\nFind single game.\n\n```js\nZYNQ.games.getByAlias('alien-hominid')\n```"
-            },
-            {
-              "id": "games_category",
-              "label": ".getByCategory()",
-              "content": "### getByCategory(category)\nFilter by category.\n\n```js\nZYNQ.games.getByCategory('shooter')\n```"
-            },
-            {
-              "id": "games_supported",
-              "label": ".filterSupported()",
-              "content": "### filterSupported()\nDevice-compatible games only."
-            },
-            {
-              "id": "games_favorites",
-              "label": ".filterFavorites()",
-              "content": "### filterFavorites()\nOnly favorites."
-            },
-            {
-              "id": "games_toggle_favorite",
-              "label": ".toggleFavorite()",
-              "content": "### toggleFavorite(alias)\nAdd/remove favorite.\n\n```js\nZYNQ.games.toggleFavorite('alien-hominid')\n```"
-            },
-            {
-              "id": "games_add_history",
-              "label": ".addToHistory()",
-              "content": "### addToHistory(alias)\nAdds game to history.\n\n```js\nZYNQ.games.addToHistory('alien-hominid')\n```"
+              "content": "### getByAlias(alias)\nFind game by unique id.\n\n```js\nconst game = ZYNQ.games.getByAlias(\"alien-hominid\")\n```\n\nReturns:\n```ts\nGame | null\n```"
             }
           ]
         }
       ]
     },
+
     {
       "title": "ZYNQ Peer",
       "items": [
@@ -145,8 +80,9 @@
           "id": "peer_constructor",
           "label": "Constructor",
           "icon": "plug",
-          "content": "### ZYNQ.Peer\nWebRTC wrapper with auto reconnect + queue system.\n\n```js\nconst peer = new ZYNQ.Peer({ txt: true })\n```\nEvent: ready → (id)"
+          "content": "## ZYNQ.Peer\nWebRTC abstraction layer on top of PeerJS.\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true\n})\n```"
         },
+
         {
           "id": "peer_methods",
           "label": "Methods",
@@ -155,40 +91,29 @@
             {
               "id": "peer_connect",
               "label": ".connect()",
-              "content": "Connect to peer.\n\n```js\npeer.connect('peer-id')\n```"
+              "content": "### connect(peerId)\nCreates a data connection.\n\n```js\npeer.connect(\"abc-123\")\n```"
             },
+
             {
               "id": "peer_send",
               "label": ".send()",
-              "content": "Send message.\n\nCallback event:\n```js\npeer.on('message', (msg) => {\n  // msg = { from, type, data }\n})\n```\nSend example:\n```js\npeer.send('id', 'hello')\n```"
+              "content": "### send(peerId, data)\nSends message to peer.\n\n```js\npeer.send(\"abc-123\", \"hello\")\n```\n\nIf connection is not ready → message is queued.\n\n---"
             },
+
             {
               "id": "peer_call",
               "label": ".call()",
-              "content": "Start call.\n\nEvent:\n```js\npeer.on('stream', ({from, stream}) => {})\n```"
+              "content": "### call(peerId, options)\nStarts media call.\n\n```js\npeer.call(\"abc-123\", {\n  video: true,\n  audio: true\n})\n```"
             },
+
             {
               "id": "peer_hangup",
               "label": ".hangup()",
-              "content": "End call.\n\n```js\npeer.hangup('id')\n```"
-            },
-            {
-              "id": "peer_getstream",
-              "label": ".getStream()",
-              "content": "Get camera/mic stream.\n\n```js\nconst stream = await peer.getStream({ video: true })\n```"
-            },
-            {
-              "id": "peer_close",
-              "label": ".close()",
-              "content": "Close all connections."
-            },
-            {
-              "id": "peer_destroy",
-              "label": ".destroy()",
-              "content": "Fully destroy peer instance."
+              "content": "### hangup(peerId)\nStops media call.\n\n```js\npeer.hangup(\"abc-123\")\n```"
             }
           ]
         },
+
         {
           "id": "peer_events",
           "label": "Events",
@@ -197,42 +122,43 @@
             {
               "id": "peer_event_ready",
               "label": "ready",
-              "content": "Fires when peer ID is assigned.\n\n```js\npeer.on('ready', (id) => {})\n// id: string\n```"
+              "content": "### ready\nFired when peer receives its ID from server.\n\n```js\npeer.on('ready', (id) => {})\n```\n\nCallback:\n```ts\nid: string\n```\n\nExample value:\n```js\n\"c12a9f3e-8b1d-4f0a\"\n```"
             },
+
             {
               "id": "peer_event_open",
               "label": "open",
-              "content": "Connection opened.\n\n```js\npeer.on('open', (peerId) => {})\n```"
+              "content": "### open\nFired when connection to another peer is established.\n\n```js\npeer.on('open', (peerId) => {})\n```\n\nCallback:\n```ts\npeerId: string\n```\n\nExample:\n```js\n\"dc560603-9e11-4d8d\"\n```"
             },
+
             {
               "id": "peer_event_message",
               "label": "message",
-              "content": "Incoming message.\n\n```js\npeer.on('message', (msg) => {\n  // { from, type, data }\n})\n```"
+              "content": "### message\nTriggered when data arrives.\n\n```js\npeer.on('message', (msg) => {})\n```\n\nCallback object:\n```ts\nmsg = {\n  from: string,\n  type: \"data\",\n  data: any\n}\n```\n\nExample:\n```js\n{\n  from: \"peer-123\",\n  type: \"data\",\n  data: \"hello\"\n}\n```"
             },
+
             {
               "id": "peer_event_stream",
               "label": "stream",
-              "content": "Incoming media stream.\n\n```js\npeer.on('stream', ({from, stream}) => {})\n```"
+              "content": "### stream\nTriggered when remote video/audio stream arrives.\n\n```js\npeer.on('stream', ({ from, stream }) => {})\n```\n\nCallback:\n```ts\n{\n  from: string,\n  stream: MediaStream\n}\n```\n\nExample:\n```js\n{\n  from: \"peer-123\",\n  stream: MediaStream\n}\n```"
             },
+
             {
               "id": "peer_event_close",
               "label": "close",
-              "content": "Connection closed.\n\n```js\npeer.on('close', ({id}) => {})\n```"
+              "content": "### close\nConnection fully closed.\n\n```js\npeer.on('close', ({ id }) => {})\n```\n\nCallback:\n```ts\n{\n  id: string\n}\n```"
             },
-            {
-              "id": "peer_event_disconnect",
-              "label": "disconnect",
-              "content": "Disconnected state.\n\n```js\npeer.on('disconnect', ({id}) => {})\n```"
-            },
-            {
-              "id": "peer_event_reconnecting",
-              "label": "reconnecting",
-              "content": "Reconnect attempt.\n\n```js\npeer.on('reconnecting', ({id, attempt, delay}) => {})\n```"
-            },
+
             {
               "id": "peer_event_error",
               "label": "error",
-              "content": "Error event.\n\n```js\npeer.on('error', (err) => {})\n```"
+              "content": "### error\nError handler.\n\n```js\npeer.on('error', (err) => {})\n```\n\nError object:\n```ts\n{\n  type: 'peer' | 'data' | 'media' | 'reconnect_failed',\n  id?: string,\n  error: any\n}\n```"
+            },
+
+            {
+              "id": "peer_event_reconnecting",
+              "label": "reconnecting",
+              "content": "### reconnecting\nTriggered when auto reconnect happens.\n\n```js\npeer.on('reconnecting', ({ id, attempt, delay }) => {})\n```\n\nCallback:\n```ts\n{\n  id: string,\n  attempt: number,\n  delay: number\n}\n```\n\nExample:\n```js\n{\n  id: \"peer-123\",\n  attempt: 2,\n  delay: 1200\n}\n```"
             }
           ]
         }
