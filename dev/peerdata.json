@@ -1,4 +1,4 @@
-const docsData = {
+{
   groups: [
     {
       title: "ZYNQ Games",
