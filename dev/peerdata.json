@@ -1,50 +1,38 @@
 {
   "groups": [
     {
-      "title": "ZYNQ.EventEmitter",
-      "items": [
-        {
-          "id": "emitter-overview",
-          "label": "Overview",
-          "badge": "Core",
-          "icon": "zap",
-          "content": "Simple event system used across the ZYNQ SDK for reactive communication."
-        },
-        {
-          "id": "emitter-api",
-          "label": "API",
-          "icon": "code",
-          "content": "### Methods\n\n```ts\non(event: string, fn: (data: any) => void): this\nemit(event: string, data?: any): void\n```\n\n### Example\n\n```ts\nconst emitter = new ZYNQ.EventEmitter();\n\nemitter.on('ready', (id) => {\n  console.log('Ready:', id);\n});\n\nemitter.emit('ready', { id: 'peer-123' });\n```"
-        }
-      ]
-    },
-    {
       "title": "ZYNQ.Peer",
       "items": [
         {
-          "id": "peer-overview",
-          "label": "Overview",
-          "badge": "WebRTC",
-          "icon": "wifi",
-          "content": "ZYNQPeer is a WebRTC wrapper powered by PeerJS with auto-reconnect, media + data support and event-driven architecture."
+          "id": "peer-intro",
+          "label": "Getting Started",
+          "badge": "Guide",
+          "icon": "book-open",
+          "content": "ZYNQPeer simplifies peer-to-peer data, video, and audio communication.\n\nThis guide explains how to create connections and exchange data between peers."
         },
         {
-          "id": "peer-constructor",
-          "label": "Constructor",
-          "icon": "box",
-          "content": "### Type\n\n```ts\nnew ZYNQ.Peer(options?: PeerOptions)\n```\n\n### PeerOptions\n\n```ts\ntype PeerOptions = {\n  video?: boolean\n  audio?: boolean\n  txt?: boolean\n  id?: string\n  rateLimit?: number\n  autoReconnect?: boolean\n  maxReconnectAttempts?: number\n}\n```\n\n### Example\n\n```ts\nconst peer = new ZYNQ.Peer({\n  video: true,\n  audio: true,\n  autoReconnect: true\n});\n```"
+          "id": "peer-setup",
+          "label": "Setup",
+          "icon": "download",
+          "content": "## 1. Create a Peer\n\nStart by creating a new Peer instance.\n\n```js\nvar peer = new ZYNQ.Peer();\n```\n\nEach peer is assigned a unique ID automatically when it is ready.\n\n## 2. Get your Peer ID\n\n```js\npeer.on('ready', function(id) {\n  console.log('My peer ID is: ' + id);\n});\n```\n\nYou will use this ID to connect with other peers."
         },
         {
-          "id": "peer-methods",
-          "label": "Methods",
-          "icon": "terminal",
-          "content": "### Methods\n\n```ts\nconnect(remoteId: string): this\nsend(data: any): void\ngetStream(): Promise<MediaStream | null>\nclose(): void\ndestroy(): void\n```\n\n### Example\n\n```ts\nconst peer = new ZYNQ.Peer();\n\npeer.on('ready', (id) => {\n  peer.connect('remote-123');\n});\n\npeer.on('data', (msg) => {\n  console.log('Message:', msg);\n});\n\npeer.send('hello world');\n```"
+          "id": "peer-usage",
+          "label": "Usage",
+          "icon": "play",
+          "content": "To connect to another peer, you need their peer ID.\n\n```js\npeer.on('ready', (id) => {\n  console.log('Share this ID:', id);\n});\n```\n\nYou are responsible for sharing IDs between clients (via server, chat, etc)."
         },
         {
-          "id": "peer-events",
-          "label": "Events",
-          "icon": "activity",
-          "content": "### Events\n\n```ts\nready: string\nopen: string\ndata: any\nstream: MediaStream\nclose: void\nerror: { type: string, error: any }\nreconnecting: { attempt: number, delay: number }\n```\n\n### Example\n\n```ts\npeer.on('stream', (stream) => {\n  video.srcObject = stream;\n});\n\npeer.on('reconnecting', (info) => {\n  console.log('Reconnect attempt:', info.attempt);\n});\n```"
+          "id": "peer-data",
+          "label": "Data Connections",
+          "icon": "send",
+          "content": "## Start a connection\n\n```js\nvar conn = peer.connect('dest-peer-id');\n```\n\n## Receive a connection\n\n```js\npeer.on('connection', function(conn) {\n  conn.on('open', function() {\n\n    // Receive data\n    conn.on('data', function(data) {\n      console.log('Received:', data);\n    });\n\n    // Send data\n    conn.send('Hello!');\n  });\n});\n```\n\nData connections allow real-time messaging between peers."
+        },
+        {
+          "id": "peer-media",
+          "label": "Video & Audio Calls",
+          "icon": "video",
+          "content": "## Start a call\n\n```js\nvar call = peer.call('dest-peer-id', mediaStream);\n```\n\n## Answer a call\n\n```js\npeer.on('call', function(call) {\n  call.answer(mediaStream);\n});\n```\n\n## Receive remote stream\n\n```js\ncall.on('stream', function(stream) {\n  video.srcObject = stream;\n});\n```\n\nMedia streams are provided via getUserMedia and enable video/audio communication."
         }
       ]
     },
@@ -52,40 +40,35 @@
       "title": "ZYNQ.games",
       "items": [
         {
-          "id": "games-overview",
-          "label": "Overview",
-          "badge": "SDK",
+          "id": "games-intro",
+          "label": "Getting Started",
+          "badge": "Guide",
           "icon": "gamepad-2",
-          "content": "ZYNQGames manages a full game library with filtering, sorting, favorites, history and device compatibility detection."
+          "content": "ZYNQGames is a game library system with search, filters, favorites, and device-aware compatibility."
         },
         {
-          "id": "games-types",
-          "label": "Types",
-          "icon": "braces",
-          "content": "### Game Object\n\n```ts\ntype Game = {\n  name: string\n  category?: string\n  alias: string\n  url: string\n  thumb: string\n  devices: number[]\n  playCount?: number\n}\n```"
+          "id": "games-setup",
+          "label": "Setup",
+          "icon": "download",
+          "content": "```js\nconst games = new ZYNQ.games();\n\nawait games.init();\n```\n\nAfter initialization, the full game list is available in `.list`."
         },
         {
-          "id": "games-api",
-          "label": "Methods",
-          "icon": "code",
-          "content": "### Core API\n\n```ts\ninit(options?): Promise<this>\nsearch(query: string): this\nreset(): this\nsortBy(field: string): this\nsortByPopularity(): this\n```\n\n### Filtering\n\n```ts\ngetByAlias(alias: string): Game | null\ngetByCategory(category: string): this\nfilterSupported(): this\nfilterFavorites(): this\n```\n\n### Randomization\n\n```ts\nrandom(n?: number): this\ngetRandomOne(): Game\nshuffle(): this\n```\n\n### Favorites & History\n\n```ts\ntoggleFavorite(alias: string): this\nisFavorite(alias: string): boolean\naddToHistory(alias: string): this\ngetHistory(): Game[]\nclearHistory(): this\n```\n\n### Example\n\n```ts\nconst games = new ZYNQ.games;\n\nawait games.init();\n\ngames\n  .search('minecraft')\n  .filterSupported()\n  .sortByPopularity();\n\nconsole.log(games.list);\n```"
+          "id": "games-usage",
+          "label": "Usage",
+          "icon": "play",
+          "content": "## Search games\n\n```js\ngames.search('minecraft');\nconsole.log(games.list);\n```\n\n## Reset filters\n\n```js\ngames.reset();\n```\n\n## Get random game\n\n```js\nconst game = games.getRandomOne();\n```"
         },
         {
-          "id": "games-getters",
-          "label": "Getters",
-          "icon": "database",
-          "content": "### Properties\n\n```ts\ngames.list: Game[]\ngames.total: number\ngames.filteredCount: number\n```"
-        }
-      ]
-    },
-    {
-      "title": "ZYNQ Global",
-      "items": [
+          "id": "games-filtering",
+          "label": "Filtering",
+          "icon": "filter",
+          "content": "## Filter by category\n\n```js\ngames.getByCategory('action');\n```\n\n## Only supported devices\n\n```js\ngames.filterSupported();\n```\n\n## Favorites\n\n```js\ngames.toggleFavorite('game-alias');\ngames.filterFavorites();\n```"
+        },
         {
-          "id": "global-export",
-          "label": "Exports",
-          "icon": "package",
-          "content": "### Global SDK Object\n\n```ts\nwindow.ZYNQ = {\n  games,\n  Peer,\n  EventEmitter\n}\n```\n\n### ES Modules\n\n```ts\nimport ZYNQ, { games, Peer, EventEmitter } from 'zynq-sdk'\n```"
+          "id": "games-history",
+          "label": "History",
+          "icon": "clock",
+          "content": "## Add to history\n\n```js\ngames.addToHistory('game-alias');\n```\n\n## Get history\n\n```js\nconsole.log(games.getHistory());\n```\n\n## Clear history\n\n```js\ngames.clearHistory();\n```"
         }
       ]
     }
