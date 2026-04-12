@@ -1,46 +1,6 @@
 {
   "groups": [
     {
-      "title": "ZYNQ Peer",
-      "items": [
-        {
-          "id": "peer-overview",
-          "label": "Overview",
-          "icon": "radio",
-          "badge": "WebRTC",
-          "content": "# ZYNQ Peer\n\nZYNQ Peer is a lightweight WebRTC wrapper built on top of PeerJS.\n\nIt enables:\n\n- 📡 Peer-to-peer messaging\n- 🎥 Video & audio streaming\n- 🔁 Automatic reconnection\n- ⚡ Rate-limited messaging\n\n## Quick Start\n\n```js\nconst peer = ZYNQ.peer.get('remote-id');\n\npeer.on('open', () => {\n  peer.send('Hello 👋');\n});\n\npeer.on('data', console.log);\n\npeer.connect();\n```"
-        },
-        {
-          "id": "peer-config",
-          "label": "Configuration",
-          "icon": "settings",
-          "badge": "Options",
-          "content": "# Configuration\n\n```js\nnew ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true,\n  debug: false,\n  rateLimit: 30,\n  maxMsgSize: 65536,\n  autoReconnect: true,\n  maxReconnectAttempts: 5,\n  rafBatching: false,\n  id: null\n});\n```\n\n## Highlights\n\n- `rateLimit` → max messages/sec\n- `maxMsgSize` → prevents large payload abuse\n- `autoReconnect` → keeps connection alive\n- `rafBatching` → smoother event batching"
-        },
-        {
-          "id": "peer-lifecycle",
-          "label": "Lifecycle",
-          "icon": "activity",
-          "badge": "Flow",
-          "content": "# Lifecycle\n\n## States\n\n- `DISCONNECTED`\n- `CONNECTING`\n- `CONNECTED`\n- `RECONNECTING`\n- `FAILED`\n\n## Flow\n\n1. Peer initializes\n2. `ready` event fires\n3. Call `connect(remoteId)`\n4. `open` event fires\n5. Data/media exchange begins\n\n## Example\n\n```js\npeer.on('ready', id => console.log('My ID:', id));\npeer.on('open', () => console.log('Connected'));\npeer.on('close', () => console.log('Disconnected'));\n```"
-        },
-        {
-          "id": "peer-events",
-          "label": "Events",
-          "icon": "zap",
-          "badge": "API",
-          "content": "# Events\n\n## Connection\n\n- `ready`\n- `open`\n- `close`\n\n## Data\n\n- `data`\n- `sent`\n\n## Media\n\n- `stream`\n- `localStream`\n\n## Errors\n\n- `error`\n- `reconnecting`\n\n---\n\n```js\npeer.on('data', msg => console.log(msg));\npeer.on('stream', stream => {\n  video.srcObject = stream;\n});\n```"
-        },
-        {
-          "id": "peer-methods",
-          "label": "Methods",
-          "icon": "terminal",
-          "badge": "API",
-          "content": "# Methods\n\n## Connection\n\n```js\npeer.connect(remoteId);\npeer.close();\npeer.destroy();\n```\n\n## Messaging\n\n```js\npeer.send('Hello');\n```\n\n## Media\n\n```js\nawait peer.getStream();\n```\n\n---\n\n## Static\n\n```js\nZYNQ.peer.get(id);\nZYNQ.peer.destroyAll();\n```"
-        }
-      ]
-    },
-    {
       "title": "ZYNQ Games",
       "items": [
         {
@@ -48,49 +8,96 @@
           "label": "Overview",
           "icon": "gamepad-2",
           "badge": "Games",
-          "content": "# ZYNQ Games\n\nZYNQ Games is a dynamic game loader and manager.\n\nIt provides:\n\n- 🔍 Smart search\n- 🎲 Random selection\n- ❤️ Favorites system\n- 📱 Device compatibility filtering\n\n## Init\n\n```js\nawait ZYNQ.games.init({\n  mode: 'all',\n  search: '',\n  sort: 'name'\n});\n```"
+          "content": "# ZYNQ Games\n\nZYNQ Games is a dynamic game manager that loads, filters, and organizes games from a remote source.\n\nIt is **chainable**, meaning most methods return the instance itself.\n\n## Key Features\n\n- 🔍 Search & filtering\n- 🎲 Random selection\n- ❤️ Favorites system\n- 📱 Device-based filtering\n\n---\n\n## ⚠️ Important\n\nMost methods DO NOT return data directly.\n\nInstead, you access results via:\n\n```js\ngames.list\n```\n\nExample:\n\n```js\nZYNQ.games.search('car');\nconsole.log(ZYNQ.games.list);\n```"
         },
         {
-          "id": "games-device",
-          "label": "Device Detection",
-          "icon": "smartphone",
-          "badge": "System",
-          "content": "# Device Detection\n\nZYNQ automatically detects device type:\n\n## Types\n\n- `1` → Hybrid (touch laptop)\n- `2` → Desktop\n- `3` → Mobile\n- `4` → Tablet\n\nAccessible via:\n\n```js\nZYNQ.deviceType\n```\n\nUsed internally for filtering supported games."
+          "id": "games-init",
+          "label": "Initialization",
+          "icon": "play",
+          "badge": "Setup",
+          "content": "# Initialization\n\n```js\nawait ZYNQ.games.init({\n  mode: 'all',\n  search: '',\n  sort: 'name'\n});\n```\n\n## Options\n\n- `mode` → `all`, `supported`, `favs`\n- `search` → initial search query\n- `sort` → field name (default: `name`)\n\n## Returns\n\n```js\nPromise<ZYNQGames>\n```\n\n---\n\nAfter init, data is available via:\n\n```js\ngames.list\ngames.total\ngames.filteredCount\n```"
         },
         {
-          "id": "games-filtering",
-          "label": "Filtering & Search",
+          "id": "games-data",
+          "label": "Game Structure",
+          "icon": "database",
+          "badge": "Structure",
+          "content": "# Game Object\n\nEach game object has:\n\n```js\n{\n  name: 'Game Name',\n  alias: 'game-id',\n  category: 'arcade',\n  url: 'provider/game-id',\n  thumb: 'cdn/provider/game-id.webp',\n  devices: [1,2,3],\n\n  // computed\n  isSupported: true,\n  isFavorite: false\n}\n```\n\n## Notes\n\n- Images are **400x300 thumbnails**\n- `devices` may be missing → treated as supported everywhere\n- `isSupported` is computed dynamically\n- `isFavorite` uses localStorage"
+        },
+        {
+          "id": "games-search",
+          "label": "Search & Filtering",
           "icon": "search",
           "badge": "API",
-          "content": "# Filtering & Search\n\n## Search\n\n```js\ngames.search('car');\n```\n\n## Filters\n\n```js\ngames.filterSupported();\ngames.filterFavorites();\n```\n\n## Categories\n\n```js\ngames.getByCategory('arcade');\n```\n\n---\n\nSearch matches both name and alias."
+          "content": "# Search & Filtering\n\n## Search\n\n```js\ngames.search('car');\n```\n\n## Returns\n\n```js\nZYNQGames (chainable)\n```\n\n## Get results\n\n```js\ngames.search('car');\nconsole.log(games.list);\n```\n\n---\n\n## Filters\n\n```js\ngames.filterSupported();\ngames.filterFavorites();\n```\n\n## Category\n\n```js\ngames.getByCategory('arcade');\n```\n\n---\n\nAll filters modify the internal `filtered` list."
         },
         {
           "id": "games-random",
           "label": "Random & Shuffle",
           "icon": "shuffle",
           "badge": "Fun",
-          "content": "# Random & Shuffle\n\n## Random selection\n\n```js\ngames.random(3);\n```\n\n## Single random\n\n```js\ngames.getRandomOne();\n```\n\n## Shuffle list\n\n```js\ngames.shuffle();\n```"
+          "content": "# Random & Shuffle\n\n## Multiple random\n\n```js\ngames.random(3);\nconsole.log(games.list);\n```\n\n## Single random\n\n```js\nconst game = games.getRandomOne();\n```\n\n## Shuffle\n\n```js\ngames.shuffle();\nconsole.log(games.list);\n```\n\n## Returns\n\n- `random()` → chainable\n- `getRandomOne()` → `GameObject`\n- `shuffle()` → chainable"
         },
         {
           "id": "games-sorting",
           "label": "Sorting",
           "icon": "arrow-down-up",
           "badge": "API",
-          "content": "# Sorting\n\n## By name\n\n```js\ngames.sortBy('name');\n```\n\n## By popularity\n\n```js\ngames.sortByPopularity();\n```"
+          "content": "# Sorting\n\n## By field\n\n```js\ngames.sortBy('name');\n```\n\n## By popularity\n\n```js\ngames.sortByPopularity();\n```\n\n## Returns\n\n```js\nZYNQGames (chainable)\n```\n\n---\n\nSorting applies to the current filtered list."
         },
         {
           "id": "games-storage",
           "label": "Favorites & History",
           "icon": "heart",
           "badge": "Storage",
-          "content": "# Favorites & History\n\n## Favorites\n\n```js\ngames.toggleFavorite('game-id');\ngames.isFavorite('game-id');\n```\n\n## History\n\n```js\ngames.addToHistory('game-id');\ngames.getHistory();\ngames.clearHistory();\n```\n\n- Stored in `localStorage`\n- History capped at 50 items"
+          "content": "# Favorites & History\n\n## Favorites\n\n```js\ngames.toggleFavorite('game-id');\ngames.isFavorite('game-id');\n```\n\n## Returns\n\n- `toggleFavorite()` → chainable\n- `isFavorite()` → boolean\n\n---\n\n## History\n\n```js\ngames.addToHistory('game-id');\ngames.getHistory();\ngames.clearHistory();\n```\n\n## Returns\n\n- `addToHistory()` → chainable\n- `getHistory()` → `GameObject[]`\n- `clearHistory()` → chainable\n\n---\n\nStored in `localStorage`\n\n- Favorites → `ZYNQ_favs`\n- History → `ZYNQ_history`\n\nHistory max length: **50**"
         },
         {
-          "id": "games-data",
-          "label": "Game Object",
-          "icon": "database",
-          "badge": "Structure",
-          "content": "# Game Object\n\nEach game looks like:\n\n```js\n{\n  name: 'Game Name',\n  alias: 'game-id',\n  category: 'arcade',\n  url: 'provider/game-id',\n  thumb: 'cdn/provider/game-id.webp',\n  devices: [1,2,3],\n  isSupported: true,\n  isFavorite: false\n}\n```"
+          "id": "games-device",
+          "label": "Device Detection",
+          "icon": "smartphone",
+          "badge": "System",
+          "content": "# Device Detection\n\nZYNQ determines device type automatically.\n\n## Types\n\n- `1` → Hybrid\n- `2` → Desktop\n- `3` → Mobile\n- `4` → Tablet\n\n```js\nZYNQ.deviceType\n```\n\n---\n\n## Important\n\nIf a game has no `devices` field:\n\n→ It is considered **supported on all devices**"
+        }
+      ]
+    },
+    {
+      "title": "ZYNQ Peer",
+      "items": [
+        {
+          "id": "peer-overview",
+          "label": "Overview",
+          "icon": "radio",
+          "badge": "WebRTC",
+          "content": "# ZYNQ Peer\n\nZYNQ Peer is a WebRTC-based communication layer using PeerJS.\n\nSupports:\n\n- 📩 Messaging\n- 🎥 Audio/video streaming\n- 🔁 Auto-reconnect\n\n---\n\n## Quick Example\n\n```js\nconst peer = ZYNQ.peer.get('remote-id');\n\npeer.on('open', () => {\n  peer.send('Hello');\n});\n\npeer.on('data', console.log);\n\npeer.connect();\n```"
+        },
+        {
+          "id": "peer-config",
+          "label": "Configuration",
+          "icon": "settings",
+          "badge": "Options",
+          "content": "# Configuration\n\n```js\nnew ZYNQ.Peer({\n  video: true,\n  audio: true,\n  txt: true,\n  debug: false,\n  rateLimit: 30,\n  maxMsgSize: 65536,\n  autoReconnect: true,\n  maxReconnectAttempts: 5,\n  rafBatching: false,\n  id: null\n});\n```\n\n## Returns\n\n```js\nZYNQPeer\n```"
+        },
+        {
+          "id": "peer-states",
+          "label": "States & Flow",
+          "icon": "activity",
+          "badge": "Flow",
+          "content": "# States & Flow\n\n## States\n\n- `DISCONNECTED`\n- `CONNECTING`\n- `CONNECTED`\n- `RECONNECTING`\n- `FAILED`\n\n## Flow\n\n1. Initialize peer\n2. `ready` event\n3. `connect()`\n4. `open` event\n5. Exchange data\n\n---\n\n```js\npeer.on('ready', id => console.log(id));\npeer.on('open', () => console.log('Connected'));\n```"
+        },
+        {
+          "id": "peer-events",
+          "label": "Events",
+          "icon": "zap",
+          "badge": "API",
+          "content": "# Events\n\n## Connection\n\n- `ready`\n- `open`\n- `close`\n\n## Data\n\n- `data`\n- `sent`\n\n## Media\n\n- `stream`\n- `localStream`\n\n## Errors\n\n- `error`\n- `reconnecting`\n\n---\n\n```js\npeer.on('data', msg => console.log(msg));\n```"
+        },
+        {
+          "id": "peer-methods",
+          "label": "Methods",
+          "icon": "terminal",
+          "badge": "API",
+          "content": "# Methods\n\n## Connection\n\n```js\npeer.connect(remoteId);\npeer.close();\npeer.destroy();\n```\n\n## Messaging\n\n```js\npeer.send(data);\n```\n\n## Media\n\n```js\nawait peer.getStream();\n```\n\n## Returns\n\n- `connect()` → ZYNQPeer\n- `send()` → void\n- `close()` → void\n- `destroy()` → void\n- `getStream()` → Promise<MediaStream | null>\n\n---\n\n## Static\n\n```js\nZYNQ.peer.get(id);\nZYNQ.peer.destroyAll();\n```\n\n- `get()` → ZYNQPeer (singleton per id)\n- `destroyAll()` → void"
         }
       ]
     }
