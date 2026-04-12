@@ -29,8 +29,8 @@
           "label": "Search & Filtering",
           "icon": "search",
           "badge": "API",
-          "content": "# Search & Filtering\n\n## Search\n\n```js\ngames.search('car');\n```\n\n## Returns\n\n```js\nZYNQGames (chainable)\n```\n\n## Get results\n\n```js\ngames.search('car');\nconsole.log(games.list);\n```\n\n---\n\n## Filters\n\n```js\ngames.filterSupported();\ngames.filterFavorites();\n```\n\n## Category\n\n```js\ngames.getByCategory('arcade');\n```\n\n---\n\nAll filters modify the internal `filtered` list."
-        },
+          "content": "# Search & Filtering\n\nZYNQ Games uses a **mutable internal state**.\n\nThis means:\n\n- Methods like `search()` or `filterSupported()` modify the current list\n- `.list` always reflects the **current filtered result**\n\n---\n\n## Full list\n\n```js\nZYNQ.games.list\n```\n\n→ Returns **all games** (e.g. 533)\n\n---\n\n## Search example\n\n```js\nZYNQ.games.search('eggy').list\n```\n\n→ Returns only games matching \"eggy\"\n\n---\n\n## Important behavior\n\n```js\nZYNQ.games.search('car');\nZYNQ.games.list; // filtered\n```\n\n- `search()` does NOT return results directly\n- It updates internal state\n- `.list` gives you the result\n\n---\n\n## Reset back to all games\n\n```js\nZYNQ.games.reset().list\n```\n\n---\n\n## Chaining\n\n```js\nZYNQ.games\n  .search('car')\n  .filterSupported()\n  .sortBy('name')\n  .list\n```\n\n→ Each step modifies the same dataset\n\n---\n\n## Returns\n\n- `search()` → ZYNQGames (chainable)\n- `filterSupported()` → ZYNQGames\n- `reset()` → ZYNQGames\n- `.list` → `GameObject[]`\n"
+        }
         {
           "id": "games-random",
           "label": "Random & Shuffle",
