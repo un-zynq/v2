@@ -22,7 +22,7 @@
           "label": "Device Support",
           "icon": "smartphone",
           "badge": "System",
-          "content": "# Device Detection\nEach game can declare supported device types:\n- 1 → Mobile\n- 2 → Desktop\n- 3 → Tablet\n- 4 → High-end / extended devices\n\n### Runtime detection\nDevice type is computed once at runtime using:\n- User agent heuristics\n- Touch capability\n- GPU fingerprint hints\n- Pointer / hover support\n\n### Usage in games\n```js\ngame.isSupported\n```\n\nThis property is dynamically evaluated based on current device type and the game’s declared supported list."
+          "content": "# Device Detection\nEach game can declare supported device types:\n- 1 → Mobile\n- 2 → Desktop\n- 3 → Phone\n- 4 → Tablet\n\n### Runtime detection\nDevice type is computed once at runtime using:\n- User agent heuristics\n- Touch capability\n- GPU fingerprint hints\n- Pointer / hover support\n\n### Usage in games\n```js\ngame.isSupported\n```\n\nThis property is dynamically evaluated based on current device type and the game’s declared supported list."
         },
         {
           "id": "games_api",
