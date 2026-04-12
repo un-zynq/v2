@@ -31,7 +31,7 @@
           "id": "games_object",
           "label": "Game Object",
           "icon": "gamepad-2",
-          "content": "# ZYNQ\n\n## ZYNQ.games\n\n### Game Object Structure\n\nRepresents a single game entry.\n\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices?: number[],\n\n  isSupported: boolean\n}\n```\n"
+          "content": "## ZYNQ.games\n\n### Game Object Structure\n\nRepresents a single game entry.\n\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices?: number[],\n\n  isSupported: boolean\n}\n```\n"
         },
 
         {
