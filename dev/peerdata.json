@@ -1,60 +1,205 @@
 {
   "groups": [
     {
-      "title": "ZYNQ.peer",
+      "title": "Installation",
       "items": [
         {
-          "id": "peer-install",
-          "label": "Install",
-          "icon": "download",
-          "content": "# ZYNQ.peer\n\n## Install\n\n### Global Script Tag\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```\n\nThis automatically makes **ZYNQ.peer** and **ZYNQ.games** available globally.\n\n---\n\n### ES Module Import\n```js\n<script type=\"module\">\nimport ZYNQ from 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js'\n</script>\n```\n\n---\n\n## Methods exposed\n- peer\n- games\n\nThese are available globally via `ZYNQ.peer` and `ZYNQ.games`."
+          "id": "install_script",
+          "label": "Script Tag",
+          "icon": "code",
+          "badge": "Install",
+          "content": "```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```"
         },
         {
-          "id": "peer-usage",
-          "label": "Usage",
-          "icon": "terminal",
-          "content": "## Create a peer\n```js\nconst peer = new ZYNQ.Peer();\n```\n\n## Listen for ready\n```js\npeer.on('ready', (id) => {\n  console.log('Peer ID:', id);\n});\n```\n\nYou use this ID to connect with other users."
-        },
-        {
-          "id": "peer-connect",
-          "label": "Connect",
-          "icon": "link",
-          "content": "## Connect to peer\n```js\nconst conn = peer.connect('remote-id');\n```\n\n## Receive connection\n```js\npeer.on('connection', (conn) => {\n  conn.on('open', () => {\n    conn.send('Hello!');\n\n    conn.on('data', (data) => {\n      console.log('Received:', data);\n    });\n  });\n});\n```"
-        },
-        {
-          "id": "peer-media",
-          "label": "Video / Audio",
-          "icon": "video",
-          "content": "## Start call\n```js\nconst call = peer.call('remote-id', mediaStream);\n```\n\n## Answer call\n```js\npeer.on('call', (call) => {\n  call.answer(mediaStream);\n});\n```\n\n## Receive stream\n```js\ncall.on('stream', (stream) => {\n  video.srcObject = stream;\n});\n```"
+          "id": "install_module",
+          "label": "ES Module",
+          "icon": "package",
+          "badge": "Install",
+          "content": "```javascript\nimport ZYNQ, { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"\n```"
         }
       ]
     },
     {
-      "title": "ZYNQ.games",
+      "title": "ZYNQ Games",
       "items": [
         {
-          "id": "games-install",
-          "label": "Install",
-          "icon": "download",
-          "content": "# ZYNQ.games\n\n## Install\n\n### Global Script Tag\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```\n\nThis exposes `ZYNQ.games` globally.\n\n---\n\n### ES Module\n```js\nimport ZYNQ from 'https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js'\n```\n\n---\n\n## Available API\n- games\n- peer"
-        },
-        {
-          "id": "games-basic",
-          "label": "Basic Usage",
+          "id": "games_object",
+          "label": "Game Object",
           "icon": "gamepad-2",
-          "content": "## Init games\n```js\nconst games = new ZYNQ.games();\nawait games.init();\n```\n\n## Search games\n```js\ngames.search('minecraft');\nconsole.log(games.list);\n```\n\n## Reset\n```js\ngames.reset();\n```"
+          "badge": "Core",
+          "content": "A game object returned by ZYNQ.games methods.\n\n```text\nGame:\n- name: string\n- category?: string\n- alias: string\n- url: string\n- thumb: string\n- devices?: number[]\n\nComputed:\n- isSupported: boolean\n- isFavorite: boolean\n```"
         },
         {
-          "id": "games-features",
-          "label": "Features",
-          "icon": "star",
-          "content": "## Favorites\n```js\ngames.toggleFavorite('game-alias');\n```\n\n## History\n```js\ngames.addToHistory('game-alias');\nconsole.log(games.getHistory());\n```\n\n## Random game\n```js\nconst game = games.getRandomOne();\n```"
+          "id": "games_properties",
+          "label": "Properties",
+          "icon": "database",
+          "badge": "API",
+          "content": "Available properties:\n\n- ZYNQ.games.list\n- ZYNQ.games.total\n- ZYNQ.games.filteredCount\n- ZYNQ.games.history\n- ZYNQ.games.favorites"
         },
         {
-          "id": "games-filter",
-          "label": "Filtering",
-          "icon": "filter",
-          "content": "## Filter by category\n```js\ngames.getByCategory('action');\n```\n\n## Supported devices only\n```js\ngames.filterSupported();\n```\n\n## Favorites only\n```js\ngames.filterFavorites();\n```"
+          "id": "games_methods",
+          "label": "Methods",
+          "icon": "cog",
+          "badge": "API",
+          "children": [
+            {
+              "id": "games_init",
+              "label": ".init()",
+              "content": "Initialize game system.\n\n```javascript\nawait ZYNQ.games.init()\n```"
+            },
+            {
+              "id": "games_search",
+              "label": ".search()",
+              "content": "Search games by name or alias.\n\n```javascript\nZYNQ.games.search(\"alien\")\n```"
+            },
+            {
+              "id": "games_random",
+              "label": ".random()",
+              "content": "Get random games.\n\n```javascript\nZYNQ.games.random(2)\n```"
+            },
+            {
+              "id": "games_get_random_one",
+              "label": ".getRandomOne()",
+              "content": "Get a single random game.\n\n```javascript\nZYNQ.games.getRandomOne()\n```"
+            },
+            {
+              "id": "games_shuffle",
+              "label": ".shuffle()",
+              "content": "Shuffle current list.\n\n```javascript\nZYNQ.games.shuffle()\n```"
+            },
+            {
+              "id": "games_sort",
+              "label": ".sortBy()",
+              "content": "Sort by field.\n\n```javascript\nZYNQ.games.sortBy(\"name\")\n```"
+            },
+            {
+              "id": "games_sort_popularity",
+              "label": ".sortByPopularity()",
+              "content": "Sort by popularity.\n\n```javascript\nZYNQ.games.sortByPopularity()\n```"
+            },
+            {
+              "id": "games_get_by_alias",
+              "label": ".getByAlias()",
+              "content": "Get a single game by alias.\n\n```javascript\nZYNQ.games.getByAlias(\"alien-hominid\")\n```"
+            },
+            {
+              "id": "games_category",
+              "label": ".getByCategory()",
+              "content": "Filter by category.\n\n```javascript\nZYNQ.games.getByCategory(\"shooter\")\n```"
+            },
+            {
+              "id": "games_supported",
+              "label": ".filterSupported()",
+              "content": "Keep only supported games.\n\n```javascript\nZYNQ.games.filterSupported()\n```"
+            },
+            {
+              "id": "games_favorites",
+              "label": ".filterFavorites()",
+              "content": "Keep only favorites.\n\n```javascript\nZYNQ.games.filterFavorites()\n```"
+            },
+            {
+              "id": "games_toggle_favorite",
+              "label": ".toggleFavorite()",
+              "content": "Toggle favorite state.\n\n```javascript\nZYNQ.games.toggleFavorite(\"alien-hominid\")\n```"
+            },
+            {
+              "id": "games_history",
+              "label": ".history",
+              "content": "History management:\n\n```javascript\nZYNQ.games.addToHistory(\"alien-hominid\")\nZYNQ.games.getHistory()\nZYNQ.games.clearHistory()\n```"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "ZYNQ Peer",
+      "items": [
+        {
+          "id": "peer_constructor",
+          "label": "Constructor",
+          "icon": "plug",
+          "badge": "Core",
+          "content": "```javascript\nnew ZYNQ.peer(options)\n```"
+        },
+        {
+          "id": "peer_options",
+          "label": "Options",
+          "icon": "sliders",
+          "badge": "Config",
+          "content": "- video: boolean\n- audio: boolean\n- txt: boolean\n- debug: boolean\n- rateLimit: number\n- maxMsgSize: number\n- autoReconnect: boolean\n- maxReconnectAttempts: number"
+        },
+        {
+          "id": "peer_methods",
+          "label": "Methods",
+          "icon": "cog",
+          "badge": "API",
+          "children": [
+            {
+              "id": "peer_connect",
+              "label": ".connect()",
+              "content": "```javascript\npeer.connect(\"peer-id\")\n```"
+            },
+            {
+              "id": "peer_send",
+              "label": ".send()",
+              "content": "```javascript\npeer.send(\"hello\")\n```"
+            },
+            {
+              "id": "peer_stream",
+              "label": ".getStream()",
+              "content": "```javascript\nawait peer.getStream()\n```"
+            },
+            {
+              "id": "peer_close",
+              "label": ".close()",
+              "content": "```javascript\npeer.close()\n```"
+            },
+            {
+              "id": "peer_destroy",
+              "label": ".destroy()",
+              "content": "```javascript\npeer.destroy()\n```"
+            }
+          ]
+        },
+        {
+          "id": "peer_events",
+          "label": "Events",
+          "icon": "radio",
+          "badge": "Events",
+          "children": [
+            {
+              "id": "peer_event_open",
+              "label": "open",
+              "content": "```javascript\npeer.on(\"open\", id => {})\n```"
+            },
+            {
+              "id": "peer_event_data",
+              "label": "data",
+              "content": "```javascript\npeer.on(\"data\", msg => {})\n```"
+            },
+            {
+              "id": "peer_event_stream",
+              "label": "stream",
+              "content": "```javascript\npeer.on(\"stream\", stream => {})\n```"
+            },
+            {
+              "id": "peer_event_close",
+              "label": "close",
+              "content": "```javascript\npeer.on(\"close\", () => {})\n```"
+            },
+            {
+              "id": "peer_event_error",
+              "label": "error",
+              "content": "```javascript\npeer.on(\"error\", err => {})\n```"
+            }
+          ]
+        },
+        {
+          "id": "peer_example",
+          "label": "Example",
+          "icon": "terminal",
+          "badge": "Demo",
+          "content": "```javascript\nconst peer = new ZYNQ.peer({\n  video: true,\n  audio: true\n})\n\npeer.on(\"open\", id => {\n  console.log(\"My ID:\", id)\n})\n\npeer.on(\"data\", msg => {\n  console.log(msg)\n})\n\npeer.connect(\"other-id\")\npeer.send(\"hello 👽\")\n```"
         }
       ]
     }
