@@ -8,28 +8,28 @@
           "label": "Overview",
           "icon": "gamepad-2",
           "badge": "Core",
-          "content": "# Games Module The games module exposes a curated dataset of **533 games**, loaded remotely and normalized into a unified structure. Each game entry includes: - Name and alias - Category (optional) - Device compatibility flags - Thumbnail URL - Internal URL key The module is designed for fast filtering, chaining, and UI rendering without mutating the original dataset."
+          "content": "# Games Module\nThe games module exposes a curated dataset of **533 games**, loaded remotely and normalized into a unified structure.\n\nEach game entry includes:\n- Name and alias\n- Category (optional)\n- Device compatibility flags\n- Thumbnail URL\n- Internal URL key\n\nThe module is designed for fast filtering, chaining, and UI rendering without mutating the original dataset."
         },
         {
           "id": "games_search",
           "label": "Search & Filter",
           "icon": "search",
           "badge": "API",
-          "content": "# Search System Search operates directly on the full dataset and updates `filtered` in-place. ### Key behavior - Case-insensitive match on `name` and `alias` - Returns chainable instance - Does not mutate `all` ### Example ```js ZYNQ.games.search(\"eggy\") console.log(ZYNQ.games.list) ``` ### Filtering logic - If query is empty → returns all 533 games - Otherwise → filtered subset is stored internally"
+          "content": "# Search System\nSearch operates directly on the full dataset and updates `filtered` in-place.\n\n### Key behavior\n- Case-insensitive match on `name` and `alias`\n- Returns chainable instance\n- Does not mutate `all`\n\n### Example\n```js\nZYNQ.games.search(\"eggy\")\nconsole.log(ZYNQ.games.list)\n```\n\n### Filtering logic\n- If query is empty → returns all 533 games\n- Otherwise → filtered subset is stored internally"
         },
         {
           "id": "games_device",
           "label": "Device Support",
           "icon": "smartphone",
           "badge": "System",
-          "content": "# Device Detection Each game can declare supported device types: - 1 → Mobile - 2 → Desktop - 3 → Tablet - 4 → High-end / extended devices ### Runtime detection Device type is computed once at runtime using: - User agent heuristics - Touch capability - GPU fingerprint hints - Pointer / hover support ### Usage in games ```js game.isSupported ``` This property is dynamically evaluated based on current device type and the game’s declared supported list."
+          "content": "# Device Detection\nEach game can declare supported device types:\n- 1 → Mobile\n- 2 → Desktop\n- 3 → Tablet\n- 4 → High-end / extended devices\n\n### Runtime detection\nDevice type is computed once at runtime using:\n- User agent heuristics\n- Touch capability\n- GPU fingerprint hints\n- Pointer / hover support\n\n### Usage in games\n```js\ngame.isSupported\n```\n\nThis property is dynamically evaluated based on current device type and the game’s declared supported list."
         },
         {
           "id": "games_api",
           "label": "API Reference",
           "icon": "code",
           "badge": "Reference",
-          "content": "# Games API ### Core properties - `ZYNQ.games.list` → current filtered array - `ZYNQ.games.total` → total games (533) - `ZYNQ.games.filteredCount` → current filtered size ### Main methods ```js ZYNQ.games.search(query) ZYNQ.games.reset() ZYNQ.games.sortBy(\"name\") ZYNQ.games.sortByPopularity() ZYNQ.games.getByAlias(alias) ZYNQ.games.getByCategory(category) ZYNQ.games.filterSupported() ZYNQ.games.toggleFavorite(alias) ``` ### Important behavior Most methods DO NOT return raw data directly. They mutate internal state and return `this` for chaining: ```js ZYNQ.games.search(\"car\").filterSupported().sortBy(\"name\") console.log(ZYNQ.games.list) ```"
+          "content": "# Games API\n\n### Core properties\n- `ZYNQ.games.list` → current filtered array\n- `ZYNQ.games.total` → total games (533)\n- `ZYNQ.games.filteredCount` → current filtered size\n\n### Main methods\n```js\nZYNQ.games.search(query)\nZYNQ.games.reset()\nZYNQ.games.sortBy(\"name\")\nZYNQ.games.sortByPopularity()\nZYNQ.games.getByAlias(alias)\nZYNQ.games.getByCategory(category)\nZYNQ.games.filterSupported()\nZYNQ.games.toggleFavorite(alias)\n```\n\n### Important behavior\nMost methods DO NOT return raw data directly.\n\nThey mutate internal state and return `this` for chaining:\n```js\nZYNQ.games.search(\"car\").filterSupported().sortBy(\"name\")\nconsole.log(ZYNQ.games.list)\n```"
         }
       ]
     },
@@ -41,28 +41,28 @@
           "label": "Overview",
           "icon": "network",
           "badge": "Core",
-          "content": "# Peer System ZYNQPeer is a wrapper around PeerJS that adds: - Auto-reconnect logic - Rate limiting - Buffered message handling - Unified media + data channels It behaves like a state machine: `DISCONNECTED → CONNECTING → CONNECTED → RECONNECTING`"
+          "content": "# Peer System\nZYNQPeer is a wrapper around PeerJS that adds:\n- Auto-reconnect logic\n- Rate limiting\n- Buffered message handling\n- Unified media + data channels\n\nIt behaves like a state machine:\n`DISCONNECTED → CONNECTING → CONNECTED → RECONNECTING`"
         },
         {
           "id": "peer_connect",
           "label": "Connection",
           "icon": "plug",
           "badge": "Lifecycle",
-          "content": "# Connection Flow ### Connect ```js peer.connect(remoteId) ``` Internally: - Establishes data channel (if enabled) - Initiates media call (if video/audio enabled) - Syncs state across peers ### Auto reconnect If connection drops: - Exponential backoff retry - Max attempts configurable - Falls back to FAILED state"
+          "content": "# Connection Flow\n\n### Connect\n```js\npeer.connect(remoteId)\n```\n\nInternally:\n- Establishes data channel (if enabled)\n- Initiates media call (if video/audio enabled)\n- Syncs state across peers\n\n### Auto reconnect\nIf connection drops:\n- Exponential backoff retry\n- Max attempts configurable\n- Falls back to FAILED state"
         },
         {
           "id": "peer_data",
           "label": "Data & Media",
           "icon": "message-square",
           "badge": "Streams",
-          "content": "# Communication Layer ### Data channel - Reliable message delivery - Rate-limited (default: 30 msg/sec) - Buffered before emit ### Media stream ```js peer.getStream() ``` Supports video, audio, and combined streams. Incoming streams emit `stream` event."
+          "content": "# Communication Layer\n\n### Data channel\n- Reliable message delivery\n- Rate-limited (default: 30 msg/sec)\n- Buffered before emit\n\n### Media stream\n```js\npeer.getStream()\n```\n\nSupports:\n- Video\n- Audio\n- Combined streams\n\nIncoming streams emit `stream` event"
         },
         {
           "id": "peer_events",
           "label": "Events & Errors",
           "icon": "zap",
           "badge": "System",
-          "content": "# Event System ZYNQPeer extends EventEmitter. ### Core events - `ready` → peer ID available - `open` → connection established - `data` → incoming message - `stream` → media stream received - `close` → connection closed - `error` → error state ### Example ```js peer.on(\"data\", (msg) => { console.log(msg) }) ``` ### Error structure Errors are typed: peer, data, media, reconnect_failed"
+          "content": "# Event System\nZYNQPeer extends EventEmitter.\n\n### Core events\n- `ready` → peer ID available\n- `open` → connection established\n- `data` → incoming message\n- `stream` → media stream received\n- `close` → connection closed\n- `error` → error state\n\n### Example\n```js\npeer.on(\"data\", (msg) => {\n  console.log(msg)\n})\n```\n\n### Error structure\nErrors are typed:\npeer, data, media, reconnect_failed"
         }
       ]
     }
