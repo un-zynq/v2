@@ -1,24 +1,31 @@
 {
   "groups": [
     {
-      "title": "Installation",
-      "items": [
-        {
-          "id": "install_script",
-          "label": "Script Tag",
-          "icon": "code",
-          "badge": "Install",
-          "content": "```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```"
-        },
-        {
-          "id": "install_module",
-          "label": "ES Module",
-          "icon": "package",
-          "badge": "Install",
-          "content": "```javascript\nimport ZYNQ, { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"\n```"
-        }
-      ]
+  "title": "Installation",
+  "items": [
+    {
+      "id": "install_title",
+      "label": "Getting Started",
+      "icon": "rocket",
+      "badge": "Install",
+      "content": "## Installation\n\nWelcome to ZYNQ!\n\nChoose your preferred way to install the library below."
     },
+    {
+      "id": "install_script",
+      "label": "Script Tag",
+      "icon": "code",
+      "badge": "CDN",
+      "content": "## Script Tag\n\nUse this if you want the fastest setup via CDN.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"></script>\n```"
+    },
+    {
+      "id": "install_module",
+      "label": "ES Module",
+      "icon": "package",
+      "badge": "Modern",
+      "content": "## ES Module\n\nFor modern JavaScript projects (Vite, Webpack, etc).\n\n```javascript\nimport ZYNQ, { games, peer } from \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.0.8/index.min.js\"\n```"
+    }
+  ]
+},
     {
       "title": "ZYNQ Games",
       "items": [
