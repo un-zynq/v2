@@ -13,13 +13,13 @@
           "id": "install_script",
           "label": "Script Tag",
           "icon": "code",
-          "content": "## Script Tag\n\nLoads ZYNQ globally into `window.ZYNQ`.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.3/index.min.js\"></script>\n```\n\nAfter loading:\n```js\nwindow.ZYNQ\n```"
+          "content": "## Script Tag\n\nLoads ZYNQ globally into `window.ZYNQ`.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/index.min.js\"></script>\n```\n\nAfter loading:\n```js\nwindow.ZYNQ\n```"
         },
         {
           "id": "install_module",
           "label": "ES Module",
           "icon": "package",
-          "content": "## ES Module (Side Effect Import)\n\nThis version only initializes global `window.ZYNQ`.\n\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.3/index.min.js\"\n```\n\nAfter import:\n```js\nwindow.ZYNQ.Peer\nwindow.ZYNQ.games\n```"
+          "content": "## ES Module (Side Effect Import)\n\nThis version only initializes global `window.ZYNQ`.\n\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/index.min.js\"\n```\n\nAfter import:\n```js\nwindow.ZYNQ.Peer\nwindow.ZYNQ.games\n```"
         }
       ]
     },
@@ -198,44 +198,6 @@
 },
 
 {
-  "title": "ZYNQ Peer",
-  "items": [
-    {
-      "id": "peer_constructor",
-      "label": "Constructor",
-      "icon": "plug",
-      "content": "## ZYNQ.Peer\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: false,\n  audio: false,\n  txt: true\n})\n```\n\nCreates a new peer instance.\n\n- video: enable video calls\n- audio: enable audio calls\n- txt: enable data connections\n- id: optional fixed peer id"
-    },
-
-    {
-      "id": "peer_methods",
-      "label": "Methods",
-      "icon": "cog",
-      "children": [
-        {
-          "id": "peer_connect",
-          "label": ".connect()",
-          "content": "### .connect()\nConnects to another peer for data messaging.\n\n```js\npeer.connect(\"abc-123\")\n```"
-        },
-        {
-          "id": "peer_send",
-          "label": ".send()",
-          "content": "### .send()\nSends a message to a peer (auto-connects if needed).\n\n```js\npeer.send(\"abc-123\", \"hello\")\n```\n\n- supports \"*\" for broadcast"
-        },
-        {
-          "id": "peer_call",
-          "label": ".call()",
-          "content": "### .call()\nStarts a media call (video/audio).\n\n```js\npeer.call(\"abc-123\", { video: true, audio: true })\n```"
-        },
-        {
-          "id": "peer_disconnect",
-          "label": ".disconnect()",
-          "content": "### .disconnect()\nCloses connection to a peer and disables reconnect.\n\n```js\npeer.disconnect(\"abc-123\")\n```"
-        }
-      ]
-    },
-
-    {
   "title": "ZYNQ Peer",
   "items": [
     {
