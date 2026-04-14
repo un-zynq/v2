@@ -278,7 +278,6 @@ ZYNQ.Peer = class {
         call.on('close', () => this._closeCall(call.peer, rId));
     }
 
-    // Handmatige disconnect fix voor frontend
     disconnect(id) {
         this._closeConnection(id);
         this._closeCall(id, 'remote-video');
@@ -286,14 +285,20 @@ ZYNQ.Peer = class {
 
     _closeConnection(id) {
         const conn = this.connections.get(id);
-        if (conn) { conn.close(); this.connections.delete(id); }
+        if (conn) { 
+            conn.close(); 
+            this.connections.delete(id); 
+        }
         this.activeSessions.delete(`${id}-CHAT`);
         this._emit('disconnected', { id, type: 'CHAT' });
     }
 
     _closeCall(id, rId) {
         const call = this.calls.get(id);
-        if (call) { call.close(); this.calls.delete(id); }
+        if (call) { 
+            call.close(); 
+            this.calls.delete(id); 
+        }
         if (this.calls.size === 0 && this.localStream) {
             this.localStream.getTracks().forEach(t => t.stop());
             this.localStream = null;
@@ -352,16 +357,28 @@ zynq.on('ready', id => { document.getElementById('my-id').innerText = `ID: ${id}
 zynq.on('incoming', req => { showModal(req, 'in'); });
 zynq.on('accepted', data => {
     hideModal();
-    if(data.type === 'CHAT') { addContact(data.id); openChat(data.id); }
-    else if(data.type === 'VIDEO') document.getElementById('video-screen').style.display = 'block';
+    if(data.type === 'CHAT') { 
+        addContact(data.id); 
+        openChat(data.id); 
+    }
+    // VIDEO accepted wordt nu via stream afgehandeld (caller + callee)
 });
 zynq.on('rejected', () => { hideModal(); hangup(); });
 zynq.on('message', p => { saveMsg(p.from, p.data, 'received'); addContact(p.from); });
 zynq.on('stream', data => {
-    if(data.type === 'LOCAL') document.getElementById('local-video').srcObject = data.stream;
-    else if(data.type === 'REMOTE') document.getElementById('remote-video').srcObject = data.stream;
+    if(data.type === 'LOCAL') {
+        document.getElementById('local-video').srcObject = data.stream;
+    } 
+    else if(data.type === 'REMOTE') {
+        document.getElementById('remote-video').srcObject = data.stream;
+        hideModal();
+        document.getElementById('video-screen').style.display = 'block';
+    }
 });
-zynq.on('disconnected', () => { hideModal(); hangup(); });
+zynq.on('disconnected', () => { 
+    hideModal(); 
+    document.getElementById('video-screen').style.display = 'none';
+});
 
 // Functions
 async function connectToPeer() {
@@ -394,7 +411,9 @@ function showModal(req, dir) {
     }
 }
 
-function hideModal() { document.getElementById('modal').style.display = 'none'; }
+function hideModal() { 
+    document.getElementById('modal').style.display = 'none'; 
+}
 
 function addContact(id) {
     if(document.getElementById(`cnt-${id}`)) return;
@@ -471,8 +490,10 @@ function backToList() {
     currentPeer = null; 
 }
 
-// Auto-check status every 15s
-setInterval(() => { if(currentPeer) checkStatus(currentPeer); }, 5000);
+// Auto-check status
+setInterval(() => { 
+    if(currentPeer) checkStatus(currentPeer); 
+}, 5000);
 </script>
 
 </body>
