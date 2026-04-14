@@ -45,11 +45,11 @@
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <strong>ZYNQ Pro</strong><br><small id="myId">...</small>
+        <strong>ZYNQ Pro</strong><br><small id="myId">Connecting...</small>
     </div>
     <div style="padding: 15px;">
         <input type="text" id="targetId" placeholder="Peer ID...">
-        <button onclick="connectPeer()" style="width:100%; margin-top:10px; padding:10px; background:#1a1a1a; color:white; border:none; border-radius:8px; cursor:pointer;">Request Chat</button>
+        <button id="connBtn" onclick="connectPeer()" style="width:100%; margin-top:10px; padding:10px; background:#1a1a1a; color:white; border:none; border-radius:8px; cursor:pointer;">Request Chat</button>
     </div>
     <div class="peer-list" id="peerList"></div>
 </div>
@@ -78,7 +78,7 @@
 </div>
 
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t44.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t45.js"></script>
 
 <script>
     const zynq = new ZYNQ.Peer();
@@ -90,13 +90,14 @@
     const showToast = (txt, color) => {
         Toastify({
             text: txt,
-            duration: 10000, // 10 seconden
+            duration: 5000,
             gravity: "top",
             position: "right",
             style: { background: color, borderRadius: "10px" }
         }).showToast();
     };
 
+    // --- ZYNQ Event Handlers ---
     zynq.on('ready', id => document.getElementById('myId').innerText = `ID: ${id}`);
 
     zynq.on('incoming', req => {
@@ -114,7 +115,7 @@
     });
 
     zynq.on('rejected', data => {
-        showToast(`CONNECTION REJECTED: ${data.id.slice(0,8)}`, "#e91e63");
+        showToast(`PEER REJECTED OR BUSY`, "#e91e63");
     });
 
     zynq.on('stream', data => {
@@ -135,19 +136,12 @@
         }
     });
 
-    // --- ENHANCED DISCONNECT: ECHT VERWIJDEREN ---
     zynq.on('disconnected', d => {
         showToast(`DISCONNECTED: ${d.id.slice(0,8)}`, "#ff9800");
-        
-        // Verwijder uit data
         delete history[d.id];
         activeCalls.delete(d.id);
-
-        // Verwijder uit Sidebar DOM
         const el = document.getElementById(`peer-${d.id}`);
         if(el) el.remove();
-
-        // Als dit de actieve chat was, UI resetten
         if (activeId === d.id) {
             activeId = null;
             document.getElementById('video-container').style.display = 'none';
@@ -157,6 +151,7 @@
         }
     });
 
+    // --- UI Functies ---
     function initPeer(id) {
         if (!history[id]) {
             history[id] = { msgs: [] };
@@ -191,9 +186,7 @@
         renderChat();
     }
 
-    function killConn(id) {
-        zynq.disconnect(id);
-    }
+    function killConn(id) { zynq.disconnect(id); }
 
     function renderChat() {
         const win = document.getElementById('chat-window');
@@ -222,7 +215,7 @@
 
     function startCall() {
         if(!activeId) return;
-        showToast(`CALLING: ${activeId.slice(0,8)}`, "#007bff");
+        showToast(`CALLING...`, "#007bff");
         document.getElementById('video-container').style.display = 'block';
         zynq.call(activeId, 'local', 'remote');
     }
@@ -239,13 +232,28 @@
         pendingReq = null;
     }
 
-    function connectPeer() {
+    // --- ONLINE CHECK VOORDAT CONNECT WORDT AANGEROEPEN ---
+    async function connectPeer() {
         const val = document.getElementById('targetId').value.trim();
-        if (val) {
-            showToast(`REQUEST SENT TO: ${val.slice(0,8)}`, "#007bff");
+        const btn = document.getElementById('connBtn');
+        if (!val) return;
+
+        btn.disabled = true;
+        btn.innerText = "Checking...";
+
+        // Gebruik de isOnline fn uit t45.js (v1.3.0)
+        const online = await zynq.isOnline(val);
+
+        if (online) {
+            showToast(`PEER ONLINE - SENDING REQUEST`, "#007bff");
             zynq.connect(val);
             document.getElementById('targetId').value = '';
+        } else {
+            showToast(`PEER OFFLINE`, "#e91e63");
         }
+
+        btn.disabled = false;
+        btn.innerText = "Request Chat";
     }
 </script>
 </body>
