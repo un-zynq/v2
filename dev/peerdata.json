@@ -245,47 +245,83 @@
           "label": "ready",
           "content": "### Ready\nFired when the peer is fully initialized and has its own ID.\n\n```js\npeer.on('ready', (id) => {\n  // id = YOUR peer id\n})\n```\n\nReturns:\n- id (string) → your own peer id"
         },
-
         {
           "id": "peer_open",
           "label": "open",
           "content": "### Open\nFired when a DATA connection is successfully opened to another peer.\n\n```js\npeer.on('open', (peerId) => {\n  // peerId = remote peer you just connected to\n})\n```\n\nReturns:\n- peerId (string) → the peer you are now connected with\n\n⚠️ This is NOT your own id. That is 'ready'."
         },
-
         {
           "id": "peer_message",
           "label": "message",
           "content": "### Message\nTriggered when a message arrives.\n\n```js\npeer.on('message', ({ from, data }) => {})\n```\n\nReturns:\n- from: sender peer id\n- data: message payload"
         },
-
         {
           "id": "peer_stream",
           "label": "stream",
           "content": "### Stream\nTriggered when receiving a media stream.\n\n```js\npeer.on('stream', ({ from, stream }) => {})\n```"
         },
-
         {
           "id": "peer_close",
           "label": "close",
           "content": "### Close\nTriggered when a connection fully closes.\n\n```js\npeer.on('close', ({ id }) => {})\n```"
         },
-
         {
-          "id": "peer_disconnect",
+          "id": "peer_disconnect_event",
           "label": "disconnect",
           "content": "### Disconnect\nTriggered when a peer fully disconnects (or reconnect fails).\n\n```js\npeer.on('disconnect', ({ id }) => {})\n```"
         },
-
         {
           "id": "peer_error",
           "label": "error",
           "content": "### Error\nTriggered when an error happens.\n\n```js\npeer.on('error', (err) => {})\n```\n\nerr.type can be:\n- peer\n- data\n- media\n- reconnect_failed"
         },
-
         {
           "id": "peer_reconnecting",
           "label": "reconnecting",
           "content": "### Reconnecting\nTriggered when auto-reconnect starts.\n\n```js\npeer.on('reconnecting', ({ id, attempt, delay }) => {})\n```"
+        }
+      ]
+    },
+
+    {
+      "id": "peer_secure_engine",
+      "label": "Ultra-Secure Engine",
+      "icon": "shield",
+      "children": [
+        {
+          "id": "secure_overview",
+          "label": "Overview",
+          "content": "# ZYNQ Ultra-Secure & Performance Engine (`safeCall.js`)\n\nA high-performance wrapper for the ZYNQ WebRTC library that implements a mandatory security handshake, adaptive resource management, and automated stream synchronization.\n\n## Core Features\n\n- Mandatory Security Handshake: Verified REQ/ACC exchange before connection\n- Adaptive Performance Scaling: Adjusts FPS and sync rate based on load\n- Intelligent Catch-up Engine: Keeps streams near real-time\n- Auto-Retry Logic: 3-attempt handshake system\n- Resource Protection: Cleans up tracks and hardware on disconnect"
+        },
+
+        {
+          "id": "secure_load",
+          "label": "Load Order",
+          "content": "### Load Order\n`safeCall.js` patches the global ZYNQ object. It must be loaded AFTER the base library.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/index.min.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/safeCall.min.js\"></script>\n```"
+        },
+
+        {
+          "id": "secure_init",
+          "label": "Initialization",
+          "content": "### Initialization\n\n```js\nconst peer = new ZYNQ.Peer({\n  video: true,\n  audio: true\n})\n```\n\nSecurity layers are injected automatically."
+        },
+
+        {
+          "id": "secure_events",
+          "label": "Secure Events",
+          "content": "### Secure Events\n\n```js\npeer.on('call', (event) => {\n  console.log(\"Call from:\", event.from);\n  // event.accept() or event.reject()\n});\n\npeer.on('secure:stream', ({ from, stream, optimize }) => {\n  const videoElement = document.getElementById('remote-video');\n  videoElement.srcObject = stream;\n  optimize(videoElement);\n});\n\npeer.on('secure:closed', ({ id }) => {\n  console.log(\"Peer disconnected:\", id);\n});\n```"
+        },
+
+        {
+          "id": "secure_modes",
+          "label": "Adaptive Modes",
+          "content": "### Adaptive Modes\n\n- High (1–3 peers): 60 FPS, 800ms interval, 1.06x playback\n- Medium (4–6 peers): 15 FPS, 1000ms interval, 1.03x playback\n- Low (7+ peers): 10 FPS, 1500ms interval, hardware throttling"
+        },
+
+        {
+          "id": "secure_protocol",
+          "label": "Security Protocol",
+          "content": "### Security Protocol\n\n1. REQ: Sender requests connection\n2. ACC/REJ: Receiver validates\n3. Stream: Only after ACC is confirmed\n4. Violation: Unauthorized streams trigger `secure:violation` and are destroyed"
         }
       ]
     }
