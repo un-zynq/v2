@@ -1,499 +1,224 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZYNQ WhatsApp Clone - Version 1.5.1 Stable</title>
-    
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <style>
-        :root {
-            --wa-green: #00a884;
-            --wa-bg: #f0f2f5;
-            --wa-bubble-me: #d9fdd3;
-            --wa-gray: #54656f;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYNQ App</title>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t53.js"></script>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: #dadbd3; height: 100dvh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#111827;
+  --border:#334155;
+  --me:#22c55e;
+  --other:#3b82f6;
+}
 
-        .app-container { width: 100%; max-width: 1600px; height: 100%; display: flex; background: var(--wa-bg); position: relative; }
+body{
+  margin:0;
+  font-family:system-ui;
+  background:var(--bg);
+  color:white;
+}
 
-        /* Sidebar & Contact List */
-        .sidebar { width: 30%; min-width: 320px; border-right: 1px solid #ddd; display: flex; flex-direction: column; background: white; z-index: 10; }
-        .header { padding: 10px 16px; background: #f0f2f5; display: flex; justify-content: space-between; align-items: center; min-height: 60px; }
-        .my-id-tag { font-size: 11px; background: var(--wa-green); color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; }
-        
-        .search-area { padding: 10px; background: #fff; }
-        .search-area input { width: 100%; padding: 10px 15px; border-radius: 8px; border: none; background: #f0f2f5; outline: none; }
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:15px;
+}
 
-        .contact-list { flex: 1; overflow-y: auto; }
-        .contact-item { padding: 12px 16px; display: flex; align-items: center; border-bottom: 1px solid #f2f2f2; cursor: pointer; }
-        .contact-item:hover { background: #f5f6f6; }
-        
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #6c757d; color: white; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; text-transform: uppercase; flex-shrink: 0; }
-        
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; background: #ccc; }
-        .online { background: #1fa855; }
-        .offline { background: #f15c5c; }
+h1{ text-align:center; }
 
-        /* Chat View */
-        .chat-view { flex: 1; display: flex; flex-direction: column; background: #e5ddd5 url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); position: relative; }
-        .chat-header { padding: 10px 16px; background: #f0f2f5; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; min-height: 60px; }
-        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-        
-        .bubble { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 14.5px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); word-wrap: break-word; }
-        .sent { align-self: flex-end; background: var(--wa-bubble-me); border-top-right-radius: 0; }
-        .received { align-self: flex-start; background: white; border-top-left-radius: 0; }
+.top{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:10px;
+}
 
-        .input-bar { padding: 10px 16px; background: #f0f2f5; display: flex; align-items: center; gap: 10px; }
-        .input-bar input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; outline: none; }
+input,button{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+}
 
-        /* Overlays */
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 20, 26, 0.9); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px; }
-        .card { background: #222e35; padding: 40px 20px; border-radius: 24px; width: 100%; max-width: 300px; text-align: center; }
-        
-        .btn-row { display: flex; justify-content: center; align-items: center; gap: 40px; margin-top: 30px; }
-        .btn { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; }
-        .btn-green { background: #1fa855; }
-        .btn-red { background: #f15c5c; }
+input{ flex:1; min-width:150px; }
+button{ background:var(--me); color:white; cursor:pointer; }
 
-        #video-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none; z-index: 3000; }
-        #remote-video { width: 100%; height: 100%; object-fit: cover; }
-        #local-video { position: absolute; top: 20px; right: 20px; width: 100px; height: 140px; border: 2px solid rgba(255,255,255,0.4); border-radius: 12px; object-fit: cover; background: #333; }
+.chat{
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:10px;
+  height:250px;
+  overflow:auto;
+  background:var(--card);
+}
 
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; min-width: 100%; }
-            .chat-view { display: none; }
-            .chat-active .sidebar { display: none; }
-            .chat-active .chat-view { display: flex; }
-        }
-    </style>
+.msg{
+  padding:8px 12px;
+  margin:6px 0;
+  border-radius:12px;
+  max-width:70%;
+  word-wrap:break-word;
+}
+
+.me{
+  background:var(--me);
+  margin-left:auto;
+  text-align:right;
+  border:2px solid #16a34a;
+}
+
+.other{
+  background:var(--other);
+  margin-right:auto;
+  text-align:left;
+  border:2px solid #2563eb;
+}
+
+.videos{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.videoBox{
+  border:3px solid var(--border);
+  border-radius:12px;
+  padding:5px;
+  text-align:center;
+}
+
+.videoBox.me{ border-color:var(--me); }
+.videoBox.other{ border-color:var(--other); }
+
+video{
+  width:100%;
+  max-width:300px;
+  border-radius:10px;
+  background:black;
+}
+
+@media(max-width:600px){
+  .chat{ height:200px; }
+  video{ max-width:100%; }
+}
+</style>
 </head>
 <body>
 
-<div class="app-container" id="app">
-    <div class="sidebar">
-        <div class="header">
-            <div class="avatar">U</div>
-            <div id="my-id" class="my-id-tag">Connecting...</div>
-        </div>
-        <div class="search-area">
-            <input type="text" id="target-id" placeholder="Start chat met ID..." onkeypress="if(event.key==='Enter') connectToPeer()">
-        </div>
-        <div class="contact-list" id="contact-list"></div>
-    </div>
+<div class="container">
+<h1>⚡ ZYNQ Chat & Video</h1>
 
-    <div class="chat-view">
-        <div id="no-chat" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#8696a0; text-align:center;">
-            <i class="fab fa-whatsapp" style="font-size: 80px; opacity: 0.1;"></i>
-            <h2>ZYNQ Messenger</h2>
-        </div>
+<p style="text-align:center">Jouw ID: <b id="myId">...</b></p>
 
-        <div id="chat-ui" style="display:none; height:100%; flex-direction:column;">
-            <div class="chat-header">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-arrow-left" onclick="backToList()" style="margin-right:15px; cursor:pointer;"></i>
-                    <div class="avatar" id="active-avatar" style="width:40px; height:40px; font-size: 16px;">?</div>
-                    <div>
-                        <b id="active-name">Peer</b><br>
-                        <small id="active-status">Offline</small>
-                    </div>
-                </div>
-                <div style="display:flex; gap:20px; color:var(--wa-gray); font-size:18px;">
-                    <i class="fas fa-video" onclick="startCall()" style="cursor:pointer; color: var(--wa-green);"></i>
-                </div>
-            </div>
-            
-            <div class="messages" id="msg-container"></div>
-            
-            <div class="input-bar">
-                <input type="text" id="chat-input" placeholder="Typ een bericht" onkeypress="if(event.key==='Enter') sendText()">
-                <i class="fas fa-paper-plane" onclick="sendText()" style="color: var(--wa-green); cursor: pointer; font-size: 20px;"></i>
-            </div>
-        </div>
-    </div>
+<div class="top">
+  <input id="peerId" placeholder="Peer ID">
+  <button onclick="connect()">Connect</button>
+  <button onclick="startCall()">📹 Call</button>
+</div>
 
-    <div id="modal" class="overlay">
-        <div class="card">
-            <div class="avatar" id="modal-avatar" style="width:70px; height:70px; margin: 0 auto 15px; font-size: 30px;">?</div>
-            <h3 id="modal-title">Oproep</h3>
-            <p id="modal-peer" style="margin: 10px 0 20px; font-size: 14px; color: #8696a0;"></p>
-            
-            <div id="modal-btns" class="btn-row">
-                <button class="btn btn-red" id="btn-no"><i class="fas fa-times"></i></button>
-                <button class="btn btn-green" id="btn-ok"><i class="fas fa-check"></i></button>
-            </div>
-            
-            <div id="modal-wait" style="display:none; margin-top: 20px;">
-                <i class="fas fa-circle-notch fa-spin" style="font-size: 28px; color: var(--wa-green);"></i>
-                <p style="margin-top:15px; font-size: 12px; color: #8696a0;">VERBINDEN...</p>
-            </div>
-        </div>
-    </div>
+<div class="chat" id="chat"></div>
 
-    <div id="video-screen">
-        <video id="remote-video" autoplay playsinline></video>
-        <video id="local-video" autoplay playsinline muted></video>
-        <div style="position:absolute; bottom:50px; left:0; width:100%; display:flex; justify-content:center;">
-            <button class="btn btn-red" onclick="hangup()" style="width:75px; height:75px; font-size: 28px;"><i class="fas fa-phone-slash"></i></button>
-        </div>
-    </div>
+<div class="top">
+  <input id="msg" placeholder="Typ bericht...">
+  <button onclick="sendMsg()">Send</button>
+</div>
+
+<div class="videos">
+  <div class="videoBox me">
+    <div>👤 Jij</div>
+    <video id="local" autoplay muted></video>
+  </div>
+
+  <div class="videoBox other">
+    <div>🧑 Peer</div>
+    <video id="remote" autoplay></video>
+  </div>
+</div>
 </div>
 
 <script>
-/**
- * ZYNQ Core Library - Version: 1.5.1 (T47-ULTRA-LOW-LATENCY)
- * Optimized for: Zero Latency Buildup, Perfect GC, and Signal-based Call Reject.
- */
-window.ZYNQ = window.ZYNQ || {};
-
-ZYNQ.Peer = class {
-    constructor() {
-        this.events = {};
-        this.connections = new Map(); 
-        this.calls = new Map();        
-        this.activeSessions = new Set();
-        this.localStream = null;
-        this.myId = null;
-        
-        this.rtcConfig = {
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-            sdpSemantics: 'unified-plan',
-            bundlePolicy: 'max-bundle'
-        };
-
-        this._init(this._generateId());
-    }
-
-    _generateId() {
-        const c = "ABCDEFGHJKLMNPRSTUVW", n = "23456789";
-        const r = (s) => s[Math.floor(Math.random() * s.length)];
-        return `${r(c)}${r(n)}${r(c)}-${r(c)}${r(n)}${r(c)}`;
-    }
-
-    async _init(id) {
-        this.peer = new Peer(id, { config: this.rtcConfig, debug: 1 });
-        
-        this.peer.on('open', assignedId => {
-            this.myId = assignedId;
-            this._emit('ready', assignedId);
-        });
-
-        this.peer.on('connection', conn => {
-            conn.on('data', data => {
-                if (data?._zynq === 'CHECK_ONLINE') {
-                    conn.isSilent = true;
-                    conn.send({ _zynq: 'PONG_ONLINE' });
-                    setTimeout(() => conn.close(), 100);
-                    return;
-                }
-                this._handleData(conn, data);
-            });
-
-            setTimeout(() => {
-                if (!conn.isSilent) {
-                    this._setupDataHandlers(conn);
-                    this._emit('incoming', { 
-                        from: conn.peer, type: 'CHAT',
-                        accept: () => {
-                            conn.send({ _zynq: 'ACCEPTED' });
-                            this._registerSession(conn.peer, 'CHAT');
-                            this._emit('accepted', { id: conn.peer, type: 'CHAT' });
-                        },
-                        reject: () => {
-                            conn.send({ _zynq: 'REJECTED' });
-                            setTimeout(() => this._closeConnection(conn.peer), 100);
-                        }
-                    });
-                }
-            }, 200);
-        });
-
-        this.peer.on('call', call => {
-            this._emit('incoming', {
-                from: call.peer, type: 'VIDEO',
-                accept: async (lId, rId) => {
-                    const s = await this._getMediaStream();
-                    if (lId && document.getElementById(lId)) document.getElementById(lId).srcObject = s;
-                    call.answer(s);
-                    this._setupMediaHandlers(call, rId);
-                    this._emit('accepted', { id: call.peer, type: 'VIDEO' });
-                },
-                reject: () => {
-                    this.send(call.peer, { _zynq: 'REJECTED_VIDEO' });
-                    call.close();
-                }
-            });
-        });
-    }
-
-    async _getMediaStream() {
-        if (this.localStream) return this.localStream;
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: { echoCancellation: true, noiseSuppression: true },
-            video: { width: { ideal: 1280 }, height: { ideal: 720 } }
-        });
-        this.localStream = stream;
-        return stream;
-    }
-
-    _handleData(conn, data) {
-        if (!data || typeof data !== 'object') {
-            this._emit('message', { from: conn.peer, data: data });
-            return;
-        }
-        switch (data._zynq) {
-            case 'ACCEPTED':
-                this._registerSession(conn.peer, 'CHAT');
-                this._emit('accepted', { id: conn.peer, type: 'CHAT' });
-                break;
-            case 'REJECTED':
-                this._emit('rejected', { id: conn.peer, type: 'CHAT' });
-                this._closeConnection(conn.peer);
-                break;
-            case 'REJECTED_VIDEO':
-                this._emit('rejected', { id: conn.peer, type: 'VIDEO' });
-                this._closeCall(conn.peer);
-                break;
-            default:
-                if (!data._zynq) this._emit('message', { from: conn.peer, data: data });
-        }
-    }
-
-    _setupDataHandlers(conn) {
-        this.connections.set(conn.peer, conn);
-        conn.on('close', () => this._closeConnection(conn.peer));
-    }
-
-    _setupMediaHandlers(call, rId) {
-        this.calls.set(call.peer, call);
-        call.on('stream', s => {
-            const videoEl = document.getElementById(rId);
-            if (videoEl) videoEl.srcObject = s;
-            this._emit('stream', { id: call.peer, type: 'REMOTE', stream: s });
-        });
-        call.on('close', () => this._closeCall(call.peer, rId));
-    }
-
-    disconnect(id) {
-        this._closeConnection(id);
-        this._closeCall(id, 'remote-video');
-    }
-
-    _closeConnection(id) {
-        const conn = this.connections.get(id);
-        if (conn) { 
-            conn.close(); 
-            this.connections.delete(id); 
-        }
-        this.activeSessions.delete(`${id}-CHAT`);
-        this._emit('disconnected', { id, type: 'CHAT' });
-    }
-
-    _closeCall(id, rId) {
-        const call = this.calls.get(id);
-        if (call) { 
-            call.close(); 
-            this.calls.delete(id); 
-        }
-        if (this.calls.size === 0 && this.localStream) {
-            this.localStream.getTracks().forEach(t => t.stop());
-            this.localStream = null;
-        }
-        const videoEl = document.getElementById(rId);
-        if (videoEl) videoEl.srcObject = null;
-        this.activeSessions.delete(`${id}-VIDEO`);
-        this._emit('disconnected', { id, type: 'VIDEO' });
-    }
-
-    _registerSession(id, type) { this.activeSessions.add(`${id}-${type}`); }
-    on(e, cb) { this.events[e] = cb; }
-    _emit(e, d) { if (this.events[e]) this.events[e](d); }
-
-    connect(id) { 
-        const conn = this.peer.connect(id, { reliable: false }); 
-        this._setupDataHandlers(conn); 
-        conn.on('data', d => this._handleData(conn, d));
-    }
-
-    send(id, msg) {
-        const c = this.connections.get(id);
-        if (c?.open) { c.send(msg); return true; }
-        return false;
-    }
-
-    async call(id, lId, rId) {
-        const s = await this._getMediaStream();
-        if (lId && document.getElementById(lId)) document.getElementById(lId).srcObject = s;
-        this._emit('stream', { id: 'local', type: 'LOCAL', stream: s });
-        const call = this.peer.call(id, s);
-        this._setupMediaHandlers(call, rId);
-    }
-
-    isOnline(id) {
-        return new Promise(resolve => {
-            const conn = this.peer.connect(id, { reliable: true });
-            let done = false;
-            const t = setTimeout(() => { if(!done){ conn.close(); resolve(false); } }, 3000);
-            conn.on('open', () => conn.send({ _zynq: 'CHECK_ONLINE' }));
-            conn.on('data', d => {
-                if(d?._zynq === 'PONG_ONLINE'){ done=true; clearTimeout(t); conn.close(); resolve(true); }
-            });
-            conn.on('error', () => { done=true; clearTimeout(t); resolve(false); });
-        });
-    }
-};
-
-// --- Frontend Apps Logic ---
-const zynq = new ZYNQ.Peer();
+const peer = new ZYNQ.Peer();
 let currentPeer = null;
-let messageDb = {};
 
-// Event Listeners
-zynq.on('ready', id => { document.getElementById('my-id').innerText = `ID: ${id}`; });
-zynq.on('incoming', req => { showModal(req, 'in'); });
-zynq.on('accepted', data => {
-    hideModal();
-    if(data.type === 'CHAT') { 
-        addContact(data.id); 
-        openChat(data.id); 
-    }
-    // VIDEO accepted wordt nu via stream afgehandeld (caller + callee)
-});
-zynq.on('rejected', () => { hideModal(); hangup(); });
-zynq.on('message', p => { saveMsg(p.from, p.data, 'received'); addContact(p.from); });
-zynq.on('stream', data => {
-    if(data.type === 'LOCAL') {
-        document.getElementById('local-video').srcObject = data.stream;
-    } 
-    else if(data.type === 'REMOTE') {
-        document.getElementById('remote-video').srcObject = data.stream;
-        hideModal();
-        document.getElementById('video-screen').style.display = 'block';
-    }
-});
-zynq.on('disconnected', () => { 
-    hideModal(); 
-    document.getElementById('video-screen').style.display = 'none';
+peer.on('ready', id => {
+  document.getElementById('myId').innerText = id;
 });
 
-// Functions
-async function connectToPeer() {
-    const id = document.getElementById('target-id').value.trim();
-    if(!id || id === zynq.myId) return;
-    showModal({from: id, type: 'CHAT'}, 'out');
-    const online = await zynq.isOnline(id);
-    if(online) zynq.connect(id);
-    else { hideModal(); alert("User Offline"); }
-    document.getElementById('target-id').value = '';
-}
-
-function showModal(req, dir) {
-    const m = document.getElementById('modal');
-    m.style.display = 'flex';
-    document.getElementById('modal-peer').innerText = req.from;
-    document.getElementById('modal-avatar').innerText = req.from[0];
-    if(dir === 'out') {
-        document.getElementById('modal-btns').style.display = 'none';
-        document.getElementById('modal-wait').style.display = 'block';
+peer.on('incoming', req => {
+  const accept = confirm(`Incoming ${req.type} van ${req.from}`);
+  if (accept) {
+    if (req.type === 'VIDEO') {
+      req.accept('local', 'remote');
     } else {
-        document.getElementById('modal-btns').style.display = 'flex';
-        document.getElementById('modal-wait').style.display = 'none';
-        document.getElementById('btn-ok').onclick = () => {
-            if(req.type === 'VIDEO') req.accept('local-video', 'remote-video');
-            else req.accept();
-            hideModal();
-        };
-        document.getElementById('btn-no').onclick = () => { req.reject(); hideModal(); };
+      req.accept();
     }
+    currentPeer = req.from;
+  } else {
+    req.reject();
+  }
+});
+
+peer.on('message', data => {
+  addChat(data.data, false);
+});
+
+peer.on('accepted', data => {
+  addSystem(`✔ Connected met ${data.id}`);
+  currentPeer = data.id;
+});
+
+peer.on('rejected', data => {
+  addSystem(`❌ Rejected door ${data.id}`);
+});
+
+peer.on('disconnected', data => {
+  addSystem(`🔌 Disconnected ${data.id}`);
+});
+
+function connect(){
+  const id = document.getElementById('peerId').value;
+  if(!id) return;
+  peer.connect(id);
+  currentPeer = id;
 }
 
-function hideModal() { 
-    document.getElementById('modal').style.display = 'none'; 
+function sendMsg(){
+  const msg = document.getElementById('msg').value;
+  if(!currentPeer) return alert('Geen peer');
+  peer.send(currentPeer, msg);
+  addChat(msg, true);
 }
 
-function addContact(id) {
-    if(document.getElementById(`cnt-${id}`)) return;
-    const list = document.getElementById('contact-list');
-    const div = document.createElement('div');
-    div.className = 'contact-item';
-    div.id = `cnt-${id}`;
-    div.onclick = () => openChat(id);
-    div.innerHTML = `<div class="avatar">${id[0]}</div><div style="flex:1"><b>${id}</b><br><small><span id="status-${id}" class="status-dot"></span></small></div>`;
-    list.prepend(div);
-    if(!messageDb[id]) messageDb[id] = [];
-    checkStatus(id);
+function startCall(){
+  const id = document.getElementById('peerId').value;
+  if(!id) return;
+  peer.call(id, 'local', 'remote');
 }
 
-async function checkStatus(id) {
-    const isOnline = await zynq.isOnline(id);
-    const dot = document.getElementById(`status-${id}`);
-    if(dot) dot.className = `status-dot ${isOnline ? 'online' : 'offline'}`;
-    if(currentPeer === id) document.getElementById('active-status').innerText = isOnline ? 'Online' : 'Offline';
+function addChat(text, isMe){
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (isMe ? 'me' : 'other');
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-function openChat(id) {
-    currentPeer = id;
-    document.getElementById('app').classList.add('chat-active');
-    document.getElementById('no-chat').style.display = 'none';
-    document.getElementById('chat-ui').style.display = 'flex';
-    document.getElementById('active-name').innerText = id;
-    document.getElementById('active-avatar').innerText = id[0];
-    renderMsgs();
-    checkStatus(id);
+function addSystem(text){
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.style.textAlign='center';
+  div.style.opacity='0.6';
+  div.innerText=text;
+  chat.appendChild(div);
 }
-
-function sendText() {
-    const input = document.getElementById('chat-input');
-    if(input.value.trim() && currentPeer) {
-        zynq.send(currentPeer, input.value);
-        saveMsg(currentPeer, input.value, 'sent');
-        input.value = '';
-    }
-}
-
-function saveMsg(id, text, type) {
-    if(!messageDb[id]) messageDb[id] = [];
-    messageDb[id].push({text, type, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})});
-    if(currentPeer === id) renderMsgs();
-}
-
-function renderMsgs() {
-    const box = document.getElementById('msg-container');
-    box.innerHTML = '';
-    (messageDb[currentPeer] || []).forEach(m => {
-        const d = document.createElement('div');
-        d.className = `bubble ${m.type}`;
-        d.innerHTML = `${m.text} <br><small style="font-size:9px; opacity:0.5; float:right;">${m.time}</small>`;
-        box.appendChild(d);
-    });
-    box.scrollTop = box.scrollHeight;
-}
-
-function startCall() {
-    if(!currentPeer) return;
-    showModal({from: currentPeer, type: 'VIDEO'}, 'out');
-    zynq.call(currentPeer, 'local-video', 'remote-video');
-}
-
-function hangup() {
-    if(currentPeer) zynq.disconnect(currentPeer);
-    document.getElementById('video-screen').style.display = 'none';
-    hideModal();
-}
-
-function backToList() { 
-    document.getElementById('app').classList.remove('chat-active'); 
-    currentPeer = null; 
-}
-
-// Auto-check status
-setInterval(() => { 
-    if(currentPeer) checkStatus(currentPeer); 
-}, 5000);
 </script>
 
 </body>
