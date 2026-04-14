@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZYNQ v35 | Fixed & Clean</title>
+    <title>ZYNQ v35 | T47 Stable</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
@@ -63,7 +63,7 @@
 </div>
 
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t46.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t47.js"></script>
 
 <script>
     const zynq = new ZYNQ.Peer();
@@ -73,7 +73,7 @@
     const activeCalls = new Map();
 
     const showToast = (txt, color) => {
-        Toastify({ text: txt, duration: 5000, gravity: "top", position: "right", style: { background: color, borderRadius: "10px" } }).showToast();
+        Toastify({ text: txt, duration: 4000, gravity: "top", position: "right", style: { background: color, borderRadius: "10px" } }).showToast();
     };
 
     zynq.on('ready', id => document.getElementById('myId').innerText = `ID: ${id}`);
@@ -92,10 +92,8 @@
         openChat(data.id);
     });
 
-    // FIX: Luister alleen naar het 'message' event van de library
     zynq.on('message', m => {
         if (!history[m.from]) history[m.from] = { msgs: [] };
-        // Voorkom dubbele rendering door te checken of dit bericht al de laatste is (optioneel)
         history[m.from].msgs.push(m);
         if (activeId === m.from) renderChat();
     });
@@ -112,7 +110,7 @@
     });
 
     zynq.on('disconnected', d => {
-        showToast(`DISCONNECTED`, "#ff9800");
+        showToast("SESSION ENDED", "#ff9800");
         delete history[d.id];
         activeCalls.delete(d.id);
         const el = document.getElementById(`peer-${d.id}`);
@@ -144,6 +142,14 @@
         if(el) el.classList.add('active');
         document.getElementById('chat-title').innerText = `Chat: ${id.slice(0,8)}`;
         document.getElementById('vBtn').style.display = 'block';
+        
+        const stream = activeCalls.get(id);
+        if (stream && typeof stream !== 'boolean') {
+            document.getElementById('video-container').style.display = 'block';
+            document.getElementById('remote').srcObject = stream;
+        } else {
+            document.getElementById('video-container').style.display = 'none';
+        }
         renderChat();
     }
 
@@ -188,6 +194,7 @@
         if (!val) return;
         const btn = document.getElementById('connBtn');
         btn.disabled = true;
+        btn.innerText = "Checking...";
         const online = await zynq.isOnline(val);
         if (online) {
             zynq.connect(val);
@@ -196,6 +203,7 @@
             showToast("PEER OFFLINE", "#e91e63");
         }
         btn.disabled = false;
+        btn.innerText = "Request Chat";
     }
 </script>
 </body>
