@@ -2,215 +2,251 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZYNQ v35 - Universal Mesh</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZYNQ v35 | Toast & Purge Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
-        :root { --primary: #e91e63; --secondary: #007bff; --bg: #f0f2f5; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: #333; }
-        
-        /* Sidebar Styles */
-        .sidebar { width: 300px; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        :root { --primary: #e91e63; --secondary: #007bff; --bg: #f0f2f5; --sidebar-w: 280px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
+
+        .sidebar { width: var(--sidebar-w); background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; z-index: 20; transition: transform 0.3s ease; }
         .sidebar-header { padding: 20px; background: var(--primary); color: white; }
-        .peer-list { flex-grow: 1; overflow-y: auto; }
-        .peer-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; }
-        .peer-item.active { background: #e7f3ff; border-left: 5px solid var(--secondary); }
-        .unread-dot { position: absolute; right: 15px; top: 15px; width: 10px; height: 10px; background: var(--secondary); border-radius: 50%; display: none; }
-
-        /* Main Chat Area */
-        .main { flex-grow: 1; display: flex; flex-direction: column; }
-        .header { padding: 15px 25px; background: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .peer-list { flex: 1; overflow-y: auto; }
+        .peer-item { padding: 12px 20px; border-bottom: 1px solid #f8f9fa; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .peer-item.active { background: #e7f3ff; border-left: 4px solid var(--secondary); }
+        .disc-btn { color: #ff4d4d; border: none; background: none; font-size: 18px; cursor: pointer; padding: 5px; }
         
-        #video-container { display: none; gap: 10px; padding: 15px; background: #000; justify-content: center; }
-        video { height: 180px; aspect-ratio: 4/3; background: #222; border-radius: 8px; object-fit: cover; }
+        .main { flex: 1; display: flex; flex-direction: column; position: relative; background: #fff; }
+        .header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; height: 60px; }
+        
+        #video-container { display: none; position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+        video { background: #111; width: 100%; height: 100%; object-fit: cover; }
+        #local { position: absolute; bottom: 10px; right: 10px; width: 100px; aspect-ratio: 3/4; border-radius: 8px; border: 2px solid #fff; }
 
-        #chat-window { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 70%; padding: 10px 14px; border-radius: 15px; font-size: 14px; }
-        .msg.received { background: white; align-self: flex-start; border: 1px solid #ddd; }
+        #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #f8f9fa; }
+        .msg { max-width: 80%; padding: 10px 14px; border-radius: 15px; font-size: 14px; }
         .msg.sent { background: var(--secondary); color: white; align-self: flex-end; }
+        .msg.received { background: white; align-self: flex-start; }
 
-        .input-area { padding: 20px; background: white; border-top: 1px solid #ddd; display: flex; gap: 10px; }
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; flex-grow: 1; outline: none; }
+        .input-area { padding: 12px; display: flex; gap: 10px; border-top: 1px solid #eee; }
+        input[type="text"] { flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px; }
+
+        #reqBox { display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); width: 90%; max-width: 320px; background:white; padding:20px; border-radius:15px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 1000; text-align: center; }
         
-        button { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-main { background: var(--secondary); color: white; }
-        .btn-video { background: #28a745; color: white; }
-
-        /* Universal Popup */
-        #reqBox { 
-            display:none; position:fixed; top:20px; right:20px; background:white; 
-            padding:20px; border-radius:12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            z-index: 1000; border-left: 6px solid var(--primary); 
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: 100%; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
         }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <strong>ZYNQ v35</strong><br>
-        <small>My ID: <span id="myId">Connecting...</span></small>
+        <strong>ZYNQ Pro</strong><br><small id="myId">...</small>
     </div>
-    <div style="padding: 15px; border-bottom: 1px solid #eee;">
-        <input id="targetId" placeholder="Enter Peer ID..." style="width: 100%; box-sizing: border-box; margin-bottom: 10px;">
-        <button onclick="connectPeer()" style="width: 100%; background: #333; color: white;">Connect</button>
+    <div style="padding: 15px;">
+        <input type="text" id="targetId" placeholder="Peer ID...">
+        <button onclick="connectPeer()" style="width:100%; margin-top:10px; padding:10px; background:#1a1a1a; color:white; border:none; border-radius:8px; cursor:pointer;">Request Chat</button>
     </div>
     <div class="peer-list" id="peerList"></div>
 </div>
 
 <div class="main">
     <div class="header">
-        <h3 id="current-peer-name">No active chat</h3>
-        <button class="btn-video" id="videoBtn" onclick="startCall()" style="display:none;">Video Call</button>
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none; border:none; font-size:20px; cursor:pointer;">☰</button>
+        <div style="flex:1"><h5 id="chat-title" style="margin:0;">No Active Session</h5></div>
+        <button id="vBtn" onclick="startCall()" style="display:none; background:#28a745; color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer;">Video</button>
     </div>
-
-    <div id="video-container">
-        <video id="local" autoplay muted playsinline></video>
-        <video id="remote" autoplay playsinline></video>
-    </div>
-
+    <div id="video-container"><video id="remote" autoplay playsinline></video><video id="local" autoplay muted playsinline></video></div>
     <div id="chat-window"></div>
-
     <div class="input-area">
-        <input id="msgIn" placeholder="Type a message..." onkeypress="if(event.key==='Enter') send()">
-        <button class="btn-main" onclick="send()">Send</button>
+        <input type="text" id="msgIn" placeholder="Type..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <button onclick="sendMsg()" style="background:var(--secondary); color:white; border:none; width:40px; height:40px; border-radius:50%;">➤</button>
     </div>
 </div>
 
 <div id="reqBox">
-    <strong id="reqTitle">Request</strong><br>
-    <p id="reqFrom" style="font-family: monospace; font-size: 12px; margin: 10px 0;"></p>
+    <b id="reqType" style="color:var(--primary)">Request</b>
+    <p id="reqFrom" style="font-size:11px; margin:10px 0;"></p>
     <div style="display:flex; gap:10px;">
-        <button onclick="handleRequest(true)" class="btn-main">Accept</button>
-        <button onclick="handleRequest(false)" style="background:#eee;">Reject</button>
+        <button onclick="ans(true)" style="flex:1; padding:10px; background:var(--secondary); color:white; border:none; border-radius:8px;">Accept</button>
+        <button onclick="ans(false)" style="flex:1; padding:10px; background:#eee; border:none; border-radius:8px;">Reject</button>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t43.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t44.js"></script>
 
 <script>
     const zynq = new ZYNQ.Peer();
-    let activePartner = null;
-    let currentRequest = null;
-    const history = {}; // { peerId: [{from, data}] }
+    let activeId = null;
+    let pendingReq = null;
+    let history = {};
+    const activeCalls = new Map();
 
-    // --- ZYNQ Events ---
+    const showToast = (txt, color) => {
+        Toastify({
+            text: txt,
+            duration: 10000, // 10 seconden
+            gravity: "top",
+            position: "right",
+            style: { background: color, borderRadius: "10px" }
+        }).showToast();
+    };
 
-    zynq.on('ready', id => {
-        document.getElementById('myId').innerText = id;
-    });
+    zynq.on('ready', id => document.getElementById('myId').innerText = `ID: ${id}`);
 
     zynq.on('incoming', req => {
-        currentRequest = req;
-        document.getElementById('reqTitle').innerText = `Incoming ${req.type}`;
+        pendingReq = req;
+        document.getElementById('reqType').innerText = `Incoming ${req.type}`;
         document.getElementById('reqFrom').innerText = req.from;
         document.getElementById('reqBox').style.display = 'block';
     });
 
     zynq.on('accepted', data => {
-        if (!history[data.id]) history[data.id] = [];
-        updatePeerList(data.id);
-        if (data.type === 'VIDEO') document.getElementById('video-container').style.display = 'flex';
-        switchChat(data.id);
+        showToast(`CONNECTION ACCEPTED: ${data.id.slice(0,8)}`, "#28a745");
+        initPeer(data.id);
+        if (data.type === 'VIDEO') activeCalls.set(data.id, true);
+        openChat(data.id);
     });
 
     zynq.on('rejected', data => {
-        // Alleen alerten als de ANDER heeft geweigerd
-        if (data.by !== zynq.myId) {
-            alert(`${data.type} request rejected by ${data.id}`);
+        showToast(`CONNECTION REJECTED: ${data.id.slice(0,8)}`, "#e91e63");
+    });
+
+    zynq.on('stream', data => {
+        if (data.type === 'LOCAL') document.getElementById('local').srcObject = data.stream;
+        else if (data.type === 'REMOTE') {
+            activeCalls.set(data.id, data.stream);
+            if (data.id === activeId) {
+                document.getElementById('remote').srcObject = data.stream;
+                document.getElementById('video-container').style.display = 'block';
+            }
         }
     });
 
     zynq.on('message', m => {
-        if (!history[m.from]) history[m.from] = [];
-        history[m.from].push(m);
+        if (history[m.from]) {
+            history[m.from].msgs.push(m);
+            if (activeId === m.from) renderChat();
+        }
+    });
+
+    // --- ENHANCED DISCONNECT: ECHT VERWIJDEREN ---
+    zynq.on('disconnected', d => {
+        showToast(`DISCONNECTED: ${d.id.slice(0,8)}`, "#ff9800");
         
-        if (activePartner === m.from) {
-            renderMessages();
+        // Verwijder uit data
+        delete history[d.id];
+        activeCalls.delete(d.id);
+
+        // Verwijder uit Sidebar DOM
+        const el = document.getElementById(`peer-${d.id}`);
+        if(el) el.remove();
+
+        // Als dit de actieve chat was, UI resetten
+        if (activeId === d.id) {
+            activeId = null;
+            document.getElementById('video-container').style.display = 'none';
+            document.getElementById('chat-window').innerHTML = '';
+            document.getElementById('chat-title').innerText = "No Active Session";
+            document.getElementById('vBtn').style.display = 'none';
+        }
+    });
+
+    function initPeer(id) {
+        if (!history[id]) {
+            history[id] = { msgs: [] };
+            const item = document.createElement('div');
+            item.id = `peer-${id}`;
+            item.className = 'peer-item';
+            item.innerHTML = `
+                <div onclick="openChat('${id}')" style="flex:1; overflow:hidden; text-overflow:ellipsis;"><strong>${id}</strong></div>
+                <button class="disc-btn" onclick="killConn('${id}')">✕</button>
+            `;
+            document.getElementById('peerList').prepend(item);
+        }
+    }
+
+    function openChat(id) {
+        if(!history[id]) return;
+        activeId = id;
+        document.querySelectorAll('.peer-item').forEach(e => e.classList.remove('active'));
+        const el = document.getElementById(`peer-${id}`);
+        if(el) el.classList.add('active');
+        
+        document.getElementById('chat-title').innerText = `Chat: ${id.slice(0,12)}...`;
+        document.getElementById('vBtn').style.display = 'block';
+
+        const stream = activeCalls.get(id);
+        if (stream && typeof stream !== 'boolean') {
+            document.getElementById('video-container').style.display = 'block';
+            document.getElementById('remote').srcObject = stream;
         } else {
-            const dot = document.querySelector(`#peer-${m.from} .unread-dot`);
-            if (dot) dot.style.display = 'block';
+            document.getElementById('video-container').style.display = 'none';
         }
-    });
-
-    zynq.on('disconnected', data => {
-        // De Universele Fix: Als de beller ophangt terwijl de popup er nog staat
-        if (currentRequest && currentRequest.from === data.id) {
-            document.getElementById('reqBox').style.display = 'none';
-            currentRequest = null;
-        }
-
-        const item = document.getElementById(`peer-${data.id}`);
-        if (item) item.style.opacity = '0.5';
-        if (data.type === 'VIDEO') document.getElementById('video-container').style.display = 'none';
-    });
-
-    // --- UI Logic ---
-
-    function connectPeer() {
-        const id = document.getElementById('targetId').value;
-        if (id) zynq.connect(id);
+        renderChat();
     }
 
-    function updatePeerList(id) {
-        if (document.getElementById(`peer-${id}`)) return;
-        const list = document.getElementById('peerList');
-        const item = document.createElement('div');
-        item.id = `peer-${id}`;
-        item.className = 'peer-item';
-        item.innerHTML = `<strong>${id.split('-')[0]}</strong><br><small>${id}</small><div class="unread-dot"></div>`;
-        item.onclick = () => switchChat(id);
-        list.prepend(item);
+    function killConn(id) {
+        zynq.disconnect(id);
     }
 
-    function switchChat(id) {
-        activePartner = id;
-        document.querySelectorAll('.peer-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(`peer-${id}`).classList.add('active');
-        document.querySelector(`#peer-${id} .unread-dot`).style.display = 'none';
-        
-        document.getElementById('current-peer-name').innerText = `Chat with ${id}`;
-        document.getElementById('videoBtn').style.display = 'block';
-        renderMessages();
-    }
-
-    function renderMessages() {
+    function renderChat() {
         const win = document.getElementById('chat-window');
         win.innerHTML = '';
-        (history[activePartner] || []).forEach(m => {
-            const div = document.createElement('div');
-            div.className = `msg ${m.from === 'Me' ? 'sent' : 'received'}`;
-            div.innerText = m.data;
-            win.appendChild(div);
-        });
-        win.scrollTop = win.scrollHeight;
+        if (history[activeId]) {
+            history[activeId].msgs.forEach(m => {
+                const d = document.createElement('div');
+                d.className = `msg ${m.from === 'Me' ? 'sent' : 'received'}`;
+                d.innerText = m.data;
+                win.appendChild(d);
+            });
+            win.scrollTop = win.scrollHeight;
+        }
     }
 
-    function send() {
-        const input = document.getElementById('msgIn');
-        if (activePartner && input.value.trim() !== "") {
-            const val = input.value;
-            if (zynq.send(activePartner, val)) {
-                history[activePartner].push({ from: 'Me', data: val });
-                renderMessages();
-                input.value = '';
+    function sendMsg() {
+        const inp = document.getElementById('msgIn');
+        if (activeId && inp.value.trim()) {
+            if (zynq.send(activeId, inp.value)) {
+                history[activeId].msgs.push({ from: 'Me', data: inp.value });
+                renderChat();
+                inp.value = '';
             }
         }
     }
 
     function startCall() {
-        if (activePartner) zynq.call(activePartner, 'local', 'remote');
+        if(!activeId) return;
+        showToast(`CALLING: ${activeId.slice(0,8)}`, "#007bff");
+        document.getElementById('video-container').style.display = 'block';
+        zynq.call(activeId, 'local', 'remote');
     }
 
-    function handleRequest(ok) {
+    function ans(ok) {
         document.getElementById('reqBox').style.display = 'none';
+        if (!pendingReq) return;
         if (ok) {
-            currentRequest.accept('local', 'remote');
+            if (pendingReq.type === 'VIDEO') document.getElementById('video-container').style.display = 'block';
+            pendingReq.accept('local', 'remote');
         } else {
-            currentRequest.reject();
+            pendingReq.reject();
         }
-        currentRequest = null;
+        pendingReq = null;
+    }
+
+    function connectPeer() {
+        const val = document.getElementById('targetId').value.trim();
+        if (val) {
+            showToast(`REQUEST SENT TO: ${val.slice(0,8)}`, "#007bff");
+            zynq.connect(val);
+            document.getElementById('targetId').value = '';
+        }
     }
 </script>
-
 </body>
 </html>
