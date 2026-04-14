@@ -3,57 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZYNQ v35 | Toast & Purge Edition</title>
+    <title>ZYNQ v35 | Fixed & Clean</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         :root { --primary: #e91e63; --secondary: #007bff; --bg: #f0f2f5; --sidebar-w: 280px; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
-
         .sidebar { width: var(--sidebar-w); background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; z-index: 20; transition: transform 0.3s ease; }
         .sidebar-header { padding: 20px; background: var(--primary); color: white; }
         .peer-list { flex: 1; overflow-y: auto; }
         .peer-item { padding: 12px 20px; border-bottom: 1px solid #f8f9fa; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .peer-item.active { background: #e7f3ff; border-left: 4px solid var(--secondary); }
         .disc-btn { color: #ff4d4d; border: none; background: none; font-size: 18px; cursor: pointer; padding: 5px; }
-        
         .main { flex: 1; display: flex; flex-direction: column; position: relative; background: #fff; }
         .header { padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; height: 60px; }
-        
         #video-container { display: none; position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
         video { background: #111; width: 100%; height: 100%; object-fit: cover; }
         #local { position: absolute; bottom: 10px; right: 10px; width: 100px; aspect-ratio: 3/4; border-radius: 8px; border: 2px solid #fff; }
-
         #chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; background: #f8f9fa; }
         .msg { max-width: 80%; padding: 10px 14px; border-radius: 15px; font-size: 14px; }
         .msg.sent { background: var(--secondary); color: white; align-self: flex-end; }
         .msg.received { background: white; align-self: flex-start; }
-
         .input-area { padding: 12px; display: flex; gap: 10px; border-top: 1px solid #eee; }
         input[type="text"] { flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px; }
-
         #reqBox { display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); width: 90%; max-width: 320px; background:white; padding:20px; border-radius:15px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 1000; text-align: center; }
-        
-        @media (max-width: 768px) {
-            .sidebar { position: fixed; height: 100%; transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-        }
+        @media (max-width: 768px) { .sidebar { position: fixed; height: 100%; transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } }
     </style>
 </head>
 <body>
-
 <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <strong>ZYNQ Pro</strong><br><small id="myId">Connecting...</small>
-    </div>
+    <div class="sidebar-header"><strong>ZYNQ Pro</strong><br><small id="myId">Connecting...</small></div>
     <div style="padding: 15px;">
         <input type="text" id="targetId" placeholder="Peer ID...">
         <button id="connBtn" onclick="connectPeer()" style="width:100%; margin-top:10px; padding:10px; background:#1a1a1a; color:white; border:none; border-radius:8px; cursor:pointer;">Request Chat</button>
     </div>
     <div class="peer-list" id="peerList"></div>
 </div>
-
 <div class="main">
     <div class="header">
         <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none; border:none; font-size:20px; cursor:pointer;">☰</button>
@@ -67,7 +53,6 @@
         <button onclick="sendMsg()" style="background:var(--secondary); color:white; border:none; width:40px; height:40px; border-radius:50%;">➤</button>
     </div>
 </div>
-
 <div id="reqBox">
     <b id="reqType" style="color:var(--primary)">Request</b>
     <p id="reqFrom" style="font-size:11px; margin:10px 0;"></p>
@@ -78,7 +63,7 @@
 </div>
 
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t45.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.2/t46.js"></script>
 
 <script>
     const zynq = new ZYNQ.Peer();
@@ -88,16 +73,9 @@
     const activeCalls = new Map();
 
     const showToast = (txt, color) => {
-        Toastify({
-            text: txt,
-            duration: 5000,
-            gravity: "top",
-            position: "right",
-            style: { background: color, borderRadius: "10px" }
-        }).showToast();
+        Toastify({ text: txt, duration: 5000, gravity: "top", position: "right", style: { background: color, borderRadius: "10px" } }).showToast();
     };
 
-    // --- ZYNQ Event Handlers ---
     zynq.on('ready', id => document.getElementById('myId').innerText = `ID: ${id}`);
 
     zynq.on('incoming', req => {
@@ -108,14 +86,18 @@
     });
 
     zynq.on('accepted', data => {
-        showToast(`CONNECTION ACCEPTED: ${data.id.slice(0,8)}`, "#28a745");
+        showToast(`CONNECTED: ${data.id.slice(0,8)}`, "#28a745");
         initPeer(data.id);
         if (data.type === 'VIDEO') activeCalls.set(data.id, true);
         openChat(data.id);
     });
 
-    zynq.on('rejected', data => {
-        showToast(`PEER REJECTED OR BUSY`, "#e91e63");
+    // FIX: Luister alleen naar het 'message' event van de library
+    zynq.on('message', m => {
+        if (!history[m.from]) history[m.from] = { msgs: [] };
+        // Voorkom dubbele rendering door te checken of dit bericht al de laatste is (optioneel)
+        history[m.from].msgs.push(m);
+        if (activeId === m.from) renderChat();
     });
 
     zynq.on('stream', data => {
@@ -129,15 +111,8 @@
         }
     });
 
-    zynq.on('message', m => {
-        if (history[m.from]) {
-            history[m.from].msgs.push(m);
-            if (activeId === m.from) renderChat();
-        }
-    });
-
     zynq.on('disconnected', d => {
-        showToast(`DISCONNECTED: ${d.id.slice(0,8)}`, "#ff9800");
+        showToast(`DISCONNECTED`, "#ff9800");
         delete history[d.id];
         activeCalls.delete(d.id);
         const el = document.getElementById(`peer-${d.id}`);
@@ -151,42 +126,26 @@
         }
     });
 
-    // --- UI Functies ---
     function initPeer(id) {
         if (!history[id]) {
             history[id] = { msgs: [] };
             const item = document.createElement('div');
             item.id = `peer-${id}`;
             item.className = 'peer-item';
-            item.innerHTML = `
-                <div onclick="openChat('${id}')" style="flex:1; overflow:hidden; text-overflow:ellipsis;"><strong>${id}</strong></div>
-                <button class="disc-btn" onclick="killConn('${id}')">✕</button>
-            `;
+            item.innerHTML = `<div onclick="openChat('${id}')" style="flex:1; overflow:hidden;"><strong>${id}</strong></div><button class="disc-btn" onclick="killConn('${id}')">✕</button>`;
             document.getElementById('peerList').prepend(item);
         }
     }
 
     function openChat(id) {
-        if(!history[id]) return;
         activeId = id;
         document.querySelectorAll('.peer-item').forEach(e => e.classList.remove('active'));
         const el = document.getElementById(`peer-${id}`);
         if(el) el.classList.add('active');
-        
-        document.getElementById('chat-title').innerText = `Chat: ${id.slice(0,12)}...`;
+        document.getElementById('chat-title').innerText = `Chat: ${id.slice(0,8)}`;
         document.getElementById('vBtn').style.display = 'block';
-
-        const stream = activeCalls.get(id);
-        if (stream && typeof stream !== 'boolean') {
-            document.getElementById('video-container').style.display = 'block';
-            document.getElementById('remote').srcObject = stream;
-        } else {
-            document.getElementById('video-container').style.display = 'none';
-        }
         renderChat();
     }
-
-    function killConn(id) { zynq.disconnect(id); }
 
     function renderChat() {
         const win = document.getElementById('chat-window');
@@ -205,55 +164,38 @@
     function sendMsg() {
         const inp = document.getElementById('msgIn');
         if (activeId && inp.value.trim()) {
-            if (zynq.send(activeId, inp.value)) {
-                history[activeId].msgs.push({ from: 'Me', data: inp.value });
+            const val = inp.value;
+            if (zynq.send(activeId, val)) {
+                if (!history[activeId]) history[activeId] = { msgs: [] };
+                history[activeId].msgs.push({ from: 'Me', data: val });
                 renderChat();
                 inp.value = '';
             }
         }
     }
 
-    function startCall() {
-        if(!activeId) return;
-        showToast(`CALLING...`, "#007bff");
-        document.getElementById('video-container').style.display = 'block';
-        zynq.call(activeId, 'local', 'remote');
-    }
-
+    function startCall() { zynq.call(activeId, 'local', 'remote'); }
+    function killConn(id) { zynq.disconnect(id); }
     function ans(ok) {
         document.getElementById('reqBox').style.display = 'none';
-        if (!pendingReq) return;
-        if (ok) {
-            if (pendingReq.type === 'VIDEO') document.getElementById('video-container').style.display = 'block';
-            pendingReq.accept('local', 'remote');
-        } else {
-            pendingReq.reject();
-        }
+        if (ok) pendingReq.accept('local', 'remote');
+        else pendingReq.reject();
         pendingReq = null;
     }
 
-    // --- ONLINE CHECK VOORDAT CONNECT WORDT AANGEROEPEN ---
     async function connectPeer() {
         const val = document.getElementById('targetId').value.trim();
-        const btn = document.getElementById('connBtn');
         if (!val) return;
-
+        const btn = document.getElementById('connBtn');
         btn.disabled = true;
-        btn.innerText = "Checking...";
-
-        // Gebruik de isOnline fn uit t45.js (v1.3.0)
         const online = await zynq.isOnline(val);
-
         if (online) {
-            showToast(`PEER ONLINE - SENDING REQUEST`, "#007bff");
             zynq.connect(val);
             document.getElementById('targetId').value = '';
         } else {
-            showToast(`PEER OFFLINE`, "#e91e63");
+            showToast("PEER OFFLINE", "#e91e63");
         }
-
         btn.disabled = false;
-        btn.innerText = "Request Chat";
     }
 </script>
 </body>
