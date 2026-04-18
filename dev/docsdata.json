@@ -1,223 +1,73 @@
 {
   "groups": [
     {
-      "title": "Overview",
+      "title": "ZYNQ Games",
       "items": [
         {
-          "id": "overview_intro",
-          "label": "Introduction",
-          "icon": "info",
-          "content": "# ZYNQ Games Engine\n\nZYNQ.games is a client-side game library engine that loads and manages a structured game dataset from a CDN.\n\nIt provides search, filtering, sorting, favorites, history tracking, and device compatibility handling.\n\nNo backend and no dependencies are required."
-        }
-      ]
-    },
-    {
-      "title": "Installation",
-      "items": [
-        {
-          "id": "install_script",
-          "label": "Script Tag",
-          "icon": "code",
-          "content": "## Script Tag\n\nLoads ZYNQ globally into window.ZYNQ.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"></script>\n```\n\nAfter loading:\n```js\nwindow.ZYNQ.games\n```"
+          "id": "install",
+          "label": "Installation",
+          "icon": "rocket",
+          "content": "# ZYNQ Games\n\nLightweight browser game engine powered by a CDN.\n\n## Installation\n\n### Script Tag\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"></script>\n```\n\n### ES Module\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"\n```\n\nAfter loading:\n```js\nwindow.ZYNQ.games\n```\n"
         },
         {
-          "id": "install_module",
-          "label": "ES Module",
-          "icon": "package",
-          "content": "## ES Module\n\nInitializes window.ZYNQ via side effect import.\n\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"\n```\n\nAfter import:\n```js\nwindow.ZYNQ.games\n```"
-        }
-      ]
-    },
-    {
-      "title": "Initialization",
-      "items": [
-        {
-          "id": "init_main",
-          "label": "init()",
+          "id": "init",
+          "label": "Initialization",
           "icon": "plug",
-          "content": "## init(options?)\n\nInitializes the engine, detects device type, loads the dataset, and applies initial transformations.\n\n```js\nawait ZYNQ.games.init({\n  mode: \"all\",\n  search: \"\",\n  sort: \"name\",\n  src: \"...\",\n  cdn: \"...\"\n})\n```\n\nOptions:\n- mode: all | supported | favs\n- search: initial query\n- sort: sorting field\n- src: JSON source URL\n- cdn: thumbnail base URL\n\nExecution order:\n1. Detect device\n2. Load dataset\n3. Normalize data\n4. Sort\n5. Apply search and filters\n"
-        }
-      ]
-    },
-    {
-      "title": "Data Model",
-      "items": [
+          "content": "## init(options?)\nInitializes engine, loads data, detects device, and applies initial state.\n\n```js\nawait ZYNQ.games.init({\n  mode: \"all\",\n  search: \"\",\n  sort: \"name\",\n  src: \"...\",\n  cdn: \"...\"\n})\n```\n\n### Options\n- mode: all | supported | favs\n- search: string\n- sort: string\n- src: JSON URL\n- cdn: thumbnail base URL\n\n### Returns\n```ts\nPromise<ZYNQGames>\n```\n"
+        },
         {
-          "id": "model_game",
-          "label": "Game Schema",
+          "id": "model",
+          "label": "Game Model",
           "icon": "box",
-          "content": "## Game\n\n```ts\nGame {\n  name: string\n  alias: string\n  url: string\n  thumb: string\n  category?: string\n  devices: number[]\n\n  isSupported: boolean\n  isFavorite: boolean\n}\n```\n\nNotes:\n- url points to the playable location\n- thumb is resolved using CDN base path\n- devices defines supported device types\n- isSupported is computed dynamically\n- isFavorite is stored in localStorage\n"
-        }
-      ]
-    },
-    {
-      "title": "Core State",
-      "items": [
+          "content": "## Game\n\n```ts\nGame {\n  name: string\n  alias: string\n  url: string\n  thumb: string\n  category?: string\n  devices: number[]\n\n  isSupported: boolean\n  isFavorite: boolean\n}\n```\n"
+        },
         {
-          "id": "core_state",
-          "label": "Internal State",
+          "id": "state",
+          "label": "State",
           "icon": "database",
-          "content": "## Internal State\n\n```ts\nconfig: {\n  src: string\n  cdn: string\n}\n\nall: Game[]\nfiltered: Game[]\n\nfavorites: Set<string>\nhistory: string[]\n\ndeviceType: number\n```\n"
-        }
-      ]
-    },
-    {
-      "title": "Device Detection",
-      "items": [
-        {
-          "id": "device_types",
-          "label": "Device Types",
-          "icon": "smartphone",
-          "content": "## Device Types\n\n- 1: Touch desktop\n- 2: Desktop\n- 3: Mobile\n- 4: Tablet\n\nDetection is based on user agent, touch capability, pointer precision, and WebGL renderer.\n\nResult is exposed via:\n```js\nZYNQ.deviceType\n```\n"
-        }
-      ]
-    },
-    {
-      "title": "View Layer",
-      "items": [
-        {
-          "id": "view_list",
-          "label": "list",
-          "icon": "list",
-          "content": "## list\n\n```ts\nZYNQ.games.list: Game[]\n```\n\nReturns the current filtered dataset.\n"
+          "content": "## Internal State\n\n```ts\nall: Game[]\nfiltered: Game[]\nfavorites: Set<string>\nhistory: string[]\ndeviceType: number\n```\n"
         },
         {
-          "id": "view_total",
-          "label": "total",
-          "icon": "hash",
-          "content": "## total\n\n```ts\nZYNQ.games.total: number\n```\n\nTotal number of loaded games.\n"
+          "id": "view",
+          "label": "View",
+          "icon": "eye",
+          "content": "## Getters\n\n### list\n```js\nZYNQ.games.list\n```\nReturns:\n```ts\nGame[]\n```\n\n### total\n```js\nZYNQ.games.total\n```\nReturns:\n```ts\nnumber\n```\n\n### filteredCount\n```js\nZYNQ.games.filteredCount\n```\nReturns:\n```ts\nnumber\n```\n"
         },
         {
-          "id": "view_filtered",
-          "label": "filteredCount",
+          "id": "methods_core",
+          "label": "Core Methods",
+          "icon": "settings",
+          "content": "## Core Methods\n\n### search(query)\n```js\nZYNQ.games.search(\"alien\")\n```\nReturns:\n```ts\nZYNQGames\n```\n\n### getByAlias(alias)\n```js\nZYNQ.games.getByAlias(\"alien-hominid\")\n```\nReturns:\n```ts\nGame | null\n```\n\n### getByCategory(category)\n```js\nZYNQ.games.getByCategory(\"shooter\")\n```\nReturns:\n```ts\nZYNQGames\n```\n\n### reset()\n```js\nZYNQ.games.reset()\n```\nReturns:\n```ts\nZYNQGames\n```\n"
+        },
+        {
+          "id": "methods_filter",
+          "label": "Filtering",
           "icon": "filter",
-          "content": "## filteredCount\n\n```ts\nZYNQ.games.filteredCount: number\n```\n\nNumber of games after filtering.\n"
-        }
-      ]
-    },
-    {
-      "title": "Search",
-      "items": [
-        {
-          "id": "search_main",
-          "label": "search()",
-          "icon": "search",
-          "content": "## search(query)\n\nFilters games by name or alias.\n\n```js\nZYNQ.games.search(\"alien\")\n```\n"
+          "content": "## Filtering\n\n### filterSupported()\n```js\nZYNQ.games.filterSupported()\n```\nReturns:\n```ts\nZYNQGames\n```\n\n### filterFavorites()\n```js\nZYNQ.games.filterFavorites()\n```\nReturns:\n```ts\nZYNQGames\n```\n"
         },
         {
-          "id": "search_alias",
-          "label": "getByAlias()",
-          "icon": "tag",
-          "content": "## getByAlias(alias)\n\nReturns a single game.\n\n```js\nZYNQ.games.getByAlias(\"alien-hominid\")\n```\n"
-        },
-        {
-          "id": "search_category",
-          "label": "getByCategory()",
-          "icon": "folder",
-          "content": "## getByCategory(category)\n\nFilters games by category.\n\n```js\nZYNQ.games.getByCategory(\"shooter\")\n```\n"
-        }
-      ]
-    },
-    {
-      "title": "Filtering",
-      "items": [
-        {
-          "id": "filter_supported",
-          "label": "filterSupported()",
-          "icon": "check",
-          "content": "## filterSupported()\n\nKeeps only compatible games.\n\n```js\nZYNQ.games.filterSupported()\n```\n"
-        },
-        {
-          "id": "filter_favorites",
-          "label": "filterFavorites()",
-          "icon": "heart",
-          "content": "## filterFavorites()\n\nKeeps only favorite games.\n\n```js\nZYNQ.games.filterFavorites()\n```\n"
-        },
-        {
-          "id": "filter_reset",
-          "label": "reset()",
-          "icon": "refresh-cw",
-          "content": "## reset()\n\nRestores full dataset.\n\n```js\nZYNQ.games.reset()\n```\n"
-        }
-      ]
-    },
-    {
-      "title": "Sorting",
-      "items": [
-        {
-          "id": "sort_by",
-          "label": "sortBy()",
+          "id": "methods_sort",
+          "label": "Sorting",
           "icon": "sort-asc",
-          "content": "## sortBy(field)\n\nSorts alphabetically by field.\n\n```js\nZYNQ.games.sortBy(\"name\")\n```\n"
+          "content": "## Sorting\n\n### sortBy(field)\n```js\nZYNQ.games.sortBy(\"name\")\n```\nReturns:\n```ts\nZYNQGames\n```\n\n### sortByPopularity()\n```js\nZYNQ.games.sortByPopularity()\n```\nReturns:\n```ts\nZYNQGames\n```\n\n### shuffle()\n```js\nZYNQ.games.shuffle()\n```\nReturns:\n```ts\nZYNQGames\n```\n"
         },
         {
-          "id": "sort_popularity",
-          "label": "sortByPopularity()",
-          "icon": "trending-up",
-          "content": "## sortByPopularity()\n\nSorts descending by playCount.\n\n```js\nZYNQ.games.sortByPopularity()\n```\n"
-        },
-        {
-          "id": "sort_shuffle",
-          "label": "shuffle()",
+          "id": "methods_random",
+          "label": "Random",
           "icon": "shuffle",
-          "content": "## shuffle()\n\nRandomizes current dataset order.\n\n```js\nZYNQ.games.shuffle()\n```\n"
-        }
-      ]
-    },
-    {
-      "title": "Random",
-      "items": [
-        {
-          "id": "random_many",
-          "label": "random()",
-          "icon": "shuffle",
-          "content": "## random(limit)\n\nReturns a random subset and replaces filtered data.\n\n```js\nZYNQ.games.random(3)\n```\n"
+          "content": "## Random\n\n### random(limit)\n```js\nZYNQ.games.random(3)\n```\nReturns:\n```ts\nZYNQGames\n```\n\n### getRandomOne()\n```js\nZYNQ.games.getRandomOne()\n```\nReturns:\n```ts\nGame\n```\n"
         },
         {
-          "id": "random_one",
-          "label": "getRandomOne()",
-          "icon": "zap",
-          "content": "## getRandomOne()\n\nReturns a single random game without mutating state.\n\n```js\nZYNQ.games.getRandomOne()\n```\n"
-        }
-      ]
-    },
-    {
-      "title": "Favorites",
-      "items": [
-        {
-          "id": "fav_toggle",
-          "label": "toggleFavorite()",
+          "id": "methods_favorites",
+          "label": "Favorites",
           "icon": "heart",
-          "content": "## toggleFavorite(alias)\n\nAdds or removes a favorite.\n\nStored in localStorage under ZYNQ_favs.\n\n```js\nZYNQ.games.toggleFavorite(\"alien-hominid\")\n```\n"
+          "content": "## Favorites\n\nStored in localStorage as ZYNQ_favs\n\n### toggleFavorite(alias)\n```js\nZYNQ.games.toggleFavorite(\"alien-hominid\")\n```\nReturns:\n```ts\nZYNQGames\n```\n\n### isFavorite(alias)\n```js\nZYNQ.games.isFavorite(\"alien-hominid\")\n```\nReturns:\n```ts\nboolean\n```\n"
         },
         {
-          "id": "fav_check",
-          "label": "isFavorite()",
-          "icon": "check-circle",
-          "content": "## isFavorite(alias)\n\nChecks if a game is favorited.\n\n```js\nZYNQ.games.isFavorite(\"alien-hominid\")\n```\n"
-        }
-      ]
-    },
-    {
-      "title": "History",
-      "items": [
-        {
-          "id": "history_add",
-          "label": "addToHistory()",
+          "id": "methods_history",
+          "label": "History",
           "icon": "clock",
-          "content": "## addToHistory(alias)\n\nAdds a game to history. Maximum of 50 entries.\n\nStored in localStorage under ZYNQ_history.\n\n```js\nZYNQ.games.addToHistory(\"alien-hominid\")\n```\n"
-        },
-        {
-          "id": "history_get",
-          "label": "getHistory()",
-          "icon": "list",
-          "content": "## getHistory()\n\nReturns history as Game objects.\n\n```js\nZYNQ.games.getHistory()\n```\n"
-        },
-        {
-          "id": "history_clear",
-          "label": "clearHistory()",
-          "icon": "trash",
-          "content": "## clearHistory()\n\nClears stored history.\n\n```js\nZYNQ.games.clearHistory()\n```\n"
+          "content": "## History\n\nStored in localStorage as ZYNQ_history (max 50)\n\n### addToHistory(alias)\n```js\nZYNQ.games.addToHistory(\"alien-hominid\")\n```\nReturns:\n```ts\nZYNQGames\n```\n\n### getHistory()\n```js\nZYNQ.games.getHistory()\n```\nReturns:\n```ts\nGame[]\n```\n\n### clearHistory()\n```js\nZYNQ.games.clearHistory()\n```\nReturns:\n```ts\nZYNQGames\n```\n"
         }
       ]
     }
