@@ -4,16 +4,10 @@
       "title": "Getting Started",
       "items": [
         {
-          "id": "intro",
-          "label": "Introduction",
-          "icon": "book",
-          "content": "# ZYNQ Games\n\nZYNQ.games is a client-side game library engine.\n\nIt loads a remote dataset, transforms it into a structured collection, and provides a full API to search, filter, sort and manage games.\n\nEverything runs locally after initialization.\n\nNo backend required.\n"
-        },
-        {
           "id": "install",
           "label": "Installation",
-          "icon": "download",
-          "content": "# Installation\n\n## Script\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"></script>\n```\n\n## Usage\n```js\nawait ZYNQ.games.init()\n```\n\nAfter init:\n```js\nZYNQ.games.list\nZYNQ.games.total\n```\n"
+          "icon": "rocket",
+          "content": "# ZYNQ Games\n\nZYNQ.games is een lightweight game library engine.\n\nGeen backend. Alles draait client-side.\n\n## Install\n\n### Script tag\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"></script>\n```\n\n### ES Module\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"\n```\n\n## Gebruik\n```js\nawait ZYNQ.games.init()\n```\n\nDaarna:\n```js\nZYNQ.games.list\nZYNQ.games.total\n```"
         }
       ]
     },
@@ -21,16 +15,10 @@
       "title": "Core",
       "items": [
         {
-          "id": "init",
-          "label": "init()",
-          "icon": "play",
-          "content": "## init(options?)\nInitializes engine, loads data and prepares state.\n\n### JS\n```js\nawait ZYNQ.games.init({\n  mode: \"supported\",\n  search: \"blo\",\n  sort: \"name\"\n})\n```\n\n### Returns\n```ts\nZYNQGames\n```\n"
-        },
-        {
-          "id": "data",
-          "label": "Game Object",
-          "icon": "box",
-          "content": "## Game Object\n\nEvery game follows this structure:\n\n```ts\n{\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices: number[],\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```\n"
+          "id": "state",
+          "label": "State",
+          "icon": "database",
+          "content": "# Internal State\n\nDit is de volledige interne state van de engine.\n\n## Config\n```ts\nconfig: {\n  src: string,\n  cdn: string\n}\n```\n\n## Data\n```ts\nall: Game[]        // volledige library\nfiltered: Game[]   // actieve view\n```\n\n## User State\n```ts\nfavorites: Set<string>\nhistory: string[]\n```\n\n## Device\n```ts\ndeviceType: number\n```\n\n## Game Object\n```ts\n{\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices: number[],\n\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```"
         }
       ]
     },
@@ -38,89 +26,132 @@
       "title": "Methods",
       "items": [
         {
-          "id": "search_layer",
+          "id": "init",
+          "label": "init()",
+          "icon": "play",
+          "content": "# init(options)\n\nInitialiseert alles.\n\n```js\nawait ZYNQ.games.init({\n  mode: \"all\",\n  search: \"bloon\",\n  sort: \"name\"\n})\n```\n\n## Options\n- mode: all | supported | favs\n- search: string\n- sort: name | category | alias\n- src: custom json\n- cdn: custom thumbnails\n\n## Returns\n```ts\nZYNQGames\n```"
+        },
+        {
+          "id": "search_group",
           "label": "Search",
           "icon": "search",
           "children": [
             {
               "id": "search",
               "label": "search()",
-              "content": "## search(query)\n\n### JS\n```js\nZYNQ.games.search(\"blo\")\n```\n\n### Returns\n```ts\nZYNQGames\n```\n\n### Example result\n```json\n[\n  {\n    \"name\": \"Bloxorz\",\n    \"alias\": \"bloxorz\",\n    \"url\": \"g1/bloxorz\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloxorz.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  },\n  {\n    \"name\": \"Bloons Tower Defense\",\n    \"alias\": \"bloons-tower-defense\",\n    \"url\": \"g1/bloons-tower-defense\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloons-tower-defense.webp\",\n    \"category\": \"strategy\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```\n"
+              "content": "### search(query)\n\n```js\nZYNQ.games.search(\"bloon\")\n```\n\n## Returns\n```ts\nZYNQGames\n```\n\n## Result Example\n```json\n[\n  {\n    \"name\": \"Bloons Tower Defense\",\n    \"alias\": \"bloons-tower-defense\",\n    \"url\": \"g1/bloons-tower-defense\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloons-tower-defense.webp\",\n    \"category\": \"strategy\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```"
             },
             {
-              "id": "get_alias",
+              "id": "getByAlias",
               "label": "getByAlias()",
-              "content": "## getByAlias(alias)\n\n### JS\n```js\nZYNQ.games.getByAlias(\"bloxorz\")\n```\n\n### Returns\n```ts\nGame | null\n```\n\n### Example\n```json\n{\n  \"name\": \"Bloxorz\",\n  \"alias\": \"bloxorz\",\n  \"url\": \"g1/bloxorz\",\n  \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloxorz.webp\",\n  \"category\": \"puzzle\",\n  \"devices\": [1,2],\n  \"isSupported\": true,\n  \"isFavorite\": false\n}\n```\n"
+              "content": "### getByAlias(alias)\n\n```js\nZYNQ.games.getByAlias(\"bloxorz\")\n```\n\n## Returns\n```ts\nGame | null\n```\n\n## Example\n```json\n{\n  \"name\": \"Bloxorz\",\n  \"alias\": \"bloxorz\",\n  \"url\": \"g1/bloxorz\",\n  \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloxorz.webp\",\n  \"category\": \"puzzle\",\n  \"devices\": [1,2],\n  \"isSupported\": true,\n  \"isFavorite\": false\n}\n```"
+            },
+            {
+              "id": "getByCategory",
+              "label": "getByCategory()",
+              "content": "### getByCategory(category)\n\n```js\nZYNQ.games.getByCategory(\"puzzle\")\n```\n\n## Returns\n```ts\nZYNQGames\n```\n\n## Example\n```json\n[\n  {\n    \"name\": \"2048\",\n    \"alias\": \"2048\",\n    \"url\": \"g1/2048\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/2048.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```"
             }
           ]
         },
         {
-          "id": "filter_layer",
-          "label": "Filters",
+          "id": "filter_group",
+          "label": "Filtering",
           "icon": "filter",
           "children": [
             {
-              "id": "filter_supported",
+              "id": "filterSupported",
               "label": "filterSupported()",
-              "content": "## filterSupported()\n\n### JS\n```js\nZYNQ.games.filterSupported()\n```\n\n### Returns\n```ts\nZYNQGames\n```\n\n### Example\n```json\n[\n  {\n    \"name\": \"2048\",\n    \"alias\": \"2048\",\n    \"url\": \"g1/2048\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/2048.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```\n"
+              "content": "### filterSupported()\n\nHoudt enkel games die werken op jouw device.\n\n```js\nZYNQ.games.filterSupported()\n```\n\n## Returns\n```ts\nZYNQGames\n```"
             },
             {
-              "id": "filter_favs",
+              "id": "filterFavorites",
               "label": "filterFavorites()",
-              "content": "## filterFavorites()\n\n### JS\n```js\nZYNQ.games.filterFavorites()\n```\n\n### Returns\n```ts\nZYNQGames\n```\n\n### Example\n```json\n[\n  {\n    \"name\": \"Bloxorz\",\n    \"alias\": \"bloxorz\",\n    \"url\": \"g1/bloxorz\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloxorz.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2],\n    \"isSupported\": true,\n    \"isFavorite\": true\n  }\n]\n```\n"
+              "content": "### filterFavorites()\n\n```js\nZYNQ.games.filterFavorites()\n```\n\n## Returns\n```ts\nZYNQGames\n```"
+            },
+            {
+              "id": "reset",
+              "label": "reset()",
+              "content": "### reset()\n\nReset naar volledige lijst.\n\n```js\nZYNQ.games.reset()\n```\n\n## Returns\n```ts\nZYNQGames\n```"
             }
           ]
         },
         {
-          "id": "sort_layer",
+          "id": "sort_group",
           "label": "Sorting",
-          "icon": "arrow-down-up",
+          "icon": "arrow-up-down",
           "children": [
             {
-              "id": "sort_by",
+              "id": "sortBy",
               "label": "sortBy()",
-              "content": "## sortBy(field)\n\n### JS\n```js\nZYNQ.games.sortBy(\"name\")\n```\n\n### Returns\n```ts\nZYNQGames\n```\n\n### Example\n```json\n[\n  {\n    \"name\": \"1010 Deluxe\",\n    \"alias\": \"1010-deluxe\",\n    \"url\": \"g1/1010-deluxe\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/1010-deluxe.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```\n"
+              "content": "### sortBy(field)\n\nSorteert alfabetisch.\n\n## Mogelijke velden\n- name\n- alias\n- category\n\n```js\nZYNQ.games.sortBy(\"name\")\n```\n\n## Returns\n```ts\nZYNQGames\n```"
             },
             {
-              "id": "sort_pop",
+              "id": "sortByPopularity",
               "label": "sortByPopularity()",
-              "content": "## sortByPopularity()\n\n### JS\n```js\nZYNQ.games.sortByPopularity()\n```\n\n### Returns\n```ts\nZYNQGames\n```\n\n### Example\n```json\n[\n  {\n    \"name\": \"2048\",\n    \"alias\": \"2048\",\n    \"url\": \"g1/2048\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/2048.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```\n"
+              "content": "### sortByPopularity()\n\nSorteert op `playCount`.\n\n⚠️ Belangrijk:\n- playCount zit NIET standaard in de data\n- als het ontbreekt wordt het als 0 gezien\n\nDus dit werkt alleen goed als jij zelf playCount toevoegt.\n\n```js\nZYNQ.games.sortByPopularity()\n```\n\n## Returns\n```ts\nZYNQGames\n```"
+            },
+            {
+              "id": "shuffle",
+              "label": "shuffle()",
+              "content": "### shuffle()\n\nRandom order.\n\n```js\nZYNQ.games.shuffle()\n```\n\n## Returns\n```ts\nZYNQGames\n```"
             }
           ]
         },
         {
-          "id": "random_layer",
+          "id": "random_group",
           "label": "Random",
           "icon": "shuffle",
           "children": [
             {
               "id": "random",
               "label": "random()",
-              "content": "## random(limit)\n\n### JS\n```js\nZYNQ.games.random(2)\n```\n\n### Returns\n```ts\nZYNQGames\n```\n\n### Example\n```json\n[\n  {\n    \"name\": \"Bally\",\n    \"alias\": \"bally\",\n    \"url\": \"g1/bally\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bally.webp\",\n    \"category\": \"casual\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  },\n  {\n    \"name\": \"Ballistic\",\n    \"alias\": \"ballistic\",\n    \"url\": \"g1/ballistic\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/ballistic.webp\",\n    \"category\": \"shooter\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```\n"
+              "content": "### random(limit)\n\n```js\nZYNQ.games.random(3)\n```\n\n## Returns\n```ts\nZYNQGames\n```\n\n## Example\n```json\n[\n  {\n    \"name\": \"Bloxorz\",\n    \"alias\": \"bloxorz\",\n    \"url\": \"g1/bloxorz\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloxorz.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```"
             },
             {
-              "id": "random_one",
+              "id": "getRandomOne",
               "label": "getRandomOne()",
-              "content": "## getRandomOne()\n\n### JS\n```js\nZYNQ.games.getRandomOne()\n```\n\n### Returns\n```ts\nGame\n```\n\n### Example\n```json\n{\n  \"name\": \"Bloxorz\",\n  \"alias\": \"bloxorz\",\n  \"url\": \"g1/bloxorz\",\n  \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloxorz.webp\",\n  \"category\": \"puzzle\",\n  \"devices\": [1,2],\n  \"isSupported\": true,\n  \"isFavorite\": false\n}\n```\n"
+              "content": "### getRandomOne()\n\n```js\nZYNQ.games.getRandomOne()\n```\n\n## Returns\n```ts\nGame\n```"
             }
           ]
-        }
-      ]
-    },
-    {
-      "title": "State",
-      "items": [
-        {
-          "id": "list",
-          "label": "list",
-          "icon": "list",
-          "content": "## list\n\nCurrent filtered games.\n\n### Example\n```json\n[\n  {\n    \"name\": \"2048\",\n    \"alias\": \"2048\",\n    \"url\": \"g1/2048\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/2048.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2,3,4],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```\n"
         },
         {
-          "id": "total",
-          "label": "total",
-          "icon": "hash",
-          "content": "## total\n\nTotal amount of games.\n\nAlways a large number (500+ depending on dataset).\n"
+          "id": "favorites_group",
+          "label": "Favorites",
+          "icon": "heart",
+          "children": [
+            {
+              "id": "toggleFavorite",
+              "label": "toggleFavorite()",
+              "content": "### toggleFavorite(alias)\n\n```js\nZYNQ.games.toggleFavorite(\"bloxorz\")\n```\n\n## Returns\n```ts\nZYNQGames\n```"
+            },
+            {
+              "id": "isFavorite",
+              "label": "isFavorite()",
+              "content": "### isFavorite(alias)\n\n```js\nZYNQ.games.isFavorite(\"bloxorz\")\n```\n\n## Returns\n```ts\nboolean\n```"
+            }
+          ]
+        },
+        {
+          "id": "history_group",
+          "label": "History",
+          "icon": "clock",
+          "children": [
+            {
+              "id": "addToHistory",
+              "label": "addToHistory()",
+              "content": "### addToHistory(alias)\n\n```js\nZYNQ.games.addToHistory(\"bloxorz\")\n```\n\n## Returns\n```ts\nZYNQGames\n```"
+            },
+            {
+              "id": "getHistory",
+              "label": "getHistory()",
+              "content": "### getHistory()\n\n```js\nZYNQ.games.getHistory()\n```\n\n## Returns\n```ts\nGame[]\n```"
+            },
+            {
+              "id": "clearHistory",
+              "label": "clearHistory()",
+              "content": "### clearHistory()\n\n```js\nZYNQ.games.clearHistory()\n```\n\n## Returns\n```ts\nZYNQGames\n```"
+            }
+          ]
         }
       ]
     }
