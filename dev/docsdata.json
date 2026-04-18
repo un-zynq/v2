@@ -13,13 +13,13 @@
           "id": "install_script",
           "label": "Script Tag",
           "icon": "code",
-          "content": "## Script Tag\n\nLoads ZYNQ globally into `window.ZYNQ`.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.3/index.min.js\"></script>\n```\n\nAfter loading:\n```js\nwindow.ZYNQ\n```"
+          "content": "## Script Tag\n\nLoads ZYNQ globally into `window.ZYNQ`.\n\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"></script>\n```\n\nAfter loading:\n```js\nwindow.ZYNQ\n```"
         },
         {
           "id": "install_module",
           "label": "ES Module",
           "icon": "package",
-          "content": "## ES Module (Side Effect Import)\n\nThis version only initializes global `window.ZYNQ`.\n\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.3/index.min.js\"\n```\n\nAfter import:\n```js\nwindow.ZYNQ.Peer\nwindow.ZYNQ.games\n```"
+          "content": "## ES Module (Side Effect Import)\n\nThis version only initializes global `window.ZYNQ`.\n\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"\n```\n\nAfter import:\n```js\nwindow.ZYNQ.Peer\nwindow.ZYNQ.games\n```"
         }
       ]
     },
