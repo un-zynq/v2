@@ -29,7 +29,7 @@
           "id": "init",
           "label": "init()",
           "icon": "play",
-          "content": "# init(options)\nInitializes the engine and loads game data via `version` hash, `src` (JSON), or `cdn` (Assets).\n\n### Options\n```ts\n{\n  mode: 'all' | 'supported' | 'favs',\n  search: string, sort: 'name' | 'alias',\n  version: string /* GH Hash */,\n  src: string /* JSON source */,\n  cdn: string /* Image source */\n}\n```\n\n### Returns\n`Promise<ZYNQGames>`"
+          "content": "# init(options)\nInitializes the engine and loads game data via `version` hash, `src` (JSON), or `cdn` (Assets).\n\n### Options\n```ts\n{\n  mode: 'all' | 'supported' | 'favs',\n  search: string, sort: 'name' | 'alias',\n  version: string /* GH Hash */,\n  src: string /* JSON source */,\n  cdn: string /* Image source */\n}\n```\n\n### \n`Promise<ZYNQGames>`"
         },
         {
           "id": "search",
@@ -89,7 +89,7 @@
           "id": "random",
           "label": "random()",
           "icon": "dice-5",
-          "content": "# random(limit)\n\nReturns a random subset of games.\n\n```js\nZYNQ.games.random(3)\n```\n\n## Returns\n```ts\nZYNQGames\n```\n\n## Example\n```json\n[\n  {\n    \"name\": \"Bloxorz\",\n    \"alias\": \"bloxorz\",\n    \"url\": \"g1/bloxorz\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloxorz.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```"
+          "content": "# random(limit)\n\nReturns a random subset of games.\n\n```js\nZYNQ.games.random(3)  // returns ZYNQGames instance\n```\n\n## Returns\n```ts\nZYNQGames\n```\n\n## Example\n```json\n[\n  {\n    \"name\": \"Bloxorz\",\n    \"alias\": \"bloxorz\",\n    \"url\": \"g1/bloxorz\",\n    \"thumb\": \"https://cdn.jsdelivr.net/gh/un-zynq/thumbnails/g1/bloxorz.webp\",\n    \"category\": \"puzzle\",\n    \"devices\": [1,2],\n    \"isSupported\": true,\n    \"isFavorite\": false\n  }\n]\n```"
         },
         {
           "id": "getRandomOne",
