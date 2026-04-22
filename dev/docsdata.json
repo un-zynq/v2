@@ -18,7 +18,7 @@
           "id": "state",
           "label": "Internal State",
           "icon": "database",
-          "content": "# Internal State\n\nThis section describes the full runtime state of ZYNQ Games.\n\n## Configuration\n```ts\nconfig: {\n  src: string,\n  cdn: string\n}\n```\n\n## Game Collections\n```ts\nall: Game[]\nfiltered: Game[]\n```\n\n## User Data\n```ts\nfavorites: Set<string>\nhistory: string[]\n```\n\n## Device Detection\n```ts\ndeviceType: number\n```\n\n## Game Object Structure\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices: number[],\n\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```"
+          "content": "# Internal State\n\nThis section describes the full runtime state of ZYNQ Games.\n\n## Configuration\n```ts\nconfig: {\n  src: string,\n  cdn: string,\n  version: string\n}\n```\n\n## Game Collections\n```ts\nall: Game[]\nfiltered: Game[]\n```\n\n## User Data\n```ts\nfavorites: Set<string>\nhistory: string[]\n```\n\n## Device Detection\n```ts\ndeviceType: number\n```\n\n## Game Object Structure\n```ts\nGame {\n  name: string,\n  alias: string,\n  url: string,\n  thumb: string,\n  category?: string,\n  devices: number[],\n\n  isSupported: boolean,\n  isFavorite: boolean\n}\n```"
         }
       ]
     },
@@ -29,7 +29,7 @@
           "id": "init",
           "label": "init()",
           "icon": "play",
-          "content": "# init(options)\nInitializes the engine and loads game data via `version` hash, `src` (JSON), or `cdn` (Assets).\n\n### Options\n```ts\n{ mode: 'all' | 'supported' | 'favs', search: string, sort: 'name' | 'alias', version: string /* GH Hash */, src: string /* JSON source */, cdn: string /* Image source */ }\n```\n\n### Returns\n`Promise<ZYNQGames>`"
+          "content": "# init(options)\nInitializes the engine and loads game data via `version` hash, `src` (JSON), or `cdn` (Assets).\n\n### Options\n```ts\n{ mode: 'all' | 'supported' | 'favs',\n search: string, sort: 'name' | 'alias',\n version: string /* GH Hash */,\n src: string /* JSON source */, cdn: string /* Image source */ }\n```\n\n### Returns\n`Promise<ZYNQGames>`"
         },
         {
           "id": "search",
