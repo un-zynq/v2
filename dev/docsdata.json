@@ -29,7 +29,7 @@
           "id": "init",
           "label": "init()",
           "icon": "play",
-          "content": "# init(options)\n\nInitializes the engine and loads game data.\n\n```js\nawait ZYNQ.games.init({\n  mode: \"all\",\n  search: \"\",\n  sort: \"name\"\n})\n```\n\n## Options\n```ts\nmode: \"all\" | \"supported\" | \"favs\"\nsearch: string\nsort: \"name\" | \"alias\" | \"category\"\nsrc: string\ncdn: string\n```\n\n## Returns\n```ts\nZYNQGames\n```"
+          "content": "# init(options)\nInitializes the engine and loads game data via `version` hash, `src` (JSON), or `cdn` (Assets).\n\n### Options\n```ts\n{ mode: 'all' | 'supported' | 'favs', search: string, sort: 'name' | 'alias', version: string /* GH Hash */, src: string /* JSON source */, cdn: string /* Image source */ }\n```\n\n### Returns\n`Promise<ZYNQGames>`"
         },
         {
           "id": "search",
