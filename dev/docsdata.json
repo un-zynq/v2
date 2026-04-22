@@ -7,7 +7,7 @@
           "id": "installation",
           "label": "Installation",
           "icon": "rocket",
-          "content": "# ZYNQ Games\n\nZYNQ Games is a client-side game library engine.\nNo backend required. Everything runs in the browser.\n\n## Installation\n\n### Script tag\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"></script>\n```\n\n### ES Module\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.4/index.min.js\"\n```\n\n## Usage\n```js\nawait ZYNQ.games.init()\n```\n\nAfter initialization:\n```js\nZYNQ.games.list\nZYNQ.games.total\n```"
+          "content": "# ZYNQ Games\n\nZYNQ Games is a client-side game library engine.\nNo backend required. Everything runs in the browser.\n\n## Installation\n\n### Script tag\n```html\n<script src=\"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.5/index.min.js\"></script>\n```\n\n### ES Module\n```js\nimport \"https://cdn.jsdelivr.net/gh/un-zynq/zynq-lib@1.1.5/index.min.js\"\n```\n\n## Usage\n```js\nawait ZYNQ.games.init()\n```\n\nAfter initialization:\n```js\nZYNQ.games.list\nZYNQ.games.total\n```"
         }
       ]
     },
